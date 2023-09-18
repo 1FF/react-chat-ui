@@ -10,8 +10,13 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^1.9.5",
+    "prop-types": "^15.8.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-redux": "^8.1.2",
+    "redux-persist": "^6.0.0",
+    "tailwind-variants": "^0.1.14"
   },
   "devDependencies": {
     "@babel/core": "^7.22.11",

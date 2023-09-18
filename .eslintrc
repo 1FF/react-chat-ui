@@ -41,10 +41,16 @@
   },
   "rules": {
     "react/react-in-jsx-scope": 0,
+    "react/forbid-prop-types": 0,
     "react/jsx-one-expression-per-line": 0,
     "react/jsx-curly-spacing": [1, { "when": "always", "children": true, "allowMultiline": false }],
+    "react/require-default-props": [1, { "forbidDefaultForRequired": true, "functions": "defaultArguments" }],
     "react-refresh/only-export-components": ["warn", { "allowConstantExport": true }],
     "react/jsx-max-props-per-line": [1, { "maximum": 2 }],
+    "react/function-component-definition": [1, {
+      "namedComponents": "arrow-function",
+      "unnamedComponents": "arrow-function"
+    }],
     "import/extensions": ["error", "always",
       {
         "js": "never",
