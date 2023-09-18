@@ -12,3 +12,5 @@ export const assistant = {
     time: new Date()
   },
 };
+
+export default { assistant };

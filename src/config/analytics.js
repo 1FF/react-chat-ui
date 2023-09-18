@@ -1,5 +1,6 @@
 import { getKeys } from '@/utils';
 
+// DEV Note: TS Enum
 export const baseEvents = {
   addToCart: 'AddToCart',
   contact: 'Contact',
@@ -20,6 +21,7 @@ export const baseEvents = {
   transactionRefund: 'TransactionRefund',
 };
 
+// DEV Note: TS Enum
 export const customEvents = {
   firstMessage: 'FirstMessage',
   linkProvided: 'LinkProvided',
