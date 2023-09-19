@@ -7,6 +7,7 @@ export const config = {
   reconnect: true,
 };
 
+// DEV Note: TS Enum
 export const events = {
   chat: 'chat',
   chatHistory: 'chat-history',
@@ -17,3 +18,5 @@ export const events = {
   streamEnd: 'stream-end',
   streamError: 'stream-error',
 };
+
+export default { config, events };
