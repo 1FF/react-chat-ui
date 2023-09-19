@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 
@@ -50,9 +49,7 @@ const initialConfig = {
 ReactDOM
   .createRoot(document.getElementById('root'))
   .render(
-    <React.StrictMode>
-      <Provider store={ store }>
-        <AppBase config={ initialConfig } />
-      </Provider>
-    </React.StrictMode>
+    <Provider store={ store }>
+      <AppBase config={ initialConfig } />
+    </Provider>
   );

@@ -34,10 +34,10 @@ export const streamBubble = /*tw*/ tv({
       },
     },
     type: {
-      response: {
+      assistant: {
         base: 'tw--justify-self-start',
       },
-      request: {
+      user: {
         base: 'tw--justify-self-end',
       },
     },
@@ -46,25 +46,25 @@ export const streamBubble = /*tw*/ tv({
     {
       slots: ['base'],
       theme: 'light',
-      type: 'request',
+      type: 'user',
       class: 'tw--bg-light-seraph tw--text-white',
     },
     {
       slots: ['base'],
       theme: 'light',
-      type: 'response',
+      type: 'assistant',
       class: 'tw--bg-light-lumina',
     },
     {
       slots: ['base'],
       theme: 'dark',
-      type: 'request',
+      type: 'user',
       class: 'tw--bg-dark-seraph',
     },
     {
       slots: ['base'],
       theme: 'dark',
-      type: 'response',
+      type: 'assistant',
       class: 'tw--bg-dark-lumina',
     },
   ],

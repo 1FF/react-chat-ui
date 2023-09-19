@@ -15,4 +15,8 @@ export const config = {
   themeId: null,
 };
 
-export default { meta, config };
+export const stream = {
+  history: [],
+};
+
+export default { meta, config, stream };
