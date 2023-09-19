@@ -3,14 +3,15 @@ import { useAppDispatch } from '@/hooks';
 
 import { setConfig, setTheme } from '@/store/slices/config';
 import { setMeta } from '@/store/slices/meta';
-
+import * as nodeEvents from 'events';
 import { LayoutBase, LayoutHead, LayoutFoot } from '@/components/Layout';
 import { StreamBase } from '@/components/Stream';
 
+const eventEmitter = new nodeEvents.EventEmitter();
 export const AppBase = ({ config = {} }) => {
   const dispatch = useAppDispatch();
   const setUiTheme = (theme = null) => dispatch(setTheme(theme));
-
+  console.log(eventEmitter);
   // Set defaults
   dispatch(setMeta(config.meta));
   dispatch(setConfig(config.app));
