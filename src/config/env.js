@@ -8,3 +8,4 @@ export const SOCKET_IO_URL = 'http://localhost:5000';
 export const UNSENT_MESSAGES_KEY = 'unsent';
 export const GO_THROUGH_QUIZ_KEY = 'hasToGoThroughQuiz';
 export const EXISTING_PRODUCT_LINK_KEY = 'existingProductLink';
+export const CID = 'cid';
