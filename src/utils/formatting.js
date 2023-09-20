@@ -1,3 +1,4 @@
+import { dateFormattingOptions } from '../config';
 import { CHAT_SEEN_KEY, CID } from '../config/env';
 // eslint-disable-next-line import/prefer-default-export
 
@@ -16,47 +17,36 @@ export const extractOptionSet = (val) => {
     return { content: val, options: [] };
   }
 
-  const [, optionsStr] = match;
-  const options = optionsStr.split('|');
-
   return {
     content: val.replace(match[0], ''),
-    options: options.map((item, index) => ({ id: `opt-${index}`, label: item, value: item })),
+    options: match[1].split('|').map((item, index) => ({ id: `opt-${index}`, label: item, value: item })),
   };
-};
-
-const dateFormattingOptions = {
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-  hour: 'numeric',
-  minute: 'numeric',
 };
 
 /**
  * Formats a date string according to the locale, including the date and time.
  *
- * @param {string} dateString - The date string to be formatted.
+ * @param {string} val - The date string to be formatted.
  * @returns {string} - The formatted date and time string.
  */
-export const formatDateByLocale = (dateString, locale = undefined, options = dateFormattingOptions) => {
-  const date = new Date(dateString);
+export const formatDateByLocale = (val, locale = undefined, options = dateFormattingOptions) => {
+  const date = new Date(val);
   const formattedDate = date.toLocaleDateString(locale, options);
 
-  return `${formattedDate}`.toUpperCase();
+  return formattedDate;
 };
 
 /**
  * Extracts a link from a given string and appends query parameters if specified.
  *
- * @param {string} string - The input string from which the link will be extracted.
+ * @param {string} val - The input string from which the link will be extracted.
  * @param {string} userId - The user ID used for query parameter construction.
  * @param {boolean} [hasQuery=false] - Indicates whether to append query parameters.
  * @example constructLink('here is a link to a diet website https://usa.example.com', '12311231a2', hasQueryParams('https://usa.example.com'));
  * //output: https://usa.example.com/?utm_chat=salesmen-keto-redirect&chatSeen=true&cid=12311231a2
  * @returns {string|boolean} The extracted link with optional query parameters or `false` if no link is found.
  */
-export const constructLink = (string, userId, hasQuery = false) => {
+export const constructLink = (val, userId, hasQuery = false) => {
   // matching example: 'Secure site: https://www.example.com' will give [ https://www.example.com ]
   const REGEX_URL = /\b((?:https?:\/\/|www\.)[^\s/$.?#][^\s{}[\]()<>]*)\b/gi;
   let search = '';
@@ -70,7 +60,7 @@ export const constructLink = (string, userId, hasQuery = false) => {
   }
 
   // Extract the link from the string
-  const matches = string.match(REGEX_URL);
+  const matches = val.match(REGEX_URL);
   const link = matches ? matches[0] : '';
 
   if (!link) {

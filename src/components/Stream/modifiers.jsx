@@ -1,13 +1,13 @@
-import { constructLink } from '../../utils/formatting';
+import { constructLink } from '@/utils/formatting';
 /**
 * Replaces all string links with anchor tags.
 * @example { replaceLinksWithAnchors('hello nice to see you here is a link to diet http://www.yourketo.diet') }
 */
-export const replaceLinksWithAnchors = (text) => {
+export const replaceLinksWithAnchors = (val) => {
   // This pattern will exclude {https://test.test.test} or any of those symbols {}[]()<> at the end of the link
   const pattern = /((?:https?:\/\/|www\.)[^\s/$.?#].[^\s{}[\]()<>]*)/gi;
 
-  const parts = text.split(pattern);
+  const parts = val.split(pattern);
 
   return parts.map((part) => {
     if (pattern.test(part)) {
