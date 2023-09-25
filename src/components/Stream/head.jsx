@@ -3,10 +3,11 @@ import { useAppSelector } from '@/hooks';
 import { isNonEmptyStr } from '@/utils';
 
 import { Profile } from '@/components/Profile';
+import { getConfig } from '@/store/slices/config';
 import { streamHead as variant } from './variants';
 
 export const StreamHead = ({ titleTxt = '' }) => {
-  const { themeId: theme } = useAppSelector((state) => state.config);
+  const { themeId: theme } = useAppSelector(getConfig);
   const { base, title } = variant({ theme });
 
   const hasTitle = isNonEmptyStr(titleTxt);
