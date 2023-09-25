@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   testEnvironment: 'jsdom',
   testMatch: ['**/__tests__/**/*.js', '**/?(*.)+(spec|test).(js|jsx)'],
   moduleFileExtensions: ['js', 'jsx', 'json', 'node'],

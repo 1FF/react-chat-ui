@@ -1,5 +1,5 @@
 /* eslint-env jest */
-import { isNull } from '../../../src/utils';
+import { isNull } from '@/utils';
 
 describe('utils', () => {
   it('isNull returns true for null', () => {

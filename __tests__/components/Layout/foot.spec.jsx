@@ -1,7 +1,7 @@
 /* eslint-env jest */
 import { render } from '@testing-library/react';
 import { useAppSelector } from '@/hooks';
-import LayoutFoot from '../../../src/components/Layout/foot';
+import LayoutFoot from '@/components/Layout/foot';
 
 jest.mock('@/hooks');
 

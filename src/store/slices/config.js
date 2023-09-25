@@ -28,6 +28,8 @@ const configSlice = createSlice({
   },
 });
 
+export const selectConfig = (state) => state.config;
+
 // DEV NOTE: the createSlice function automatically create both action creator functions
 export const {
   setConfig, resetConfig,
