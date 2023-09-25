@@ -2,7 +2,7 @@
 import { render } from '@testing-library/react';
 import { useAppSelector } from '@/hooks';
 import { faker } from '@faker-js/faker';
-import LayoutHead from '@/components/Layout/head';
+import { LayoutHead } from '@/components/Layout';
 
 jest.mock('@/hooks');
 

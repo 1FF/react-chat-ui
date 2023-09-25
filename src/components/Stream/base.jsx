@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 import { useAppSelector } from '@/hooks';
 
+import { getConfig } from '@/store/slices/config';
 import { StreamHead } from './head';
 import { StreamRow } from './row';
 import { streamBase as variant } from './variants';
@@ -39,7 +40,7 @@ const demoMessages = [
 ];
 
 export const StreamBase = () => {
-  const { themeId: theme } = useAppSelector((state) => state.config);
+  const { themeId: theme } = useAppSelector(getConfig);
   const isAwaitingResponse = false; // DEV Note: will be comming from global state
   const { base } = variant({ theme });
 

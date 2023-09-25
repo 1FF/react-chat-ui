@@ -1,11 +1,12 @@
 import { object } from 'prop-types';
 import { useAppSelector } from '@/hooks';
 
+import { getConfig } from '@/store/slices/config';
 import { StreamBubble } from './bubble';
 import { streamRow as variant } from './variants';
 
 export const StreamRow = ({ item = {} }) => {
-  const { themeId: theme } = useAppSelector((state) => state.config);
+  const { themeId: theme } = useAppSelector(getConfig);
   const { base } = variant({ theme });
 
   return (

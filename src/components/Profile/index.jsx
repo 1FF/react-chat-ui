@@ -1,10 +1,11 @@
 import { string, bool } from 'prop-types';
 import { useAppSelector } from '@/hooks';
 
+import { getConfig } from '@/store/slices/config';
 import { profile as variant } from './variants';
 
 export const Profile = ({ orientation = 'horizontal', minimized = false }) => {
-  const { aiProfile, themeId: theme } = useAppSelector((state) => state.config);
+  const { aiProfile, themeId: theme } = useAppSelector(getConfig);
   const { base, avatar, info, name, role } = variant({ theme, orientation, minimized });
 
   return (

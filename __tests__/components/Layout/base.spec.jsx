@@ -1,7 +1,7 @@
 /* eslint-env jest */
 import { render } from '@testing-library/react';
 import { useAppSelector } from '@/hooks';
-import LayoutBase from '@/components/Layout/base';
+import { LayoutBase } from '@/components/Layout';
 
 const original = console.error;
 jest.mock('@/hooks');

@@ -1,9 +1,10 @@
 import { useAppSelector } from '@/hooks';
 
+import { getConfig } from '@/store/slices/config';
 import { layoutFoot as variant } from './variants';
 
 export const LayoutFoot = () => {
-  const { themeId: theme } = useAppSelector((state) => state.config);
+  const { themeId: theme } = useAppSelector(getConfig);
   const { base } = variant({ theme });
 
   return (
