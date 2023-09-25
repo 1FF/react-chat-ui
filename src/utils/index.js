@@ -187,7 +187,7 @@ export const debounce = ({ timeout, id }) => {
 };
 
 /**
- * @desc Hide page scroll
+ * @description Hide page scroll
  */
 export const hidePageScroll = () => {
   document.documentElement.classList.add('hide-scroll');
@@ -198,4 +198,47 @@ export const hidePageScroll = () => {
  */
 export const showPageScroll = () => {
   document.documentElement.classList.remove('hide-scroll');
+};
+
+/**
+ * Checks if a URL contains query parameters.
+ *
+ * @param {string} url - The URL to check for query parameters.
+ * @returns {boolean} `true` if the URL contains query parameters, `false` otherwise.
+ */
+export const hasQueryParams = (url) => {
+  // Regular expression pattern to match query parameters
+  const pattern = /[?&]([^=#]+)=([^&#]*)/g;
+
+  // Check if the pattern matches any query parameters
+  return pattern.test(url);
+};
+
+/**
+ * Retrieves certain query parameter from a URL.
+ *
+ * @example getQueryParam(window.location.search, 'utm_chat')
+ * @param {string} url
+ * @param {string} param
+ */
+export const getQueryParam = (url, param) => {
+  const urlParams = new URLSearchParams(url);
+
+  return urlParams.get(param);
+};
+
+/**
+ * Checks if 24 hours have passed since the given date.
+ *
+ * @function isExpired
+ * @param {string} date - The date to compare in ISO 8601 format (e.g., "2023-07-04T14:11:00.097Z").
+ * @returns {boolean} Returns true if 24 hours have passed since the given date, or false otherwise.
+ */
+export const isExpired = (date, maxHours = 24) => {
+  const currentDate = new Date();
+  const givenDate = new Date(date);
+  const elapsedMilliseconds = currentDate - givenDate;
+  const elapsedHours = elapsedMilliseconds / (1000 * 60 * 60); // Convert milliseconds to hours
+
+  return elapsedHours >= maxHours;
 };
