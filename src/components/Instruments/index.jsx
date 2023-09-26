@@ -1,12 +1,15 @@
 import { useAppDispatch, useAppSelector } from '@/hooks';
-import { setTheme } from '@/store/slices/config';
+import { getConfig, setTheme } from '@/store/slices/config';
+import buttons from './variants';
 
 const Instruments = () => {
   const dispatch = useAppDispatch();
   const setUiTheme = (theme = null) => dispatch(setTheme(theme));
-  const isVisible = useAppSelector((state) => state.config.isVisible);
+  const { tools: hasTools } = useAppSelector(getConfig);
+  const { base } = buttons({ hidden: !hasTools });
+
   return (
-    <div className="tw--fixed tw--flex tw--gap-2 tw--p-3 tw--bg-black tw--text-white">
+    <div className={ base() }>
       <button
         type="button"
         onClick={ () => setUiTheme('light') }

@@ -13,7 +13,7 @@ export const config = {
     displayInStream: false,
   },
   themeId: null,
-  instrumentsVisible: true
+  tools: true
 };
 
 export default { meta, config };
