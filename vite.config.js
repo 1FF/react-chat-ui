@@ -2,11 +2,15 @@ import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import eslint from 'vite-plugin-eslint';
-import postcssConfig from './postcss.config';
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
+import path from "path";
+import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
+import tailwind from 'tailwindcss';
+import autoprefixer from 'autoprefixer';
+import tailwindConfig from './tailwind.config';
 
 export default defineConfig({
-  plugins: [react(), eslint(), nodePolyfills({ include: ['events'] })],
+  plugins: [react(), eslint(), nodePolyfills({ include: ['events'] }), cssInjectedByJsPlugin({styleId: 'chat-styles'}),],
   resolve: {
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json'],
     alias: {
@@ -18,6 +22,24 @@ export default defineConfig({
     port: 5173,
   },
   css: {
-    postcss: postcssConfig,
+    postcss: {
+      plugins: [tailwind(tailwindConfig), autoprefixer],
+    },
+  },
+  build: {
+    lib: {
+      entry: path.resolve(__dirname, "./src/main.jsx"),
+      name: "ReactBotClient",
+      fileName: (format) => `index.${format}.js`,
+    },
+    rollupOptions: {
+      external: [
+        "react", "react-dom", "react-redux",
+        "redux-persist", "socket.io-client", "@reduxjs/toolkit",
+        "prop-types", "events"
+      ],
+    },
+    sourcemap: true,
+    emptyOutDir: true,
   },
 });
