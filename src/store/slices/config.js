@@ -11,11 +11,13 @@ const configSlice = createSlice({
       console.log(payload);
       state.aiProfile = payload.aiProfile;
       state.themeId = payload.themeId;
+      state.instrumentsVisible = true;
     },
     // set App Config
     resetConfig(state) {
       state.aiProfile = initialState.aiProfile;
       state.themeId = initialState.themeId;
+      state.instrumentsVisible = true;
     },
     // set theme config
     setTheme(state, { payload }) {
