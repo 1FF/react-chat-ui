@@ -1,12 +1,12 @@
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { getConfig, setTheme } from '@/store/slices/config';
-import buttons from './variants';
+import { wrapper } from './variants';
 
 const Instruments = () => {
   const dispatch = useAppDispatch();
   const setUiTheme = (theme = null) => dispatch(setTheme(theme));
-  const { tools: hasTools } = useAppSelector(getConfig);
-  const { base } = buttons({ hidden: !hasTools });
+  const { devToolsEnabled } = useAppSelector(getConfig);
+  const { base } = wrapper({ hidden: !devToolsEnabled });
 
   return (
     <div className={ base() }>

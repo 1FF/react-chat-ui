@@ -1,14 +1,12 @@
 {
-  "name": "vite-react-starter",
+  "name": "react-aibot-client",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "module": "dist/index.es.js",
+  "main": "dist/index.es.js",
   "exports": {
-    ".": {
-      "import": "./dist/index.es.js",
-      "require": "./dist/index.umd.js"
-    }
+    ".": "./dist/index.es.js"
   },
   "files": [
     "/dist"

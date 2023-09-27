@@ -10,7 +10,7 @@ import autoprefixer from 'autoprefixer';
 import tailwindConfig from './tailwind.config';
 
 export default defineConfig({
-  plugins: [react(), eslint(), nodePolyfills({ include: ['events'] }), cssInjectedByJsPlugin({styleId: 'chat-styles'}),],
+  plugins: [react(), eslint(), nodePolyfills({ include: ['events'] }), cssInjectedByJsPlugin({ styleId: 'chat-ai-client-tw' }),],
   resolve: {
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json'],
     alias: {
@@ -33,6 +33,7 @@ export default defineConfig({
       fileName: (format) => `index.${format}.js`,
     },
     rollupOptions: {
+      output: { exports: "default" },
       external: [
         "react", "react-dom", "react-redux",
         "redux-persist", "socket.io-client", "@reduxjs/toolkit",
