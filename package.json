@@ -15,6 +15,8 @@
     "access": "public"
   },
   "scripts": {
+    "dev": "NODE_ENV=development vite",
+    "prod": "NODE_ENV=production vite",
     "serve": "vite serve --host",
     "build": "vite build",
     "preview": "vite preview",
