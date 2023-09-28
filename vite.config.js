@@ -10,7 +10,7 @@ import autoprefixer from 'autoprefixer';
 import tailwindConfig from './tailwind.config';
 
 export default defineConfig({
-  plugins: [react(), eslint(), nodePolyfills({ include: ['events'] }), cssInjectedByJsPlugin({ styleId: 'chat-ai-client-tw' }),],
+  plugins: [react(), eslint(), nodePolyfills({ include: ['events'] }), cssInjectedByJsPlugin({ styleId: 'react-tw-ai-client' }),],
   resolve: {
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json'],
     alias: {

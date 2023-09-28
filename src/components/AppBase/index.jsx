@@ -6,7 +6,7 @@ import { setMeta } from '@/store/slices/meta';
 import * as nodeEvents from 'events';
 import { LayoutBase, LayoutHead, LayoutFoot } from '@/components/Layout';
 import { StreamBase } from '@/components/Stream';
-import Instruments from '@/components/Instruments';
+import DevTools from '@/components/DevTools';
 
 const eventEmitter = new nodeEvents.EventEmitter();
 export const AppBase = ({ config = {} }) => {
@@ -18,7 +18,7 @@ export const AppBase = ({ config = {} }) => {
 
   return (
     <>
-      <Instruments />
+      <DevTools />
       <LayoutBase
         head={ <LayoutHead /> }
         stream={ <StreamBase /> }

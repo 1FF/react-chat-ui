@@ -2,7 +2,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks';
 import { getConfig, setTheme } from '@/store/slices/config';
 import { wrapper } from './variants';
 
-const Instruments = () => {
+const DevTools = () => {
   const dispatch = useAppDispatch();
   const setUiTheme = (theme = null) => dispatch(setTheme(theme));
   const { devToolsEnabled } = useAppSelector(getConfig);
@@ -27,4 +27,4 @@ const Instruments = () => {
   );
 };
 
-export default Instruments;
+export default DevTools;
