@@ -20,21 +20,22 @@ const configSlice = createSlice({
     resetTheme(state) {
       state.themeId = initialState.themeId;
     },
-    enableDevTools(state) {
-      state.devToolsEnabled = true;
+    setDevToolsStatus(state, { payload }) {
+      state.enableDevTools = payload;
     },
-    disableDevTools(state) {
-      state.devToolsEnabled = false;
-    }
+    resetDevToolsStatus(state) {
+      state.enableDevTools = initialState.enableDevTools;
+    },
   },
 });
 
 export const getConfig = ({ config }) => config;
+export const getDevToolsStatus = ({ config }) => config.devToolsEnabled;
 
 // DEV NOTE: the createSlice function automatically create both action creator functions
 export const {
   setConfig, resetConfig,
   setTheme, resetTheme,
-  enableDevTools, disableDevTools
+  setDevToolsStatus, resetDevToolsStatus,
 } = configSlice.actions;
 export default configSlice.reducer;

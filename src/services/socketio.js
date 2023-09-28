@@ -5,10 +5,12 @@ const { chatHistory, disconnect, streamStart, streamData, streamEnd } = events;
 
 export const connectSocket = (serverUrl, { onConnect, onHistory, onStreamStart, onStreamData, onStreamEnd }) => {
   const socket = io.connect(serverUrl, config);
+
   socket.on(events.connect, () => {
     socket.emit(events.chatHistory, { user_id: localStorage.getItem('__cid') }); // Extract this from store meta slice
     onConnect();
   });
+
   socket.on(chatHistory, onHistory);
   socket.on(disconnect, () => console.log('Disconnected from socket'));
   socket.on(streamStart, onStreamStart);

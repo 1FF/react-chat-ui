@@ -13,7 +13,15 @@ export const config = {
     displayInStream: false,
   },
   themeId: null,
-  devToolsEnabled: process.env.NODE_ENV === 'development',
+  enableDevTools: false,
 };
 
-export default { meta, config };
+export const stream = {
+  streamPointer: null,
+  queue: [],
+  history: [],
+  status: null,
+  error: null,
+};
+
+export default { meta, config, stream };

@@ -2,11 +2,11 @@ import { useAppDispatch, useAppSelector } from '@/hooks';
 import { getConfig, setTheme } from '@/store/slices/config';
 import { wrapper } from './variants';
 
-const DevTools = () => {
+export const DevTools = () => {
   const dispatch = useAppDispatch();
   const setUiTheme = (theme = null) => dispatch(setTheme(theme));
-  const { devToolsEnabled } = useAppSelector(getConfig);
-  const { base } = wrapper({ hidden: !devToolsEnabled });
+  const { enableDevTools } = useAppSelector(getConfig);
+  const { base } = wrapper({ hidden: !enableDevTools });
 
   return (
     <div className={ base() }>
