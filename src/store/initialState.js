@@ -1,3 +1,15 @@
+import { baseEventsArr, customEventsArr } from '@/config/analytics';
+
+const baseEvents = baseEventsArr.reduce((acc, cur) => {
+  acc[cur] = { executed: false };
+  return acc;
+}, {});
+
+const customEvents = customEventsArr.reduce((acc, cur) => {
+  acc[cur] = { executed: false };
+  return acc;
+}, {});
+
 export const meta = {
   pd: null,
   cid: null,
@@ -47,4 +59,11 @@ export const intentions = {
   }
 };
 
-export default { meta, config, stream, intentions };
+export const analytics = {
+  events: {
+    ...baseEvents,
+    ...customEvents,
+  }
+};
+
+export default { meta, config, analytics, intentions, stream };

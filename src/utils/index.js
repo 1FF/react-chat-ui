@@ -133,7 +133,7 @@ export const eachProp = (obj, callback) => {
 };
 
 /**
- * @description Extract nexted prop
+ * @description Extract nested prop
  * @param obj
  * @param keysText
  * @returns {*}
