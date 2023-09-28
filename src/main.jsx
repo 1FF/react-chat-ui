@@ -47,12 +47,14 @@ const initialConfig = {
   },
 };
 
-ReactDOM
-  .createRoot(document.getElementById('root'))
-  .render(
-    <React.StrictMode>
+const ReactBotClient = (config) => {
+  ReactDOM
+    .createRoot(config.root)
+    .render(
       <Provider store={ store }>
-        <AppBase config={ initialConfig } />
+        <AppBase config={ config.initialConfig || initialConfig } />
       </Provider>
-    </React.StrictMode>
-  );
+    );
+};
+
+export default ReactBotClient;

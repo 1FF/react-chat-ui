@@ -13,6 +13,7 @@ export const config = {
     displayInStream: false,
   },
   themeId: null,
+  devToolsEnabled: process.env.NODE_ENV === 'development',
 };
 
 export default { meta, config };

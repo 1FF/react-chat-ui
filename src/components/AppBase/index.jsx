@@ -1,16 +1,16 @@
 import { object } from 'prop-types';
 import { useAppDispatch } from '@/hooks';
 
-import { setConfig, setTheme } from '@/store/slices/config';
+import { setConfig } from '@/store/slices/config';
 import { setMeta } from '@/store/slices/meta';
 import * as nodeEvents from 'events';
 import { LayoutBase, LayoutHead, LayoutFoot } from '@/components/Layout';
 import { StreamBase } from '@/components/Stream';
+import DevTools from '@/components/DevTools';
 
 const eventEmitter = new nodeEvents.EventEmitter();
 export const AppBase = ({ config = {} }) => {
   const dispatch = useAppDispatch();
-  const setUiTheme = (theme = null) => dispatch(setTheme(theme));
   console.log(eventEmitter);
   // Set defaults
   dispatch(setMeta(config.meta));
@@ -18,27 +18,13 @@ export const AppBase = ({ config = {} }) => {
 
   return (
     <>
-      <div className="tw--fixed tw--flex tw--gap-2 tw--p-3 tw--bg-black tw--text-white">
-        <button
-          type="button"
-          onClick={ () => setUiTheme('light') }
-        >
-          Light
-        </button>
-
-        <button
-          type="button"
-          onClick={ () => setUiTheme('dark') }
-        >
-          Dark
-        </button>
-      </div>
-
+      <DevTools />
       <LayoutBase
         head={ <LayoutHead /> }
         stream={ <StreamBase /> }
         foot={ <LayoutFoot /> }
       />
+
     </>
   );
 };
