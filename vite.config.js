@@ -2,8 +2,8 @@ import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import eslint from 'vite-plugin-eslint';
-import { nodePolyfills } from 'vite-plugin-node-polyfills'
-import path from "path";
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import path from 'path';
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
 import tailwind from 'tailwindcss';
 import autoprefixer from 'autoprefixer';
@@ -28,16 +28,16 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: path.resolve(__dirname, "./src/main.jsx"),
-      name: "ReactBotClient",
+      entry: path.resolve(__dirname, './src/main.jsx'),
+      name: 'ReactBotClient',
       fileName: (format) => `index.${format}.js`,
     },
     rollupOptions: {
-      output: { exports: "default" },
+      output: { exports: 'default' },
       external: [
-        "react", "react-dom", "react-redux",
-        "redux-persist", "socket.io-client", "@reduxjs/toolkit",
-        "prop-types", "events"
+        'react', 'react-dom', 'react-redux',
+        'redux-persist', 'socket.io-client', '@reduxjs/toolkit',
+        'prop-types', 'events'
       ],
     },
     sourcemap: true,

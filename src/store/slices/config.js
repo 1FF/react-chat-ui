@@ -26,6 +26,9 @@ const configSlice = createSlice({
     resetDevToolsStatus(state) {
       state.enableDevTools = initialState.enableDevTools;
     },
+    togglePluginMode(state) {
+      state.isPluginMode = !state.isPluginMode;
+    },
   },
 });
 
@@ -37,5 +40,6 @@ export const {
   setConfig, resetConfig,
   setTheme, resetTheme,
   setDevToolsStatus, resetDevToolsStatus,
+  togglePluginMode
 } = configSlice.actions;
 export default configSlice.reducer;

@@ -22,7 +22,7 @@ export const streamRow = /*tw*/ tv({
 
 export const streamBubble = /*tw*/ tv({
   slots: {
-    base: 'tw--max-w-[50%] tw--px-4 tw--py-3',
+    base: 'tw--max-w-xs tw--px-4 tw--py-3',
   },
   variants: {
     theme: {

@@ -7,9 +7,10 @@ import { layoutBase as variant } from './variants';
 export const LayoutBase = ({ head, stream, foot }) => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { base, wrapper } = variant({ theme });
+  const { isPluginMode } = useAppSelector(getConfig);
 
   return (
-    <div className={ base() }>
+    <div className={ base({ minimized: isPluginMode }) }>
       <div className={ wrapper() }>
         { head }
         { stream }
