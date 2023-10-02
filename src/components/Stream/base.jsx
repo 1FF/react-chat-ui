@@ -18,7 +18,7 @@ export const StreamBase = () => {
       { history.map((message) => (
         <StreamRow key={ message.id } item={ message } />)
       ) }
-      { downstreamQueue && <StreamRow key={ downstreamQueue.id } item={ downstreamQueue } /> }
+      { downstreamQueue && <StreamRow item={ downstreamQueue } /> }
       { isAwaitingResponse && <div>loading</div> }
     </div>
   );
