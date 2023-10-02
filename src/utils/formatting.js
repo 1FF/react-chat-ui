@@ -7,18 +7,18 @@ import { CHAT_SEEN_KEY, CID } from '../config/env';
  *
  * @param {string} val - The input string possibly containing options enclosed in square brackets.
  * @returns {Object} An object containing the content with options removed and an array of extracted options.
- * @property {string} content - The content with options removed.
+ * @property {string} message - The content with options removed.
  * @property {Array<{id: string, label: string, value: string}>} options - An array of extracted options as objects.
  */
 export const extractOptionSet = (val) => {
   const match = /\[(.*?)\]/.exec(val);
 
   if (!match || match.length <= 1) {
-    return { content: val, options: [] };
+    return { message: val, options: [] };
   }
 
   return {
-    content: val.replace(match[0], ''),
+    message: val.replace(match[0], ''),
     options: match[1].split('|').map((item, index) => ({ id: `opt-${index}`, label: item, value: item })),
   };
 };

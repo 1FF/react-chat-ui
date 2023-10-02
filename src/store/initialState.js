@@ -18,7 +18,8 @@ export const config = {
 
 export const stream = {
   streamPointer: null,
-  queue: [],
+  upstreamQueue: null,
+  downstreamQueue: null,
   history: [],
   status: null,
   error: null,
