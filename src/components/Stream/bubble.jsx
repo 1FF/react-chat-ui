@@ -6,13 +6,13 @@ import { setQueueItem } from '@/store/slices/stream';
 
 import { Button } from '@/components/Button';
 import { streamBubble as variant } from './variants';
+import Typewriter from '../Typewriter';
 
 export const StreamBubble = ({ item = {} }) => {
   const dispatch = useAppDispatch();
   const { themeId: theme } = useAppSelector(getConfig);
   const { base } = variant({ theme, type: item.role });
   const hasOptions = isNonEmptyArr(item.options);
-
   const setOption = (val) => {
     dispatch(setQueueItem(val));
   };
@@ -28,7 +28,8 @@ export const StreamBubble = ({ item = {} }) => {
 
   return (
     <div className={ base() }>
-      { item.content }
+      { /* DEVNOTE: need a flag to use the typewriter */ }
+      <Typewriter text={ item.content } />
       { hasOptions && <div className="tw--flex tw--flex-col"><OptionList items={ item.options } /></div> }
     </div>
   );
