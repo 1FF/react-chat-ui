@@ -6,6 +6,7 @@ import { isNonEmptyArr } from '@/utils';
 
 import { Button } from '@/components/Button';
 import { streamBubble as variant } from './variants';
+import { replaceStringInCurlyBracketsWithStrong } from './modifiers';
 
 export const StreamBubble = ({ item = {} }) => {
   const dispatch = useAppDispatch();
@@ -30,7 +31,7 @@ export const StreamBubble = ({ item = {} }) => {
 
   return (
     <div className={ base() }>
-      { item.message }
+      { replaceStringInCurlyBracketsWithStrong(item.message) }
       { displayOptionList && <div className="tw--flex tw--flex-col"><OptionList items={ item.options } /></div> }
     </div>
   );
