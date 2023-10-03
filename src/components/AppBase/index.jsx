@@ -11,7 +11,6 @@ import { StreamBase } from '@/components/Stream';
 import { DevTools } from '@/components/DevTools';
 
 const eventEmitter = new EventEmitter();
-console.log(eventEmitter);
 
 export const AppBase = ({ config = {} }) => {
   const dispatch = useAppDispatch();

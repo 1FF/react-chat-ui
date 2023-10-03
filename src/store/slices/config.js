@@ -7,7 +7,7 @@ const configSlice = createSlice({
   reducers: {
     // DEV NOTE: note that immer makes these immutable under the hood
     setConfig(state, { payload }) {
-      state.aiProfile = payload.aiProfile;
+      state.aiProfile = { ...initialState.aiProfile, ...payload.aiProfile };
       state.themeId = payload.themeId;
     },
     resetConfig(state) {

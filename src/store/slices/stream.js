@@ -2,53 +2,57 @@ import { createSlice } from '@reduxjs/toolkit';
 import { uid } from 'uid';
 import { stream as initialState } from '@/store/initialState';
 import { extractOptionSet } from '@/utils/formatting';
+import { getQueryParam } from '@/utils';
 
 const configSlice = createSlice({
   name: 'stream',
   initialState,
   reducers: {
     setStatus(state, { payload }) {
-      console.log(payload);
       state.status = payload;
     },
     resetStatus(state) {
       state.status = initialState.status;
     },
-    setPointer(state, { payload }) {
-      state.streamPointer = payload;
-    },
-    resetPointer(state) {
-      state.streamPointer = initialState.streamPointer;
-    },
+    // for SENDING messages
     setUpstreamItem(state, { payload }) {
-      const url = window.location.search;
-      const urlParams = new URLSearchParams(url);
-
       const nextQueueItem = {
-        term: urlParams.get('utm_chat'),
+        term: getQueryParam(window.location.search, 'utm_chat'),
         user_id: localStorage.getItem('__cid'),
         role: 'user',
         message: payload,
       };
-
-      // Reset the stream pointer cause it's we have a new history item proposition
-      configSlice.caseReducers.resetPointer(state);
-
-      // Set the proposed upstream object
       state.upstreamQueue = nextQueueItem;
     },
     resetUpstreamItem(state) {
       state.upstreamQueue = initialState.upstreamQueue;
     },
+    // for RECEIVING messages
+    setDownstreamItem(state, { payload }) {
+      const nextQueueItem = {
+        term: getQueryParam(window.location.search, 'utm_chat'),
+        user_id: localStorage.getItem('__cid'),
+        role: 'assistant',
+        message: payload,
+      };
+
+      state.downstreamQueue = nextQueueItem;
+    },
+    resetDownstreamItem(state) {
+      state.downstreamQueue = initialState.downstreamQueue;
+    },
+    setDownstreamMessage(state, { payload }) {
+      state.downstreamQueue = {
+        ...state.downstreamQueue,
+        message: state.downstreamQueue.message + payload.chunk,
+      };
+    },
     setHistory(state, { payload }) {
       const nextHistory = payload.map((item) => ({ id: uid(), role: item.role, ...extractOptionSet(item.content) }));
-      const nextPointer = nextHistory.slice(-1).pop().id;
-      console.log(payload);
       state.history = nextHistory;
-      configSlice.caseReducers.setPointer(state, { payload: nextPointer });
     },
-    updateHistory(state, { payload }) {
-      configSlice.caseReducers.setPointer(state, { payload: payload.id });
+    appendHistory(state, { payload }) {
+      state.history.push({ id: uid(), ...payload, ...extractOptionSet(payload.message) });
     },
     resetHistory(state) {
       state.history = initialState.history;
@@ -56,7 +60,5 @@ const configSlice = createSlice({
   },
 });
 
-export const getStreamPointer = ({ stream }) => stream.streamPointer;
-
-export const { setUpstreamItem, resetUpstreamItem, setHistory, resetHistory } = configSlice.actions;
+export const { setUpstreamItem, setDownstreamItem, resetDownstreamItem, setDownstreamMessage, resetUpstreamItem, setHistory, resetHistory, appendHistory } = configSlice.actions;
 export default configSlice.reducer;

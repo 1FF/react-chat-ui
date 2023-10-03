@@ -10,6 +10,7 @@ export const config = {
     name: null,
     role: null,
     imgSrc: null,
+    initialMessage: '',
     displayInStream: false,
   },
   themeId: null,
@@ -17,7 +18,6 @@ export const config = {
 };
 
 export const stream = {
-  streamPointer: null,
   upstreamQueue: null,
   downstreamQueue: null,
   history: [],

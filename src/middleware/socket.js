@@ -1,6 +1,6 @@
 import { config, events } from '@/config';
-import { setHistory } from '@/store/slices/stream';
-import { useDispatch } from 'react-redux';
+import { appendHistory, resetDownstreamItem, resetUpstreamItem, setDownstreamItem, setDownstreamMessage, setHistory, setUpstreamItem } from '@/store/slices/stream';
+import { getQueryParam } from '@/utils';
 import { io } from 'socket.io-client';
 
 const chatMiddleware = store => next => {
@@ -11,21 +11,50 @@ const chatMiddleware = store => next => {
   });
 
   socket.on(events.chatHistory, (data) => {
-    store.dispatch(setHistory(data.history));
-    console.log(data);
+    if (data.history.length) {
+      store.dispatch(setHistory(data.history));
+    } else {
+      socket.emit(events.chat, {
+        role: 'assistant',
+        term: getQueryParam(window.location.search, 'utm_chat'),
+        user_id: localStorage.getItem('__cid'),
+        message: store.getState().config.aiProfile.initialMessage
+      });
+      store.dispatch(setHistory([{ role: 'assistant', content: store.getState().config.aiProfile.initialMessage }]));
+    }
   });
 
-  // socket.onChat = (method) => socket.on(chat, method);
-  // socket.onStreamStart = (method) => socket.on(streamStart, method);
-  // socket.onStreamData = (method) => socket.on(streamData, method);
-  // socket.onStreamEnd = (method) => socket.on(streamEnd, method);
-  // socket.onStreamError = (method) => socket.on(streamError, method);
-  // socket.emitChat = (payload) => socket.emit(chat, payload);
-  // store.dispatch
+  socket.on(events.streamStart, () => {
+    store.dispatch(resetUpstreamItem());
+    store.dispatch(setDownstreamItem(''));
+  });
+
+  socket.on(events.streamData, ({ chunk }) => {
+    store.dispatch(setDownstreamMessage({ chunk }));
+  });
+
+  socket.on(events.streamEnd, () => {
+    store.dispatch(appendHistory(store.getState().stream.downstreamQueue));
+    store.dispatch(resetDownstreamItem());
+  });
+
+  socket.on(events.streamError, () => {
+    console.log('streamError');
+  });
 
   return action => {
     // here we listen for actions applied to the store and do stuff with the socket
-    console.log(action);
+    if (setUpstreamItem.match(action) && socket.connected) {
+      const data = {
+        term: getQueryParam(window.location.search, 'utm_chat'),
+        user_id: localStorage.getItem('__cid'),
+        role: 'user',
+        message: action.payload,
+      };
+      store.dispatch(appendHistory(data));
+      socket.emit(events.chat, data);
+    }
+
     next(action);
   };
 };

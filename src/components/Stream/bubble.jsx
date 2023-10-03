@@ -1,7 +1,7 @@
 import { object } from 'prop-types';
 import { useAppSelector, useAppDispatch } from '@/hooks';
 import { getConfig } from '@/store/slices/config';
-import { setUpstreamItem, getStreamPointer } from '@/store/slices/stream';
+import { setUpstreamItem } from '@/store/slices/stream';
 import { isNonEmptyArr } from '@/utils';
 
 import { Button } from '@/components/Button';
@@ -12,7 +12,7 @@ export const StreamBubble = ({ item = {} }) => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { base } = variant({ theme, type: item.role });
 
-  const currentPointer = useAppSelector(getStreamPointer);
+  const currentPointer = useAppSelector((state) => state.stream.history[state.stream.history.length - 1].id);
   const displayOptionList = isNonEmptyArr(item.options) && item.id === currentPointer;
 
   const setOption = (val) => {
