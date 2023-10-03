@@ -52,13 +52,19 @@ const configSlice = createSlice({
       state.history = nextHistory;
     },
     appendHistory(state, { payload }) {
-      state.history.push({ id: uid(), ...payload, ...extractOptionSet(payload.message) });
+      state.history.push({ id: uid(), ...extractOptionSet(payload.message), ...payload });
     },
     resetHistory(state) {
       state.history = initialState.history;
     },
+    setTextToParse(state, { payload }) {
+      state.textToParse += payload;
+    },
+    resetTextToParse(state) {
+      state.textToParse = initialState.textToParse;
+    }
   },
 });
 
-export const { setUpstreamItem, setDownstreamItem, resetDownstreamItem, setDownstreamMessage, resetUpstreamItem, setHistory, resetHistory, appendHistory } = configSlice.actions;
+export const { setUpstreamItem, setDownstreamItem, resetDownstreamItem, setDownstreamMessage, resetUpstreamItem, setHistory, resetHistory, appendHistory, setTextToParse, resetTextToParse } = configSlice.actions;
 export default configSlice.reducer;

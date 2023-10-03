@@ -20,6 +20,7 @@ export const config = {
 export const stream = {
   upstreamQueue: null,
   downstreamQueue: null,
+  textToParse: '',
   history: [],
   status: null,
   error: null,

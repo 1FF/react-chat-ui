@@ -1,6 +1,7 @@
 import { config, events } from '@/config';
-import { appendHistory, resetDownstreamItem, resetUpstreamItem, setDownstreamItem, setDownstreamMessage, setHistory, setUpstreamItem } from '@/store/slices/stream';
+import { appendHistory, resetDownstreamItem, resetTextToParse, resetUpstreamItem, setDownstreamItem, setDownstreamMessage, setHistory, setTextToParse, setUpstreamItem } from '@/store/slices/stream';
 import { getQueryParam } from '@/utils';
+import { extractOptionSet } from '@/utils/formatting';
 import { io } from 'socket.io-client';
 
 const chatMiddleware = store => next => {
@@ -30,12 +31,30 @@ const chatMiddleware = store => next => {
   });
 
   socket.on(events.streamData, ({ chunk }) => {
+    const { textToParse } = store.getState().stream;
+    if (chunk.includes('[')) {
+      store.dispatch(setTextToParse(chunk));
+      return;
+    }
+
+    if (chunk.includes(']') || textToParse) {
+      store.dispatch(setTextToParse(chunk));
+      return;
+    }
+
     store.dispatch(setDownstreamMessage({ chunk }));
   });
 
   socket.on(events.streamEnd, () => {
-    store.dispatch(appendHistory(store.getState().stream.downstreamQueue));
+    const { options } = extractOptionSet(store.getState().stream.textToParse);
+    const data = {
+      ...store.getState().stream.downstreamQueue,
+      options
+    };
+
+    store.dispatch(appendHistory(data));
     store.dispatch(resetDownstreamItem());
+    store.dispatch(resetTextToParse());
   });
 
   socket.on(events.streamError, () => {
