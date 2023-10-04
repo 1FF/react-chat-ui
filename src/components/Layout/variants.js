@@ -17,6 +17,9 @@ export const layoutBase = /*tw*/ tv({
         wrapper: 'tw--bg-dark-whisper tw--text-white tw--border-black',
       }
     },
+    minimized: {
+      true: 'tw--fixed tw--right-0 tw--bottom-0 tw--max-h-[700px] tw--max-w-md'
+    }
   },
   responsiveVariants: true, // ['sm', 'md']
 });

@@ -15,6 +15,7 @@ export const config = {
   },
   themeId: null,
   enableDevTools: false,
+  isPluginMode: false,
 };
 
 export const stream = {
