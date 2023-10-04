@@ -1,8 +1,8 @@
+import { io } from 'socket.io-client';
 import { config, events } from '@/config';
 import { appendHistory, resetDownstreamItem, resetTextToParse, resetUpstreamItem, setDownstreamItem, setDownstreamMessage, setHistory, setTextToParse, setUpstreamItem } from '@/store/slices/stream';
 import { getQueryParam } from '@/utils';
 import { extractOptionSet } from '@/utils/formatting';
-import { io } from 'socket.io-client';
 
 const chatMiddleware = store => next => {
   const socket = io.connect('https://chat-ws.test', config);
