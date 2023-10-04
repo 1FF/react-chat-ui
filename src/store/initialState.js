@@ -25,6 +25,7 @@ export const stream = {
   history: [],
   status: null,
   error: null,
+  isLoading: false,
 };
 
 export default { meta, config, stream };

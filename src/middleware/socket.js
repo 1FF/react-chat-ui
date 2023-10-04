@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 import { config, events } from '@/config';
-import { appendHistory, resetDownstreamItem, resetTextToParse, resetUpstreamItem, setDownstreamItem, setDownstreamMessage, setHistory, setTextToParse, setUpstreamItem } from '@/store/slices/stream';
+import { appendHistory, resetDownstreamItem, resetIsLoading, resetTextToParse, resetUpstreamItem, setDownstreamItem, setDownstreamMessage, setHistory, setIsLoading, setTextToParse, setUpstreamItem } from '@/store/slices/stream';
 import { getQueryParam } from '@/utils';
 import { extractOptionSet } from '@/utils/formatting';
 
@@ -8,10 +8,13 @@ const chatMiddleware = store => next => {
   const socket = io.connect('https://chat-ws.test', config);
 
   socket.on('connect', () => {
+    store.dispatch(setIsLoading());
     socket.emit(events.chatHistory, { user_id: localStorage.getItem('__cid') }); // Extract this from store meta slice and use the param
   });
 
   socket.on(events.chatHistory, (data) => {
+    store.dispatch(resetIsLoading());
+
     if (data.history.length) {
       store.dispatch(setHistory(data.history));
     } else {
@@ -26,6 +29,7 @@ const chatMiddleware = store => next => {
   });
 
   socket.on(events.streamStart, () => {
+    store.dispatch(resetIsLoading());
     store.dispatch(resetUpstreamItem());
     store.dispatch(setDownstreamItem(''));
   });
@@ -58,6 +62,7 @@ const chatMiddleware = store => next => {
   });
 
   socket.on(events.streamError, () => {
+    store.dispatch(resetIsLoading());
     console.log('streamError');
   });
 
@@ -71,6 +76,7 @@ const chatMiddleware = store => next => {
         message: action.payload,
       };
       store.dispatch(appendHistory(data));
+      store.dispatch(setIsLoading());
       socket.emit(events.chat, data);
     }
 

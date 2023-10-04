@@ -8,12 +8,6 @@ const configSlice = createSlice({
   name: 'stream',
   initialState,
   reducers: {
-    setStatus(state, { payload }) {
-      state.status = payload;
-    },
-    resetStatus(state) {
-      state.status = initialState.status;
-    },
     // for SENDING messages
     setUpstreamItem(state, { payload }) {
       const nextQueueItem = {
@@ -62,9 +56,15 @@ const configSlice = createSlice({
     },
     resetTextToParse(state) {
       state.textToParse = initialState.textToParse;
+    },
+    setIsLoading(state) {
+      state.isLoading = true;
+    },
+    resetIsLoading(state) {
+      state.isLoading = initialState.isLoading;
     }
   },
 });
 
-export const { setUpstreamItem, setDownstreamItem, resetDownstreamItem, setDownstreamMessage, resetUpstreamItem, setHistory, resetHistory, appendHistory, setTextToParse, resetTextToParse } = configSlice.actions;
+export const { setUpstreamItem, setDownstreamItem, resetDownstreamItem, setDownstreamMessage, resetUpstreamItem, setHistory, resetHistory, appendHistory, setTextToParse, resetTextToParse, setIsLoading, resetIsLoading } = configSlice.actions;
 export default configSlice.reducer;
