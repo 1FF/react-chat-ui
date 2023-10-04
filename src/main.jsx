@@ -41,6 +41,7 @@ const initialConfig = {
       role: 'AI-powered nutritionist',
       imgSrc: 'https://storage.1forfit.com/4oZrkOwbOQcSIGJopBG5qsf0CmBbVDKDqflzEkXq.jpg',
       displayInStream: true,
+      initialMessage: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you. [Continue]',
     },
     themeId: 'light',
   },

@@ -1,20 +1,24 @@
 import { object } from 'prop-types';
 import { useAppSelector, useAppDispatch } from '@/hooks';
 import { getConfig } from '@/store/slices/config';
+import { setUpstreamItem } from '@/store/slices/stream';
 import { isNonEmptyArr } from '@/utils';
-import { setQueueItem } from '@/store/slices/stream';
 
 import { Button } from '@/components/Button';
-import { streamBubble as variant } from './variants';
+import { flickerEffect, streamBubble as variant } from './variants';
+import { replaceStringInCurlyBracketsWithStrong } from './modifiers';
 
 export const StreamBubble = ({ item = {} }) => {
   const dispatch = useAppDispatch();
   const { themeId: theme } = useAppSelector(getConfig);
+  const currentPointer = useAppSelector((state) => state.stream.history[state.stream.history.length - 1].id);
+  const displayOptionList = isNonEmptyArr(item.options) && item.id === currentPointer;
+  const { downstreamQueue } = useAppSelector(state => state.stream);
   const { base } = variant({ theme, type: item.role });
-  const hasOptions = isNonEmptyArr(item.options);
+  const { base: baseFlicker } = flickerEffect({ isTyping: !!downstreamQueue && !item.id, theme });
 
   const setOption = (val) => {
-    dispatch(setQueueItem(val));
+    dispatch(setUpstreamItem(val));
   };
 
   const OptionList = ({ items = [] }) => (
@@ -28,8 +32,8 @@ export const StreamBubble = ({ item = {} }) => {
 
   return (
     <div className={ base() }>
-      { item.content }
-      { hasOptions && <div className="tw--flex tw--flex-col"><OptionList items={ item.options } /></div> }
+      <span className={ baseFlicker() }>{ replaceStringInCurlyBracketsWithStrong(item.message) }</span>
+      { displayOptionList && <div className="tw--flex tw--flex-col"><OptionList items={ item.options } /></div> }
     </div>
   );
 };
