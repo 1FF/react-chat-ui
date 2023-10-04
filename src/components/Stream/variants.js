@@ -86,4 +86,22 @@ export const streamBubble = /*tw*/ tv({
   ],
 });
 
-export default { streamBase, streamHead, streamRow, streamBubble };
+export const ellipsis = tv({
+  slots: {
+    dotFirst: 'tw--inline-block tw--h-[12px] tw--w-[12px] tw--rounded-full tw--mx-1 tw--my-1 tw--opacity-40 tw--animate-wave',
+    dotSecond: 'tw--inline-block tw--h-[12px] tw--w-[12px] tw--rounded-full tw--mx-1 tw--my-1 tw--opacity-40 tw--animate-wave-delay',
+    dotThird: 'tw--inline-block tw--h-[12px] tw--w-[12px] tw--rounded-full tw--mx-1 tw--my-1 tw--opacity-40 tw--animate-wave-delay-2',
+  },
+  compoundSlots: [{
+    slots: ['dotFirst', 'dotSecond', 'dotThird'],
+    theme: 'light',
+    class: 'tw--bg-light-zephyr',
+  },
+  {
+    slots: ['dotFirst', 'dotSecond', 'dotThird'],
+    theme: 'dark',
+    class: 'tw--bg-dark-zephyr',
+  }]
+});
+
+export default { streamBase, streamHead, streamRow, streamBubble, ellipsis };
