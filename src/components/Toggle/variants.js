@@ -7,8 +7,8 @@ export const wrapper = /*tw*/ tv({
   },
   variants: {
     color: {
-      on: 'tw--bg-light-seraph',
-      off: 'tw--bg-light-zephyr'
+      enabled: 'tw--bg-light-seraph',
+      disabled: 'tw--bg-light-zephyr'
     }
   }
 });
@@ -19,8 +19,8 @@ export const pin = /*tw*/ tv({
   },
   variants: {
     position: {
-      on: 'tw--left-0',
-      off: 'tw--right-0'
+      enabled: 'tw--left-0',
+      disabled: 'tw--right-0'
     }
   }
 });

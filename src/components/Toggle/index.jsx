@@ -1,27 +1,26 @@
+/* eslint-disable import/prefer-default-export */
 import { bool, func, string } from 'prop-types';
 import { wrapper, pin } from './variants';
 
-const Toggler = ({ toggle, on = false, title = '' }) => {
-  const { base: toggleWrapper } = wrapper({ color: on ? 'on' : 'off' });
-  const { base: togglePin } = pin({ position: on ? 'on' : 'off' });
+export const Toggler = ({ onToggle, on = false, title = '' }) => {
+  const { base: outline } = wrapper({ color: on ? 'enabled' : 'disabled' });
+  const { base: toggle } = pin({ position: on ? 'enabled' : 'disabled' });
   return (
     <div className="tw--flex tw--flex-col tw--text-white">
       <span className="tw--pb-1">{ title }</span>
       <button
         type="button"
-        className={ toggleWrapper() }
-        onClick={ toggle }
+        className={ outline() }
+        onClick={ onToggle }
       >
-        <span className={ togglePin() } />
+        <span className={ toggle() } />
       </button>
     </div>
   );
 };
 
 Toggler.propTypes = {
-  toggle: func.isRequired,
+  onToggle: func.isRequired,
+  title: string.isRequired,
   on: bool,
-  title: string
 };
-
-export default Toggler;

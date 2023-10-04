@@ -1,11 +1,12 @@
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { getConfig, setTheme, togglePluginMode } from '@/store/slices/config';
+import { Toggler } from '@/components/Toggle';
 import { wrapper } from './variants';
-import Toggler from '../Toggle';
 
 export const DevTools = () => {
   const dispatch = useAppDispatch();
   const { enableDevTools, themeId, isPluginMode } = useAppSelector(getConfig);
+  // DEV NOTE: when more than 2 themes are available the toggler must be replaced by another component
   const setUiTheme = () => dispatch(setTheme(themeId === 'light' ? 'dark' : 'light'));
   const { base } = wrapper({ hidden: !enableDevTools });
 
@@ -13,11 +14,11 @@ export const DevTools = () => {
     <div className={ base() }>
       <Toggler
         title="Theme" on={ themeId === 'light' }
-        toggle={ setUiTheme }
+        onToggle={ setUiTheme }
       />
       <Toggler
         title="Plugin mode" on={ isPluginMode }
-        toggle={ () => dispatch(togglePluginMode()) }
+        onToggle={ () => dispatch(togglePluginMode()) }
       />
     </div>
   );
