@@ -38,15 +38,18 @@ export const flickerEffect = /* tw */ tv({
 
 export const streamBubble = /*tw*/ tv({
   slots: {
-    base: 'tw--max-w-xs tw--px-4 tw--py-3',
+    base: 'tw--relative tw--max-w-xs tw--px-4 tw--py-3',
+    action: 'tw--absolute tw--bottom-[-16px] tw--right-[-10px]'
   },
   variants: {
     theme: {
       light: {
         base: 'tw--rounded-3xl',
+        action: 'tw--text-light-seraph',
       },
       dark: {
         base: 'tw--rounded-3xl',
+        action: 'tw--text-dark-seraph',
       },
     },
     type: {
