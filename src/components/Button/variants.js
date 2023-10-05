@@ -3,15 +3,15 @@ import { tv } from 'tailwind-variants';
 
 export const basic = /*tw*/ tv({
   slots: {
-    base: 'tw--flex-1 tw--px-4 tw--py-3 tw--rounded-full',
+    base: 'tw--flex-1 tw--text-[inherit]',
   },
   variants: {
     theme: {
       light: {
-        base: 'tw--bg-light-glaze tw--text-white',
+        base: '',
       },
       dark: {
-        base: 'tw--bg-dark-glazeBg tw--text-dark-glazeText',
+        base: '',
       },
     },
   },
