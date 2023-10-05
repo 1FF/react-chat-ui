@@ -21,4 +21,14 @@ export const icon = /*tw*/ tv({
   slots: {
     base: 'tw--flex-1 tw--text-[inherit]',
   },
+  variants: {
+    theme: {
+      light: null,
+      dark: null,
+    },
+    outlined: {
+      true: 'tw--p-0.5 tw--bg-white tw--rounded-full tw--shadow',
+      false: 'tw--bg-[transparent]',
+    },
+  },
 });
