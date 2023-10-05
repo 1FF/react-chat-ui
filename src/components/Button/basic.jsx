@@ -1,10 +1,11 @@
 import { string, func } from 'prop-types';
 import { useAppSelector } from '@/hooks';
+import { getConfig } from '@/store/slices/config';
 
 import { basic as variant } from './variants';
 
-export const Button = ({ text = null, onClick = null }) => {
-  const { themeId: theme } = useAppSelector((state) => state.config);
+export const Btn = ({ text = null, onClick = null }) => {
+  const { themeId: theme } = useAppSelector(getConfig);
   const { base } = variant({ theme });
 
   return (
@@ -18,9 +19,9 @@ export const Button = ({ text = null, onClick = null }) => {
   );
 };
 
-Button.propTypes = {
+Btn.propTypes = {
   text: string.isRequired,
   onClick: func,
 };
 
-export default Button;
+export default Btn;

@@ -4,7 +4,7 @@ import { getConfig } from '@/store/slices/config';
 import { setUpstreamItem } from '@/store/slices/stream';
 import { isNonEmptyArr } from '@/utils';
 
-import { Button } from '@/components/Button';
+import { Btn } from '@/components/Button';
 import { flickerEffect, streamBubble as variant } from './variants';
 import { replaceStringInCurlyBracketsWithStrong } from './modifiers';
 
@@ -23,10 +23,9 @@ export const StreamBubble = ({ item = {} }) => {
 
   const OptionList = ({ items = [] }) => (
     items.map(({ id, label, value }) => (
-      <Button
-        key={ id } text={ label }
-        onClick={ () => setOption(value) }
-      />
+      <div key={ id } className="tw--my-2">
+        <Btn text={ label } onClick={ () => setOption(value) } />
+      </div>
     ))
   );
 
