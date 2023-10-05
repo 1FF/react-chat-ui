@@ -9,6 +9,7 @@ const configSlice = createSlice({
     setConfig(state, { payload }) {
       state.aiProfile = { ...initialState.aiProfile, ...payload.aiProfile };
       state.themeId = payload.themeId;
+      state.translations = { ...initialState.translations, ...payload.translations };
     },
     resetConfig(state) {
       state.aiProfile = initialState.aiProfile;

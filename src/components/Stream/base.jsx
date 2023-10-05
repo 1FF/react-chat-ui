@@ -1,6 +1,7 @@
 import { useAppSelector } from '@/hooks';
 import { getConfig } from '@/store/slices/config';
 
+import { getStream } from '@/store/slices/stream';
 import { Ellipsis } from './ellipsis';
 import { StreamHead } from './head';
 import { StreamRow } from './row';
@@ -8,7 +9,7 @@ import { streamBase as variant } from './variants';
 
 export const StreamBase = () => {
   const { themeId: theme } = useAppSelector(getConfig);
-  const { history, downstreamQueue, isLoading } = useAppSelector((state) => state.stream);
+  const { history, downstreamQueue, isLoading } = useAppSelector(getStream);
   const { base } = variant({ theme });
 
   return (

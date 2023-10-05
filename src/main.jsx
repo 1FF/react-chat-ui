@@ -44,6 +44,7 @@ const initialConfig = {
       initialMessage: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you. [Continue]',
     },
     themeId: 'light',
+    translations: { emailPlaceholder: 'Please enter your email' }
   },
 };
 

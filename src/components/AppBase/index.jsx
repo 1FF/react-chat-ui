@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-vars */
 import { object } from 'prop-types';
-import { EventEmitter } from 'node:events';
 import { useAppDispatch } from '@/hooks';
 
 import { setConfig, setDevToolsStatus } from '@/store/slices/config';
@@ -9,8 +8,6 @@ import { setMeta } from '@/store/slices/meta';
 import { LayoutBase, LayoutHead, LayoutFoot } from '@/components/Layout';
 import { StreamBase } from '@/components/Stream';
 import { DevTools } from '@/components/DevTools';
-
-const eventEmitter = new EventEmitter();
 
 export const AppBase = ({ config = {} }) => {
   const dispatch = useAppDispatch();
