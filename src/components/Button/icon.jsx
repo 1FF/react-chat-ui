@@ -2,7 +2,7 @@ import { func, element } from 'prop-types';
 import { useAppSelector } from '@/hooks';
 import { getConfig } from '@/store/slices/config';
 
-import { basic as variant } from './variants';
+import { icon as variant } from './variants';
 
 // eslint-disable-next-line react/prop-types
 export const IconBtn = ({ onClick = null, children }) => {

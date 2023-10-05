@@ -3,15 +3,15 @@ import { tv } from 'tailwind-variants';
 
 export const basic = /*tw*/ tv({
   slots: {
-    base: 'tw--flex-1 tw--text-[inherit]',
+    base: 'tw--flex-1 tw--w-full tw--px-4 tw--py-3 tw--rounded-full',
   },
   variants: {
     theme: {
       light: {
-        base: '',
+        base: 'tw--bg-light-glaze tw--text-white',
       },
       dark: {
-        base: '',
+        base: 'tw--bg-dark-glazeBg tw--text-dark-glazeText',
       },
     },
   },
@@ -19,6 +19,6 @@ export const basic = /*tw*/ tv({
 
 export const icon = /*tw*/ tv({
   slots: {
-    base: 'tw--flex-1 tw--px-4 tw--py-2',
+    base: 'tw--flex-1 tw--text-[inherit]',
   },
 });
