@@ -14,7 +14,10 @@ export const config = {
     displayInStream: false,
   },
   translations: {
-    emailPlaceholder: ''
+    emailPlaceholder: '',
+    tm526: '',
+    tm715: '',
+    tm716: '',
   },
   themeId: null,
   enableDevTools: false,
@@ -38,6 +41,9 @@ export const intentions = {
     isEmailFieldVisible: false,
     currentEmail: '',
     isLoading: false
+  },
+  messaging: {
+    isVisible: false
   }
 };
 

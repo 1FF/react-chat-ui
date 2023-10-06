@@ -1,10 +1,11 @@
 import { object } from 'prop-types';
 import { useAppSelector, useAppDispatch } from '@/hooks';
 import { getConfig } from '@/store/slices/config';
-import { getCurrentPointer, getStream, setUpstreamItem } from '@/store/slices/stream';
+import { appendHistory, getCurrentPointer, getStream, setUpstreamItem } from '@/store/slices/stream';
 import { isNonEmptyArr } from '@/utils';
 
 import { Btn, IconBtn } from '@/components/Button';
+import { Link } from '@/components/Link';
 import { flickerEffect, streamBubble as variant } from './variants';
 import { replaceStringInCurlyBracketsWithStrong } from './modifiers';
 
@@ -22,10 +23,16 @@ export const StreamBubble = ({ item = {} }) => {
     dispatch(setUpstreamItem(val));
   };
 
+  const setMessage = (val) => {
+    dispatch(appendHistory({ role: 'user', message: val }));
+  };
+
   const OptionList = ({ items = [] }) => (
-    items.map(({ id, label, value }) => (
+    items.map(({ id, label, value, link, noStream }) => (
       <div key={ id } className="tw--my-2">
-        <Btn text={ label } onClick={ () => setOption(value) } />
+        { link
+          ? (<Link text={ label } href={ link } />)
+          : (<Btn text={ label } onClick={ noStream ? () => setMessage(value) : () => setOption(value) } />) }
       </div>
     ))
   );
@@ -33,7 +40,7 @@ export const StreamBubble = ({ item = {} }) => {
   return (
     <div className={ base() }>
       <span className={ baseFlicker() }>{ replaceStringInCurlyBracketsWithStrong(item.message) }</span>
-      { displayOptionList && <div className="tw--flex tw--flex-col"><OptionList items={ item.options } />{ item.isSpecial ? 'special' : '' }</div> }
+      { displayOptionList && <div className="tw--flex tw--flex-col"><OptionList items={ item.options } /></div> }
       { displayActionButton && (
         <div className={ action() }>
           <IconBtn outlined>
