@@ -4,9 +4,9 @@ import { getConfig } from '@/store/slices/config';
 
 import { basic as variant } from './variants';
 
-export const Input = ({ type, ref = null, placeholder = '', onChange = null, onKeyUp = null, isLoading = false }) => {
+export const Input = ({ type, ref = null, placeholder = '', onChange = null, onKeyUp = null, isLoading = false, value = null }) => {
   const { themeId: theme } = useAppSelector(getConfig);
-  const { base, input, loader } = variant({ theme });
+  const { base, input, loader, spin } = variant({ theme });
 
   return (
     <div className={ base() }>
@@ -18,12 +18,13 @@ export const Input = ({ type, ref = null, placeholder = '', onChange = null, onK
         placeholder={ placeholder }
         onChange={ onChange }
         onKeyUp={ onKeyUp }
+        value={ value }
       />
 
       { isLoading && (
-        <div className={ loader() }>
-          spinner
-        </div> /* DEV Note: will be added with an icon component  */
+        <span className={ loader() }>
+          <span className={ spin() } />
+        </span>
       ) }
     </div>
   );
@@ -32,6 +33,7 @@ export const Input = ({ type, ref = null, placeholder = '', onChange = null, onK
 Input.propTypes = {
   type: string.isRequired,
   ref: string,
+  value: string,
   placeholder: string,
   onChange: func,
   onKeyUp: func,

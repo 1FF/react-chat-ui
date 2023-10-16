@@ -3,6 +3,8 @@ import { config, events } from '@/config';
 import { appendHistory, resetDownstreamItem, resetIsLoading, resetTextToParse, resetUpstreamItem, setDownstreamItem, setDownstreamMessage, setHistory, setIsLoading, setTextToParse, setUpstreamItem } from '@/store/slices/stream';
 import { getQueryParam } from '@/utils';
 import { extractOptionSet } from '@/utils/formatting';
+import intent from '@/services/intentions';
+import { setIsEmailFieldVisible } from '@/store/slices/intentions';
 
 const chatMiddleware = store => next => {
   const socket = io.connect('https://chat-ws.test', config);
@@ -16,6 +18,9 @@ const chatMiddleware = store => next => {
     store.dispatch(resetIsLoading());
 
     if (data.history.length) {
+      const lastIdx = data.history.length - 1;
+      data.history[lastIdx].isSpecial = data.history[lastIdx].content.includes(intent.type.email);
+      store.dispatch(setIsEmailFieldVisible(data.history[lastIdx].isSpecial));
       store.dispatch(setHistory(data.history));
     } else {
       socket.emit(events.chat, {
@@ -36,6 +41,11 @@ const chatMiddleware = store => next => {
 
   socket.on(events.streamData, ({ chunk }) => {
     const { textToParse } = store.getState().stream;
+    if (textToParse.includes(intent.type.email)) {
+      store.dispatch(resetTextToParse());
+      store.dispatch(setIsEmailFieldVisible(true));
+    }
+
     if (chunk.includes('[')) {
       store.dispatch(setTextToParse(chunk));
       return;

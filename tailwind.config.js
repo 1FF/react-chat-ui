@@ -39,11 +39,16 @@ export default {
         '30%': {
           transform: 'translateY(-15px)'
         }
-      }
+      },
+      rotate: {
+        '0%': { transform: 'rotate(0deg)' },
+        '100%': { transform: 'rotate(360deg)' },
+      },
     },
     animation: {
       blink: 'blink 0.5s infinite',
       wave: 'wave 1.3s linear infinite',
+      rotate: 'rotate 500ms linear infinite',
       'wave-delay': 'wave 1.3s linear infinite -1.1s',
       'wave-delay-2': 'wave 1.3s linear infinite -0.9s',
     },

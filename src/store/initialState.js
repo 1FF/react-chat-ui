@@ -13,6 +13,12 @@ export const config = {
     initialMessage: '',
     displayInStream: false,
   },
+  translations: {
+    emailPlaceholder: '',
+    tm526: '',
+    tm715: '',
+    tm716: '',
+  },
   themeId: null,
   enableDevTools: false,
   isPluginMode: false,
@@ -28,4 +34,17 @@ export const stream = {
   isLoading: false,
 };
 
-export default { meta, config, stream };
+export const intentions = {
+  email: {
+    success: false,
+    error: false,
+    isEmailFieldVisible: false,
+    currentEmail: '',
+    isLoading: false
+  },
+  messaging: {
+    isVisible: false
+  }
+};
+
+export default { meta, config, stream, intentions };
