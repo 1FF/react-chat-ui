@@ -35,9 +35,9 @@ export const EmailForm = () => {
 
     dispatch(setIsEmailLoading(true));
     dispatch(setEmail(email));
+    intent.core.emit(intent.type.email, { email });
     setCurrentEmail('');
     setIsValid(true);
-    intent.core.emit(intent.type.email, email);
   };
 
   return (

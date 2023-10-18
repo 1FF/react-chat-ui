@@ -30,7 +30,10 @@ const configSlice = createSlice({
     togglePluginMode(state) {
       state.isPluginMode = !state.isPluginMode;
     },
-  },
+    setTranslations(state, { payload }) {
+      state.translations = { ...state.translations, ...payload };
+    }
+  }
 });
 
 export const getConfig = ({ config }) => config;
@@ -41,6 +44,6 @@ export const {
   setConfig, resetConfig,
   setTheme, resetTheme,
   setDevToolsStatus, resetDevToolsStatus,
-  togglePluginMode
+  togglePluginMode, setTranslations
 } = configSlice.actions;
 export default configSlice.reducer;

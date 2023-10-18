@@ -6,6 +6,8 @@ import store from '@/store';
 import '@/assets/css/index.css';
 import { AppBase } from '@/components/AppBase';
 
+export { intent } from '@/services/intentions';
+
 // DEV Note: will be received by Razvigor
 const initialConfig = {
   meta: {
@@ -48,12 +50,32 @@ const initialConfig = {
       emailPlaceholder: 'Please enter your email',
       tm526: 'Continue to my plan',
       tm715: 'Enter new email',
-      tm716: 'Entered email already exists, choose below to proceed'
+      tm716: 'Entered email already exists, choose below to proceed',
+      tm530: 'Take the quiz',
+      tm1224: 'Payment in progress...',
+      // tm566 -> removing backEndVars undefined variable
+      subscriberBillingFrequency: 'Billed every {1} month(s)',
+      // tm241 -> removing backEndVars undefined variable
+      oneTimer: 'Total price to be charged',
+      billingFrequencyTmsg: '',
+      paymentHeaderTxt1: '<span class="font-bold block text-tau">SECURITY</span> verified',
+      paymentHeaderTxt2: 'secured payments',
+      loaderTexts: [
+        'We securely lock up your payment details.',
+        'Details zoom to the payment center.',
+        'Payment center requests our bank to process.',
+        'Our bank contacts your card network.',
+        'Card network asks your bank for approval.',
+        'Your bank reviews funds or credit.',
+        'Decision travels back to us.',
+        'Waiting your payment to be verified and complete.'
+      ],
+      payButton: 'Secure payment'
     }
   },
 };
 
-const ReactBotClient = (config) => {
+export const ReactBotClient = (config) => {
   ReactDOM
     .createRoot(config.root)
     .render(

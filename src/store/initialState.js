@@ -54,6 +54,11 @@ export const intentions = {
     currentEmail: '',
     isLoading: false
   },
+  payment: {
+    isPaymentButtonVisible: false,
+    isPaymentFormVisible: false,
+    isPaymentSuccessful: false
+  },
   messaging: {
     isVisible: false
   }

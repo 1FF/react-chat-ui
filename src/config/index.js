@@ -15,6 +15,7 @@ export const dateFormattingOptions = {
 export const colors = {
   white: '#ffffff',
   black: '#000000',
+  'muted-blue': 'rgba(15, 14, 30, 0.6)',
   ...baseThemeColors,
 };
 

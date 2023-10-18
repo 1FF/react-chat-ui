@@ -4,4 +4,4 @@ export const roles = {
   assistant: 'assistant',
 };
 
-export default { roles };
+export default roles;
