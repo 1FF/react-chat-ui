@@ -1,7 +1,7 @@
 import { func, object, string } from 'prop-types';
 import payment from './variants';
 
-export const Anchor = ({ href = '/', text, onClick, forwardedRef }) => {
+export const Link = ({ href, text, onClick, forwardedRef }) => {
   const { btn } = payment();
   return (
     <a
@@ -13,11 +13,11 @@ export const Anchor = ({ href = '/', text, onClick, forwardedRef }) => {
   );
 };
 
-Anchor.propTypes = {
+Link.propTypes = {
   onClick: func.isRequired,
   text: string.isRequired,
   forwardedRef: object.isRequired,
-  href: string,
+  href: string.isRequired,
 };
 
-export default Anchor;
+export default Link;

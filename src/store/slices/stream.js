@@ -69,5 +69,10 @@ const configSlice = createSlice({
 export const getCurrentPointer = (state) => state.stream.history[state.stream.history.length - 1].id;
 export const getStream = state => state.stream;
 
-export const { setUpstreamItem, setDownstreamItem, resetDownstreamItem, setDownstreamMessage, resetUpstreamItem, setHistory, resetHistory, appendHistory, setTextToParse, resetTextToParse, setIsLoading, resetIsLoading } = configSlice.actions;
+export const { setUpstreamItem, setDownstreamItem,
+  resetDownstreamItem, setDownstreamMessage,
+  resetUpstreamItem, setHistory, resetHistory,
+  appendHistory, setTextToParse, resetTextToParse,
+  setIsLoading, resetIsLoading
+} = configSlice.actions;
 export default configSlice.reducer;

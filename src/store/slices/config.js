@@ -8,12 +8,15 @@ const configSlice = createSlice({
     // DEV NOTE: note that immer makes these immutable under the hood
     setConfig(state, { payload }) {
       state.aiProfile = { ...initialState.aiProfile, ...payload.aiProfile };
-      state.themeId = payload.themeId;
       state.translations = { ...initialState.translations, ...payload.translations };
+      state.themeId = payload.themeId;
+      state.chatUrl = payload.chatUrl;
     },
     resetConfig(state) {
       state.aiProfile = initialState.aiProfile;
       state.themeId = initialState.themeId;
+      state.translations = initialState.translations;
+      state.chatUrl = initialState.chatUrl;
     },
     setTheme(state, { payload }) {
       state.themeId = payload;

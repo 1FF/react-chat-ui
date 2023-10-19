@@ -29,10 +29,20 @@ const intentionsSlice = createSlice({
     setIsPaymentSuccessful(state, { payload }) {
       state.payment.isPaymentSuccessful = payload;
     },
+    setLink(state, { payload }) {
+      state.link = { ...state.link, ...payload };
+    }
   }
 });
 
 export const getEmailIntentions = state => state.intentions.email;
+export const getPaymentIntentions = state => state.intentions.payment;
+export const getLinkIntentions = state => state.intentions.link;
 
-export const { setEmail, setEmailSuccess, setIsPaymentSuccessful, setPaymentFormVisibility, setEmailError, setIsEmailLoading, setIsEmailFieldVisible, setIsPaymentButtonVisible } = intentionsSlice.actions;
+export const { setEmail, setEmailSuccess,
+  setIsPaymentSuccessful, setPaymentFormVisibility,
+  setEmailError, setIsEmailLoading,
+  setIsEmailFieldVisible, setIsPaymentButtonVisible,
+  setLink
+} = intentionsSlice.actions;
 export default intentionsSlice.reducer;

@@ -3,4 +3,4 @@ export { PaymentButton } from './btn';
 export { CloseButton } from './close';
 export { PaymentFooter } from './foot';
 export { PaymentLoader } from './loader';
-export { Anchor } from './anchor';
+export { Link } from './link';

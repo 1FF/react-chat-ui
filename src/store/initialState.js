@@ -32,6 +32,7 @@ export const config = {
     tm716: '',
   },
   themeId: null,
+  chatUrl: null,
   enableDevTools: false,
   isPluginMode: false,
 };
@@ -61,6 +62,11 @@ export const intentions = {
   },
   messaging: {
     isVisible: false
+  },
+  link: {
+    isVisible: false,
+    href: null,
+    text: ''
   }
 };
 

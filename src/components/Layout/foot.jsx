@@ -3,18 +3,19 @@ import { useRef, useState } from 'react';
 import intent from '@/services/intentions';
 import { useAppSelector } from '@/hooks';
 import { EmailForm } from '@/components/Form/email';
-import { setIsPaymentButtonVisible, setIsPaymentSuccessful, setPaymentFormVisibility } from '@/store/slices/intentions';
-import { PaymentButton, PaymentHead, CloseButton, PaymentFooter, Anchor, PaymentLoader } from '@/components/Payment';
+import { getEmailIntentions, getLinkIntentions, getPaymentIntentions, setIsPaymentButtonVisible, setIsPaymentSuccessful, setLink, setPaymentFormVisibility } from '@/store/slices/intentions';
+import { PaymentButton, Link } from '@/components/Payment';
 import { appendHistory } from '@/store/slices/stream';
 import { roles } from '@/config/roles';
-import { Overlay } from '@/components/Overlay';
+import { PaymentScene } from '@/components/Scenes/payment';
+import { getConfig } from '@/store/slices/config';
 
 export const LayoutFoot = () => {
   const dispatch = useDispatch();
-  const { isEmailFieldVisible } = useAppSelector(state => state.intentions.email);
-  const { displayPlanPrice } = useAppSelector(state => state.meta.pd);
-  const { translations } = useAppSelector(state => state.config);
-  const { isPaymentButtonVisible, isPaymentFormVisible, isPaymentSuccessful } = useAppSelector(state => state.intentions.payment);
+  const { isEmailFieldVisible } = useAppSelector(getEmailIntentions);
+  const { translations } = useAppSelector(getConfig);
+  const { isPaymentButtonVisible, isPaymentFormVisible } = useAppSelector(getPaymentIntentions);
+  const { isVisible: isCtaVisible, text: ctaText, href: ctaHref } = useAppSelector(getLinkIntentions);
   const ctaAfterPayButton = useRef(null);
   const [disabled, setDisabled] = useState(false);
 
@@ -41,6 +42,8 @@ export const LayoutFoot = () => {
     dispatch(setIsPaymentSuccessful(true));
     dispatch(setIsPaymentButtonVisible(false));
     setIsPaymentContainerVisible(false);
+
+    dispatch(setLink({ href: '/', isVisible: true, text: translations.tm530 }));
   };
 
   const initializePaymentForm = () => {
@@ -51,34 +54,32 @@ export const LayoutFoot = () => {
   const onClickCtaPay = (e) => {
     // TODO must check what happen when cta is clicked;
     console.log('clicked redirect', e.currentTarget);
+    // this.track(customEventTypes.linkProvided);
+    // this.elements.ctaButton.addEventListener('click', () => {
+    //   this.track(customEventTypes.linkClicked);
+    // });
+    // this.mainContainer.innerHTML = '';
+    // scroll.add();
+    // this.closeSocket();
+    // localStorage.setItem(CHAT_SEEN_KEY, true);
   };
 
   return (
     <>
-      { isPaymentFormVisible && (
-        <div className="tw--absolute tw--bg-dark-whisper tw--top-0 tw--left-0 tw--w-full tw--h-screen tw--flex tw--flex-col tw--justify-center tw--items-center tw--px-5 tw--z-50">
-          <div
-            id="chat-payment-view"
-            className="light-pink-blue tw--max-w-[500px] tw--bg-white tw--w-full tw--min-h-[400px] tw--relative tw--rounded-lg tw--flex tw--flex-col tw--p-7"
-          >
-            <Overlay><PaymentLoader texts={ translations.loaderTexts } title={ translations.tm1224 } /></Overlay>
-            <CloseButton onClick={ onClosePaymentForm } />
-            <div id="primer-form-container" className="tw--w-full h-full">
-              <PaymentHead config={ { price: displayPlanPrice, period: translations.billingFrequencyTmsg } } />
-            </div>
-            <PaymentFooter />
-          </div>
-        </div>
-      ) }
+      { isPaymentFormVisible && <PaymentScene onClose={ onClosePaymentForm } /> }
 
-      { isPaymentSuccessful
+      { isCtaVisible
         && (
-          <Anchor
-            forwardedRef={ ctaAfterPayButton } text={ translations.tm530 }
+          <Link
+            forwardedRef={ ctaAfterPayButton }
+            text={ ctaText }
             onClick={ onClickCtaPay }
+            href={ ctaHref }
           />
         ) }
+
       { isEmailFieldVisible && <EmailForm /> }
+
       { isPaymentButtonVisible && (
         <PaymentButton
           text={ translations.payButton }
