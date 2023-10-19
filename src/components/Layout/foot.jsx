@@ -33,17 +33,15 @@ export const LayoutFoot = () => {
   const onPaymentSuccess = () => {
     // TODO: set in store to be persisted the GO THROUGH QUIZ button
     dispatch(appendHistory({ role: roles.assistant, message: translations.tm1226 }));
+    dispatch(setIsPaymentSuccessful(true));
+    dispatch(setIsPaymentButtonVisible(false));
+    dispatch(setLink({ href: '/', isVisible: true, text: translations.tm530 }));
+    setIsPaymentContainerVisible(false);
 
     // // in case the user does not click on take the quiz button
     setTimeout(() => {
       ctaAfterPayButton.current.click();
     }, 7000);
-
-    dispatch(setIsPaymentSuccessful(true));
-    dispatch(setIsPaymentButtonVisible(false));
-    setIsPaymentContainerVisible(false);
-
-    dispatch(setLink({ href: '/', isVisible: true, text: translations.tm530 }));
   };
 
   const initializePaymentForm = () => {

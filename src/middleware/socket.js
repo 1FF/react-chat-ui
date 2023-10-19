@@ -6,14 +6,47 @@ import { getQueryParam } from '@/utils';
 import { extractOptionSet } from '@/utils/formatting';
 import intent from '@/services/intentions';
 import { setIsEmailFieldVisible, setIsPaymentButtonVisible } from '@/store/slices/intentions';
-import { setTranslations } from '@/store/slices/config';
+import { setConfig, setConnectedToSocket, setTranslations } from '@/store/slices/config';
 
-const chatMiddleware = store => next => {
-  const socket = io.connect('https://chat-ws.test', config);
+let socket;
+
+const chatMiddleware = store => next => action => {
+  // here we listen for actions applied to the store and do stuff with the socket
+  if (setUpstreamItem.match(action)) {
+    const data = {
+      term: getQueryParam(window.location.search, 'utm_chat'),
+      user_id: localStorage.getItem('__cid'),
+      role: 'user',
+      message: action.payload,
+    };
+    store.dispatch(appendHistory(data));
+    store.dispatch(setIsLoading());
+    console.log(socket);
+    socket.emit(events.chat, data);
+  }
+
+  if (setIsPaymentButtonVisible.match(action)) {
+    const { meta, config } = store.getState();
+    const freshMeta = { pd: JSON.parse(localStorage.getItem('__pd')) || meta.pd };
+    const translations = {
+      billingFrequencyTmsg: freshMeta.pd.billingOptionType === 'one-time'
+        ? config.translations.oneTimer
+        : config.translations.subscriberBillingFrequency.replace('{1}', freshMeta.pd.frequencyInMonths)
+    };
+
+    store.dispatch(setTranslations(translations));
+  }
+
+  if (!setConfig.match(action)) {
+    return next(action);
+  }
+
+  socket = io.connect(action.payload.chatUrl, config);
 
   socket.on('connect', () => {
-    store.dispatch(setIsLoading());
     socket.emit(events.chatHistory, { user_id: localStorage.getItem('__cid') }); // Extract this from store meta slice and use the param
+    store.dispatch(setIsLoading());
+    store.dispatch(setConnectedToSocket());
   });
 
   socket.on(events.chatHistory, (data) => {
@@ -23,7 +56,7 @@ const chatMiddleware = store => next => {
       const lastIdx = data.history.length - 1;
       data.history[lastIdx].isSpecial = checkForSpecialPhrases(data.history[lastIdx].content);
 
-      if (data.history[lastIdx].content.includes(intent.type.email))store.dispatch(setIsEmailFieldVisible(true));
+      if (data.history[lastIdx].content.includes(intent.type.email)) store.dispatch(setIsEmailFieldVisible(true));
 
       if (data.history[lastIdx].content.includes(intent.type.payment)) {
         store.dispatch(setIsPaymentButtonVisible(true));
@@ -99,33 +132,7 @@ const chatMiddleware = store => next => {
     console.log('streamError');
   });
 
-  return action => {
-    // here we listen for actions applied to the store and do stuff with the socket
-    if (setUpstreamItem.match(action) && socket.connected) {
-      const data = {
-        term: getQueryParam(window.location.search, 'utm_chat'),
-        user_id: localStorage.getItem('__cid'),
-        role: 'user',
-        message: action.payload,
-      };
-      store.dispatch(appendHistory(data));
-      store.dispatch(setIsLoading());
-      socket.emit(events.chat, data);
-    }
-
-    if (setIsPaymentButtonVisible.match(action)) {
-      const { meta, config } = store.getState();
-      const translations = {
-        billingFrequencyTmsg: meta.pd.billingOptionType === 'one-time'
-          ? config.translations.oneTimer
-          : config.translations.subscriberBillingFrequency.replace('{1}', meta.pd.frequencyInMonths)
-      };
-
-      store.dispatch(setTranslations(translations));
-    }
-
-    next(action);
-  };
+  next(action);
 };
 
 const checkForSpecialPhrases = (string) => {

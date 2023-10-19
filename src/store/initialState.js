@@ -35,6 +35,7 @@ export const config = {
   chatUrl: null,
   enableDevTools: false,
   isPluginMode: false,
+  connectedToSocket: false,
 };
 
 export const stream = {

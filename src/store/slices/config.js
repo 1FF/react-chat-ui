@@ -35,6 +35,9 @@ const configSlice = createSlice({
     },
     setTranslations(state, { payload }) {
       state.translations = { ...state.translations, ...payload };
+    },
+    setConnectedToSocket(state) {
+      state.connectedToSocket = true;
     }
   }
 });
@@ -47,6 +50,7 @@ export const {
   setConfig, resetConfig,
   setTheme, resetTheme,
   setDevToolsStatus, resetDevToolsStatus,
-  togglePluginMode, setTranslations
+  togglePluginMode, setTranslations,
+  setConnectedToSocket
 } = configSlice.actions;
 export default configSlice.reducer;
