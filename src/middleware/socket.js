@@ -1,12 +1,14 @@
 /* eslint-disable no-undef */
 import { io } from 'socket.io-client';
-import { config, events } from '@/config';
+import { config, events, roles } from '@/config';
 import { appendHistory, resetDownstreamItem, resetIsLoading, resetTextToParse, resetUpstreamItem, setDownstreamItem, setDownstreamMessage, setHistory, setIsLoading, setTextToParse, setUpstreamItem } from '@/store/slices/stream';
 import { getQueryParam } from '@/utils';
 import { extractOptionSet } from '@/utils/formatting';
 import intent from '@/services/intentions';
 import { setIsEmailFieldVisible, setIsPaymentButtonVisible } from '@/store/slices/intentions';
 import { setConfig, setConnectedToSocket, setTranslations } from '@/store/slices/config';
+import { track } from '@/plugins/socketio';
+import { baseEvents, customEvents } from '@/config/analytics';
 
 let socket;
 
@@ -15,18 +17,28 @@ const chatMiddleware = store => next => action => {
   if (setUpstreamItem.match(action)) {
     const data = {
       term: getQueryParam(window.location.search, 'utm_chat'),
-      user_id: localStorage.getItem('__cid'),
-      role: 'user',
+      user_id: store.getState().meta.cid,
+      role: roles.user,
       message: action.payload,
     };
     store.dispatch(appendHistory(data));
     store.dispatch(setIsLoading());
-    console.log(socket);
     socket.emit(events.chat, data);
+
+    if (isFirstUserMessage(store.getState().stream.history)) {
+      const { meta } = store.getState();
+      // { eventType, systemType, utmParams, customerUuid, email } ===> data format
+      track({
+        eventType: customEvents.firstMessage,
+        systemType: meta.systemType,
+        utmParams: meta.marketing.lastUtmParams,
+        customerUuid: meta.cid
+      });
+    }
   }
 
   if (setIsPaymentButtonVisible.match(action)) {
-    const { meta, config } = store.getState();
+    const { meta, intentions, config } = store.getState();
     const freshMeta = { pd: JSON.parse(localStorage.getItem('__pd')) || meta.pd };
     const translations = {
       billingFrequencyTmsg: freshMeta.pd.billingOptionType === 'one-time'
@@ -35,6 +47,34 @@ const chatMiddleware = store => next => action => {
     };
 
     store.dispatch(setTranslations(translations));
+
+    if (action.payload === true) {
+      const data = {
+        eventType: null,
+        systemType: meta.systemType,
+        utmParams: meta.marketing.lastUtmParams,
+        customerUuid: meta.cid,
+        email: intentions.email.currentEmail
+      };
+
+      data.eventType = baseEvents.addToCart;
+      track(data);
+
+      data.eventType = customEvents.priceSeen;
+      track(data);
+    }
+  }
+
+  if (setIsEmailFieldVisible.match(action) && action.payload) {
+    const { meta, intentions } = store.getState();
+
+    track({
+      eventType: customEvents.emailField,
+      systemType: meta.systemType,
+      utmParams: meta.marketing.lastUtmParams,
+      customerUuid: meta.cid,
+      email: intentions.email.currentEmail
+    });
   }
 
   if (!setConfig.match(action)) {
@@ -44,7 +84,8 @@ const chatMiddleware = store => next => action => {
   socket = io.connect(action.payload.chatUrl, config);
 
   socket.on('connect', () => {
-    socket.emit(events.chatHistory, { user_id: localStorage.getItem('__cid') }); // Extract this from store meta slice and use the param
+    const { meta } = store.getState();
+    socket.emit(events.chatHistory, { user_id: meta.cid });
     store.dispatch(setIsLoading());
     store.dispatch(setConnectedToSocket());
   });
@@ -62,19 +103,17 @@ const chatMiddleware = store => next => action => {
         store.dispatch(setIsPaymentButtonVisible(true));
         const { config: freshConfig } = store.getState();
         data.history[lastIdx].content += meta.pd.displayPlanPrice + ' ' + freshConfig.translations.billingFrequencyTmsg;
-        // this.track(standardEventTypes.addToCart);
-        // this.track(customEventTypes.priceSeen);
       }
 
       store.dispatch(setHistory(data.history));
     } else {
       socket.emit(events.chat, {
-        role: 'assistant',
+        role: roles.assistant,
         term: getQueryParam(window.location.search, 'utm_chat'),
-        user_id: localStorage.getItem('__cid'),
+        user_id: meta.cid,
         message: config.aiProfile.initialMessage
       });
-      store.dispatch(setHistory([{ role: 'assistant', content: config.aiProfile.initialMessage }]));
+      store.dispatch(setHistory([{ role: roles.assistant, content: config.aiProfile.initialMessage }]));
     }
   });
 
@@ -98,8 +137,6 @@ const chatMiddleware = store => next => action => {
       store.dispatch(setIsPaymentButtonVisible(true));
       const { config } = store.getState();
       store.dispatch(setDownstreamItem(downstreamQueue.message + meta.pd.displayPlanPrice + ' ' + config.translations.billingFrequencyTmsg));
-      // this.track(standardEventTypes.addToCart);
-      // this.track(customEventTypes.priceSeen);
     }
 
     if (chunk.includes('[')) {
@@ -140,5 +177,7 @@ const checkForSpecialPhrases = (string) => {
   const specialRegex = specialMessages.map(keyword => new RegExp(`\\[?${keyword}\\]?`));
   return specialRegex.some(regex => string.match(regex));
 };
+
+const isFirstUserMessage = (messages) => messages.filter(obj => obj.role === roles.user).length === 1;
 
 export default chatMiddleware;

@@ -1,25 +1,31 @@
+import { customEvents } from '@/config/analytics';
+import { track } from '@/plugins/socketio';
 import intent from '@/services/intentions';
-import { setIsEmailLoading, setEmailSuccess, setIsEmailFieldVisible, setEmailError } from '@/store/slices/intentions';
+import { setIsEmailLoading, setEmailSuccess, setIsEmailFieldVisible, setEmailError, setLink } from '@/store/slices/intentions';
 import { appendHistory, setUpstreamItem } from '@/store/slices/stream';
 
 export const intentionsMiddleware = store => next => {
   intent.core.on(intent.type.emailSuccess, () => {
-    const { currentEmail } = store.getState().intentions.email;
+    const { meta, intentions } = store.getState();
 
     store.dispatch(setIsEmailLoading(false));
-    store.dispatch(setUpstreamItem(currentEmail));
+    store.dispatch(setUpstreamItem(intentions.email.currentEmail));
 
     // DEV: setEmailSuccess this status is for us to know if mail is validated in the endpoint
     store.dispatch(setEmailSuccess(true));
     store.dispatch(setIsEmailFieldVisible(false));
-
-    // DEV NOTE: add trackings;
-    // !!important!! track the user with the socket and save the analytics data;
-    // this.track(customEventTypes.emailEntered);
+    track({
+      eventType: customEvents.emailEntered,
+      systemType: meta.systemType,
+      utmParams: meta.marketing.lastUtmParams,
+      customerUuid: meta.cid,
+      email: intentions.email.currentEmail
+    });
   });
 
   intent.core.on(intent.type.emailError, (response) => {
-    const { tm716, tm526, tm715 } = store.getState().config.translations;
+    const { meta, intentions, config } = store.getState();
+    const { tm716, tm526, tm715 } = config.translations;
 
     store.dispatch(setIsEmailLoading(false));
 
@@ -33,8 +39,13 @@ export const intentionsMiddleware = store => next => {
         ]
       }));
 
-      // DEV NOTE: add trackings;
-      // this.track(customEventTypes.emailExist);
+      track({
+        eventType: customEvents.emailExist,
+        systemType: meta.systemType,
+        utmParams: meta.marketing.lastUtmParams,
+        customerUuid: meta.cid,
+        email: intentions.email.currentEmail
+      });
 
       // DEV NOTE: this must be persisted so on refresh the message with options is still part of the history;
       // localStorage.setItem(ALREADY_REGISTERED_KEY, 'true');
@@ -44,14 +55,31 @@ export const intentionsMiddleware = store => next => {
     if (response.status === 422) {
       store.dispatch(setEmailError(response.errors.email[0]));
 
-      // DEV NOTE: add trackings;
-      // this.track(customEventTypes.emailWrong);
+      track({
+        eventType: customEvents.emailWrong,
+        systemType: meta.systemType,
+        utmParams: meta.marketing.lastUtmParams,
+        customerUuid: meta.cid,
+        email: intentions.email.currentEmail
+      });
     }
-    console.log('email error');
   });
 
   // add logic to listen when correct email is being submitted
-  return action => next(action);
+  return action => {
+    if (setLink.match(action) && action.payload.isVisible) {
+      const { meta, intentions } = store.getState();
+
+      track({
+        eventType: customEvents.linkProvided,
+        systemType: meta.systemType,
+        utmParams: meta.marketing.lastUtmParams,
+        customerUuid: meta.cid,
+        email: intentions.email.currentEmail
+      });
+    }
+    next(action);
+  };
 };
 
 export default intentionsMiddleware;

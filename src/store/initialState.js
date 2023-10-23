@@ -14,6 +14,7 @@ export const meta = {
   pd: null,
   cid: null,
   eid: null,
+  systemType: null,
   marketing: {},
 };
 

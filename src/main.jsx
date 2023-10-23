@@ -27,6 +27,7 @@ const initialConfig = {
       displayPlanPrice: '$29.90',
     },
     cid: '23c7cdcf-4d90-4ea1-aab0-c73f8426dc1d',
+    systemType: 'test',
     marketing: {
       utmParams: { utm_chat: 'db-sales-nopresetquestions' },
       lastUtmParams: { utm_chat: 'db-sales-nopresetquestions' },
