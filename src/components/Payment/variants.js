@@ -3,7 +3,7 @@ import { tv } from 'tailwind-variants';
 
 export const payment = /*tw*/ tv({
   slots: {
-    btn: 'tw--flex-1 tw--space-x-2 tw--text-white tw--bg-dark-neon tw--max-w-[280px] tw--mx-auto tw--px-4 tw--py-3 tw--font-bold tw--rounded-[20px] tw--shadow-[0px_12px_24px_-4px_rgba(1,154,255,0.2)] tw--flex tw--justify-center tw--items-center tw--cursor-pointer tw--relative tw--w-full tw--text-base',
+    btn: 'tw--flex-1 tw--space-x-2 tw--max-h-14 tw--text-white tw--bg-dark-neon tw--max-w-[280px] tw--mx-auto tw--px-4 tw--py-3 tw--font-bold tw--rounded-[20px] tw--shadow-[0px_12px_24px_-4px_rgba(1,154,255,0.2)] tw--flex tw--justify-center tw--items-center tw--cursor-pointer tw--relative tw--w-full tw--text-base',
   }
 });
 

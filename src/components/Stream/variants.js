@@ -3,7 +3,7 @@ import { tv } from 'tailwind-variants';
 
 export const streamBase = /*tw*/ tv({
   slots: {
-    base: 'tw--flex-1 tw--px-4 tw--py-2',
+    base: 'tw--flex-1 tw--px-4 tw--py-2 tw--overflow-y-scroll',
   },
 });
 
