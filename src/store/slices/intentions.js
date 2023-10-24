@@ -31,18 +31,31 @@ const intentionsSlice = createSlice({
     },
     setLink(state, { payload }) {
       state.link = { ...state.link, ...payload };
-    }
+    },
+    // Response Form reducers
+    setResponse(state, { payload }) {
+      state.response.value = payload;
+    },
+    setResponseFormVisibility(state, { payload }) {
+      state.response.isFormVisible = payload;
+    },
+    setResponseLoadingStatus(state, { payload }) {
+      state.response.isLoading = payload;
+    },
   }
 });
 
 export const getEmailIntentions = state => state.intentions.email;
 export const getPaymentIntentions = state => state.intentions.payment;
 export const getLinkIntentions = state => state.intentions.link;
+export const getResponseIntentions = state => state.intentions.response;
 
 export const { setEmail, setEmailSuccess,
   setIsPaymentSuccessful, setPaymentFormVisibility,
   setEmailError, setIsEmailLoading,
   setIsEmailFieldVisible, setIsPaymentButtonVisible,
-  setLink
+  setLink, setResponse, setResponseFormVisibility,
+  setResponseLoadingStatus,
 } = intentionsSlice.actions;
+
 export default intentionsSlice.reducer;

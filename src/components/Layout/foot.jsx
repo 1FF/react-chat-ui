@@ -2,7 +2,7 @@ import { useDispatch } from 'react-redux';
 import { useRef, useState } from 'react';
 import intent from '@/services/intentions';
 import { useAppSelector } from '@/hooks';
-import { EmailForm } from '@/components/Form/email';
+import { ResponseForm, EmailForm } from '@/components/Form/';
 import { getEmailIntentions, getLinkIntentions, getPaymentIntentions, setIsPaymentButtonVisible, setIsPaymentSuccessful, setLink, setPaymentFormVisibility } from '@/store/slices/intentions';
 import { PaymentButton, Link } from '@/components/Payment';
 import { appendHistory } from '@/store/slices/stream';
@@ -16,6 +16,7 @@ import { getMeta } from '@/store/slices/meta';
 export const LayoutFoot = () => {
   const dispatch = useDispatch();
   const { isEmailFieldVisible, currentEmail } = useAppSelector(getEmailIntentions);
+  const { isFormVisible: isResponseFormVisible } = useAppSelector(state => state.intentions.response);
   const { cid, systemType, marketing } = useAppSelector(getMeta);
   const { translations } = useAppSelector(getConfig);
   const { isPaymentButtonVisible, isPaymentFormVisible } = useAppSelector(getPaymentIntentions);
@@ -86,6 +87,7 @@ export const LayoutFoot = () => {
         ) }
 
       { isEmailFieldVisible && <EmailForm /> }
+      { isResponseFormVisible && <ResponseForm /> }
 
       { isPaymentButtonVisible && (
         <PaymentButton

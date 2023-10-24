@@ -55,7 +55,13 @@ export const intentions = {
     error: false,
     isEmailFieldVisible: false,
     currentEmail: '',
-    isLoading: false
+    isLoading: false,
+  },
+  response: {
+    value: '',
+    isFormVisible: false,
+    isLoading: false,
+    error: false,
   },
   payment: {
     isPaymentButtonVisible: false,
