@@ -3,8 +3,8 @@ import { tv } from 'tailwind-variants';
 
 export const layoutBase = /*tw*/ tv({
   slots: {
-    base: 'tw--flex tw--self-stretch tw--justify-self-stretch tw--items-stretch tw--justify-center tw--max-h-full tw--overflow-hidden',
-    wrapper: 'tw--flex tw--flex-col tw--w-full md:tw--max-w-3xl tw--max-h-screen tw--border-x',
+    base: 'tw--flex tw--self-stretch tw--justify-self-stretch tw--items-stretch tw--justify-center tw--overflow-hidden tw--h-full',
+    wrapper: 'tw--flex tw--flex-col tw--w-full md:tw--max-w-3xl tw--max-h-screen tw--border-x tw--h-full',
   },
   variants: {
     theme: {
@@ -21,7 +21,6 @@ export const layoutBase = /*tw*/ tv({
       true: 'tw--fixed tw--right-0 tw--bottom-0 tw--max-h-[700px] tw--max-w-md'
     }
   },
-  responsiveVariants: true, // ['sm', 'md']
 });
 
 export const layoutHead = /*tw*/ tv({
