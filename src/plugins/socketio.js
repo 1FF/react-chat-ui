@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { io } from 'socket.io-client';
 
 let socket = null;
@@ -19,7 +20,7 @@ if (
    *
    * @param trackingData
    */
-const event = (trackingData = {}) => {
+const constructEvent = (trackingData = {}) => {
   const date = Date.now();
 
   return {
@@ -110,13 +111,24 @@ const getGaClientId = () => {
   return googleAnalyticsClientId;
 };
 
-const getTwClickId = () => window.store.get('__clid');
+const getTwClickId = () => localStorage.getItem('__clid');
 
-window.tracking = {
-  event,
-  getFbClientId,
-  getFbClickId,
-  getGaClientId,
-  getTwClickId,
-  trackClient,
+// eslint-disable-next-line import/prefer-default-export
+export const track = ({ eventType, systemType, utmParams, customerUuid, email, phone }) => {
+  const event = constructEvent({
+    eventType,
+    systemType,
+    uri: window.location.pathname,
+    domain: window.location.hostname,
+    email: email || null,
+    phone: phone || null,
+    customerUuid,
+    additionalData: {},
+    utmParams,
+  });
+
+  trackClient(event);
+  if (window.trackEventInGTM) {
+    window.trackEventInGTM(event);
+  }
 };

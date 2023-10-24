@@ -9,10 +9,14 @@ import { appendHistory } from '@/store/slices/stream';
 import { roles } from '@/config/roles';
 import { PaymentScene } from '@/components/Scenes/payment';
 import { getConfig } from '@/store/slices/config';
+import { track } from '@/plugins/socketio';
+import { customEvents } from '@/config/analytics';
+import { getMeta } from '@/store/slices/meta';
 
 export const LayoutFoot = () => {
   const dispatch = useDispatch();
-  const { isEmailFieldVisible } = useAppSelector(getEmailIntentions);
+  const { isEmailFieldVisible, currentEmail } = useAppSelector(getEmailIntentions);
+  const { cid, systemType, marketing } = useAppSelector(getMeta);
   const { translations } = useAppSelector(getConfig);
   const { isPaymentButtonVisible, isPaymentFormVisible } = useAppSelector(getPaymentIntentions);
   const { isVisible: isCtaVisible, text: ctaText, href: ctaHref } = useAppSelector(getLinkIntentions);
@@ -52,10 +56,15 @@ export const LayoutFoot = () => {
   const onClickCtaPay = (e) => {
     // TODO must check what happen when cta is clicked;
     console.log('clicked redirect', e.currentTarget);
-    // this.track(customEventTypes.linkProvided);
-    // this.elements.ctaButton.addEventListener('click', () => {
-    //   this.track(customEventTypes.linkClicked);
-    // });
+
+    track({
+      eventType: customEvents.linkClicked,
+      systemType,
+      utmParams: marketing.lastUtmParams,
+      customerUuid: cid,
+      email: currentEmail
+    });
+
     // this.mainContainer.innerHTML = '';
     // scroll.add();
     // this.closeSocket();

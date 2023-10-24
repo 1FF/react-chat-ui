@@ -27,6 +27,7 @@ const initialConfig = {
       displayPlanPrice: '$29.90',
     },
     cid: '23c7cdcf-4d90-4ea1-aab0-c73f8426dc1d',
+    systemType: 'test',
     marketing: {
       utmParams: { utm_chat: 'db-sales-nopresetquestions' },
       lastUtmParams: { utm_chat: 'db-sales-nopresetquestions' },
@@ -43,7 +44,7 @@ const initialConfig = {
       role: 'AI-powered nutritionist',
       imgSrc: 'https://storage.1forfit.com/4oZrkOwbOQcSIGJopBG5qsf0CmBbVDKDqflzEkXq.jpg',
       displayInStream: true,
-      initialMessage: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you. [Continue]',
+      initialMessage: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you. [yes|no|continue]',
     },
     chatUrl: 'https://yourketo.ngrok.io',
     themeId: 'light',
