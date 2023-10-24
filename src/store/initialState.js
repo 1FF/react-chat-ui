@@ -32,8 +32,10 @@ export const config = {
     tm716: '',
   },
   themeId: null,
+  chatUrl: null,
   enableDevTools: false,
   isPluginMode: false,
+  connectedToSocket: false,
 };
 
 export const stream = {
@@ -54,8 +56,18 @@ export const intentions = {
     currentEmail: '',
     isLoading: false
   },
+  payment: {
+    isPaymentButtonVisible: false,
+    isPaymentFormVisible: false,
+    isPaymentSuccessful: false
+  },
   messaging: {
     isVisible: false
+  },
+  link: {
+    isVisible: false,
+    href: null,
+    text: ''
   }
 };
 

@@ -8,12 +8,15 @@ const configSlice = createSlice({
     // DEV NOTE: note that immer makes these immutable under the hood
     setConfig(state, { payload }) {
       state.aiProfile = { ...initialState.aiProfile, ...payload.aiProfile };
-      state.themeId = payload.themeId;
       state.translations = { ...initialState.translations, ...payload.translations };
+      state.themeId = payload.themeId;
+      state.chatUrl = payload.chatUrl;
     },
     resetConfig(state) {
       state.aiProfile = initialState.aiProfile;
       state.themeId = initialState.themeId;
+      state.translations = initialState.translations;
+      state.chatUrl = initialState.chatUrl;
     },
     setTheme(state, { payload }) {
       state.themeId = payload;
@@ -30,7 +33,13 @@ const configSlice = createSlice({
     togglePluginMode(state) {
       state.isPluginMode = !state.isPluginMode;
     },
-  },
+    setTranslations(state, { payload }) {
+      state.translations = { ...state.translations, ...payload };
+    },
+    setConnectedToSocket(state) {
+      state.connectedToSocket = true;
+    }
+  }
 });
 
 export const getConfig = ({ config }) => config;
@@ -41,6 +50,7 @@ export const {
   setConfig, resetConfig,
   setTheme, resetTheme,
   setDevToolsStatus, resetDevToolsStatus,
-  togglePluginMode
+  togglePluginMode, setTranslations,
+  setConnectedToSocket
 } = configSlice.actions;
 export default configSlice.reducer;

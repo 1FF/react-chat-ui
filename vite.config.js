@@ -33,7 +33,7 @@ export default defineConfig({
       fileName: (format) => `index.${format}.js`,
     },
     rollupOptions: {
-      output: { exports: 'default' },
+      output: { exports: 'auto' },
       external: [
         'react', 'react-dom', 'react-redux',
         'redux-persist', 'socket.io-client', '@reduxjs/toolkit',

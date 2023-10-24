@@ -18,6 +18,7 @@ export const light = {
     status: '#21bb5a', // tw--light-seraph
     loader: '#f6f8fa',
     dots: '#21bb5a', // tw--light-seraph
+    neon: '#019aff',
     // loading-dots: -24px 0 rgba(202, 202, 219, 0.6), 24px 0 rgba(202, 202, 219, 0.6); // tw--light-ember (0.6 opacity)
     'pale-dots': '#cacadb', // tw--light-ember (0.6 opacity)
     'iota-dots': '#21bb5a', // tw--light-seraph
@@ -25,6 +26,9 @@ export const light = {
     // text-color: '#0f0e1e'; will be replaced with // tw--light-sigma
     'pay-bg': '#ffffff', // tw--white
     'pay-color': '#0f0e1e', // tw--light-sigma
+
+    overlay: 'rgba(15, 14, 30, 0.2)',
+    beta: '#f6f8fa',
   },
 };
 
@@ -45,14 +49,26 @@ export const dark = {
     status: '#21bb5a',
     loader: '#252239', // was loader-bg // tw--dark-lumina
     dots: '#f53374',
+    neon: '#019aff',
+
     // --loading-dots: -24px 0 rgba(255, 255, 255, 0.5), 24px 0 rgba(255, 255, 255, 0.5); // tw--white (0.5 opacity)
     'pale-dots': '#ffffff', // (0.5 opacity)
     'iota-dots': '#21bb5a', // same as status
-
     // 'text-color': '#ffffff', // will be replaced by tw--text-white
     // 'pay-bg': '#', // missing
     // 'pay-color': '#', // missing
+
+    overlay: 'rgba(15, 14, 30, 0.9)',
+    beta: '#252239'
   },
+};
+
+export const boxShadow = {
+  'light-card': '0 12px 24px 0 rgba(43, 49, 57, 0.06), 0 4px 8px 0 rgba(43, 55, 70, 0.04)',
+  'light-loading-dots': '-24px 0 rgba(201, 201, 201, 0.5), 24px 0 rgba(201, 201, 201, 0.5)',
+
+  'dark-card': '0 12px 24px 0 rgba(0, 0, 0, 0.12), 0 4px 8px 0 rgba(0, 0, 0, 0.1)',
+  'dark-loading-dots': '-24px 0 rgba(255, 255, 255, 0.5), 24px 0 rgba(255, 255, 255, 0.5)',
 };
 
 export const colors = {

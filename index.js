@@ -10,9 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // MOCKERIES FOR TESTING PURPOSES
 
     // SUCCESS
-    // setTimeout(() => {
-    //   intent.core.emit(intent.type.emailSuccess, 'great');
-    // }, 3000);
+    setTimeout(() => {
+      intent.core.emit(intent.type.emailSuccess, 'great');
+    }, 3000);
 
     // ERROR - EXISTING USER
     // setTimeout(() => {
@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // }, 3000);
 
     // ERROR - BLACKLISTED MAIL OR ELSE
-    setTimeout(() => {
-      intent.core.emit(intent.type.emailError, { status: 422, errors: { email: ['Email is invalid, please enter valid one'] } });
-    }, 3000);
+    // setTimeout(() => {
+    //   intent.core.emit(intent.type.emailError, { status: 422, errors: { email: ['Email is invalid, please enter valid one'] } });
+    // }, 3000);
   });
 });

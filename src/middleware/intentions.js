@@ -5,12 +5,9 @@ import { appendHistory, setUpstreamItem } from '@/store/slices/stream';
 export const intentionsMiddleware = store => next => {
   intent.core.on(intent.type.emailSuccess, () => {
     const { currentEmail } = store.getState().intentions.email;
-    console.log('email success');
+
     store.dispatch(setIsEmailLoading(false));
     store.dispatch(setUpstreamItem(currentEmail));
-
-    // !!important!! the the email must be set into RZ localStorage
-    // store.set('answers', { 'saved-email': currentEmail });
 
     // DEV: setEmailSuccess this status is for us to know if mail is validated in the endpoint
     store.dispatch(setEmailSuccess(true));
