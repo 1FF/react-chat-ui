@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import { io } from 'socket.io-client';
-import { config, events, roles } from '@/config';
+import { config as socketConfig, events, roles } from '@/config';
 import { appendHistory, resetDownstreamItem, resetIsLoading, resetTextToParse, resetUpstreamItem, setDownstreamItem, setDownstreamMessage, setHistory, setIsLoading, setTextToParse, setUpstreamItem } from '@/store/slices/stream';
 import { getQueryParam } from '@/utils';
 import { extractOptionSet } from '@/utils/formatting';
@@ -14,10 +14,11 @@ let socket;
 
 const chatMiddleware = store => next => action => {
   // here we listen for actions applied to the store and do stuff with the socket
+  const { meta, config, stream, intentions } = store.getState();
   if (setUpstreamItem.match(action)) {
     const data = {
       term: getQueryParam(window.location.search, 'utm_chat'),
-      user_id: store.getState().meta.cid,
+      user_id: meta.cid,
       role: roles.user,
       message: action.payload,
     };
@@ -25,9 +26,7 @@ const chatMiddleware = store => next => action => {
     store.dispatch(setIsLoading());
     socket.emit(events.chat, data);
 
-    if (isFirstUserMessage(store.getState().stream.history)) {
-      const { meta } = store.getState();
-      // { eventType, systemType, utmParams, customerUuid, email } ===> data format
+    if (isFirstUserMessage(stream.history)) {
       track({
         eventType: customEvents.firstMessage,
         systemType: meta.systemType,
@@ -37,13 +36,23 @@ const chatMiddleware = store => next => action => {
     }
   }
 
+  const hasNoUserMessages = !stream.history.some(item => item.role === roles.user);
+  const lastMessage = stream.history[stream.history.length - 1];
+  if (hasNoUserMessages && appendHistory.match(action) && action.payload.role === roles.user && lastMessage.options.length) {
+    const buttonSequence = lastMessage.options.findIndex((item) => item.value === action.payload.message) + 1;
+    track({
+      eventType: customEvents.buttonClick + buttonSequence,
+      systemType: meta.systemType,
+      utmParams: meta.marketing.lastUtmParams,
+      customerUuid: meta.cid,
+    });
+  }
+
   if (setIsPaymentButtonVisible.match(action)) {
-    const { meta, intentions, config } = store.getState();
-    const freshMeta = { pd: JSON.parse(localStorage.getItem('__pd')) || meta.pd };
     const translations = {
-      billingFrequencyTmsg: freshMeta.pd.billingOptionType === 'one-time'
+      billingFrequencyTmsg: meta.pd.billingOptionType === 'one-time'
         ? config.translations.oneTimer
-        : config.translations.subscriberBillingFrequency.replace('{1}', freshMeta.pd.frequencyInMonths)
+        : config.translations.subscriberBillingFrequency.replace('{1}', meta.pd.frequencyInMonths)
     };
 
     store.dispatch(setTranslations(translations));
@@ -66,8 +75,6 @@ const chatMiddleware = store => next => action => {
   }
 
   if (setIsEmailFieldVisible.match(action) && action.payload) {
-    const { meta, intentions } = store.getState();
-
     track({
       eventType: customEvents.emailField,
       systemType: meta.systemType,
@@ -81,7 +88,7 @@ const chatMiddleware = store => next => action => {
     return next(action);
   }
 
-  socket = io.connect(action.payload.chatUrl, config);
+  socket = io.connect(action.payload.chatUrl, socketConfig);
 
   socket.on('connect', () => {
     const { meta } = store.getState();

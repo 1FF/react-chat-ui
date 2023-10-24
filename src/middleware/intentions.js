@@ -2,6 +2,7 @@ import { customEvents } from '@/config/analytics';
 import { track } from '@/plugins/socketio';
 import intent from '@/services/intentions';
 import { setIsEmailLoading, setEmailSuccess, setIsEmailFieldVisible, setEmailError, setLink } from '@/store/slices/intentions';
+import { setPd, setMarketing } from '@/store/slices/meta';
 import { appendHistory, setUpstreamItem } from '@/store/slices/stream';
 
 export const intentionsMiddleware = store => next => {
@@ -65,6 +66,9 @@ export const intentionsMiddleware = store => next => {
     }
   });
 
+  dataIntervalChecker('marketing', store, setMarketing);
+  dataIntervalChecker('__pd', store, setPd);
+
   // add logic to listen when correct email is being submitted
   return action => {
     if (setLink.match(action) && action.payload.isVisible) {
@@ -80,6 +84,16 @@ export const intentionsMiddleware = store => next => {
     }
     next(action);
   };
+};
+
+const dataIntervalChecker = (key, store, setValue) => {
+  const intervalId = setInterval(() => {
+    const data = JSON.parse(localStorage.getItem(key));
+    if (data) {
+      store.dispatch(setValue(data));
+      clearInterval(intervalId);
+    }
+  }, 1000);
 };
 
 export default intentionsMiddleware;
