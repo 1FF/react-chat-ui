@@ -24,7 +24,7 @@ export const StreamBubble = ({ item = {} }) => {
   };
 
   const setMessage = (val) => {
-    dispatch(appendHistory({ role: 'user', message: val }));
+    dispatch(appendHistory({ role: 'user', content: val }));
   };
 
   const OptionList = ({ items = [] }) => (
@@ -39,7 +39,7 @@ export const StreamBubble = ({ item = {} }) => {
 
   return (
     <div className={ base() }>
-      <span className={ baseFlicker() }>{ replaceStringInCurlyBracketsWithStrong(item.message) }</span>
+      <span className={ baseFlicker() }>{ replaceStringInCurlyBracketsWithStrong(item.content) }</span>
       { displayOptionList && <div className="tw--flex tw--flex-col"><OptionList items={ item.options } /></div> }
       { displayActionButton && (
         <div className={ action() }>

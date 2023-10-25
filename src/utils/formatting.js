@@ -14,11 +14,11 @@ export const extractOptionSet = (val) => {
   const match = /\[(.*?)\]/.exec(val);
 
   if (!match || match.length <= 1) {
-    return { message: val, options: [] };
+    return { content: val, options: [] };
   }
 
   return {
-    message: val.replace(match[0], ''),
+    content: val.replace(match[0], ''),
     options: match[1].split('|').map((item, index) => ({ id: `opt-${index}`, label: item, value: item })),
   };
 };

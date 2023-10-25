@@ -1,7 +1,7 @@
 import { customEvents } from '@/config/analytics';
 import { track } from '@/plugins/socketio';
 import intent from '@/services/intentions';
-import { setIsEmailLoading, setEmailSuccess, setIsEmailFieldVisible, setEmailError, setLink } from '@/store/slices/intentions';
+import { setIsEmailLoading, setEmailSuccess, setIsEmailFormVisible, setEmailError, setLink } from '@/store/slices/intentions';
 import { setPd, setMarketing } from '@/store/slices/meta';
 import { appendHistory, setUpstreamItem } from '@/store/slices/stream';
 
@@ -14,7 +14,7 @@ export const intentionsMiddleware = store => next => {
 
     // DEV: setEmailSuccess this status is for us to know if mail is validated in the endpoint
     store.dispatch(setEmailSuccess(true));
-    store.dispatch(setIsEmailFieldVisible(false));
+    store.dispatch(setIsEmailFormVisible(false));
     track({
       eventType: customEvents.emailEntered,
       systemType: meta.systemType,
@@ -33,7 +33,7 @@ export const intentionsMiddleware = store => next => {
     if (response.status === 409) {
       store.dispatch(appendHistory({
         role: 'assistant',
-        message: tm716,
+        content: tm716,
         options: [
           { id: 'opt-1', label: tm526, value: 'link', link: response.data.buttonLink },
           { id: 'opt-2', label: tm715, value: 'button', noStream: true }

@@ -53,7 +53,7 @@ export const intentions = {
   email: {
     success: false,
     error: false,
-    isEmailFieldVisible: false,
+    isFormVisible: false,
     currentEmail: '',
     isLoading: false,
   },

@@ -5,7 +5,7 @@ import { appendHistory, resetDownstreamItem, resetIsLoading, resetTextToParse, r
 import { getQueryParam } from '@/utils';
 import { extractOptionSet } from '@/utils/formatting';
 import intent from '@/services/intentions';
-import { setIsEmailFieldVisible, setIsPaymentButtonVisible } from '@/store/slices/intentions';
+import { setIsEmailFormVisible, setIsPaymentButtonVisible, setResponseFormVisibility } from '@/store/slices/intentions';
 import { setConfig, setConnectedToSocket, setTranslations } from '@/store/slices/config';
 import { track } from '@/plugins/socketio';
 import { baseEvents, customEvents } from '@/config/analytics';
@@ -16,15 +16,19 @@ const chatMiddleware = store => next => action => {
   // here we listen for actions applied to the store and do stuff with the socket
   const { meta, config, stream, intentions } = store.getState();
   if (setUpstreamItem.match(action)) {
-    const data = {
-      term: getQueryParam(window.location.search, 'utm_chat'),
-      user_id: meta.cid,
+    store.dispatch(appendHistory({
+      role: roles.user,
+      content: action.payload,
+    }));
+
+    store.dispatch(setIsLoading());
+
+    socket.emit(events.chat, {
       role: roles.user,
       message: action.payload,
-    };
-    store.dispatch(appendHistory(data));
-    store.dispatch(setIsLoading());
-    socket.emit(events.chat, data);
+      term: getQueryParam(window.location.search, 'utm_chat'),
+      user_id: meta.cid,
+    });
 
     if (isFirstUserMessage(stream.history)) {
       track({
@@ -74,7 +78,7 @@ const chatMiddleware = store => next => action => {
     }
   }
 
-  if (setIsEmailFieldVisible.match(action) && action.payload) {
+  if (setIsEmailFormVisible.match(action) && action.payload) {
     track({
       eventType: customEvents.emailField,
       systemType: meta.systemType,
@@ -99,20 +103,20 @@ const chatMiddleware = store => next => action => {
 
   socket.on(events.chatHistory, (data) => {
     store.dispatch(resetIsLoading());
-    const { config, meta } = store.getState();
+    const { config, meta, intentions } = store.getState();
     if (data.history.length) {
       const lastIdx = data.history.length - 1;
       data.history[lastIdx].isSpecial = checkForSpecialPhrases(data.history[lastIdx].content);
 
-      if (data.history[lastIdx].content.includes(intent.type.email)) store.dispatch(setIsEmailFieldVisible(true));
+      if (data.history[lastIdx].content.includes(intent.type.email)) store.dispatch(setIsEmailFormVisible(true));
 
       if (data.history[lastIdx].content.includes(intent.type.payment)) {
         store.dispatch(setIsPaymentButtonVisible(true));
-        const { config: freshConfig } = store.getState();
-        data.history[lastIdx].content += meta.pd.displayPlanPrice + ' ' + freshConfig.translations.billingFrequencyTmsg;
+        data.history[lastIdx].content += meta.pd.displayPlanPrice + ' ' + config.translations.billingFrequencyTmsg;
       }
 
       store.dispatch(setHistory(data.history));
+      store.dispatch(setResponseFormVisibility(!intentions.link.isVisible && !intentions.email.isFormVisible && !intentions.payment.isPaymentFormVisible && extractOptionSet(data.history[lastIdx].content).options.length === 0));
     } else {
       socket.emit(events.chat, {
         role: roles.assistant,
@@ -136,14 +140,14 @@ const chatMiddleware = store => next => action => {
 
     if (textToParse.includes(intent.type.email)) {
       store.dispatch(resetTextToParse());
-      store.dispatch(setIsEmailFieldVisible(true));
+      store.dispatch(setIsEmailFormVisible(true));
     }
 
     if (textToParse.includes(intent.type.payment)) {
       store.dispatch(resetTextToParse());
       store.dispatch(setIsPaymentButtonVisible(true));
       const { config } = store.getState();
-      store.dispatch(setDownstreamItem(downstreamQueue.message + meta.pd.displayPlanPrice + ' ' + config.translations.billingFrequencyTmsg));
+      store.dispatch(setDownstreamItem(downstreamQueue.content + meta.pd.displayPlanPrice + ' ' + config.translations.billingFrequencyTmsg));
     }
 
     if (chunk.includes('[')) {
@@ -160,7 +164,8 @@ const chatMiddleware = store => next => action => {
   });
 
   socket.on(events.streamEnd, () => {
-    const { options } = extractOptionSet(store.getState().stream.textToParse);
+    const { stream, intentions } = store.getState();
+    const { options } = extractOptionSet(stream.textToParse);
     const data = {
       ...store.getState().stream.downstreamQueue,
       options
@@ -169,6 +174,7 @@ const chatMiddleware = store => next => action => {
     store.dispatch(appendHistory(data));
     store.dispatch(resetDownstreamItem());
     store.dispatch(resetTextToParse());
+    store.dispatch(setResponseFormVisibility(!intentions.link.isVisible && !intentions.email.isFormVisible && !intentions.payment.isPaymentFormVisible && options.length === 0));
   });
 
   socket.on(events.streamError, () => {

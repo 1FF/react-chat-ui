@@ -27,7 +27,7 @@ const configSlice = createSlice({
         term: getQueryParam(window.location.search, 'utm_chat'),
         user_id: localStorage.getItem('__cid'),
         role: 'assistant',
-        message: payload,
+        content: payload,
       };
 
       state.downstreamQueue = nextQueueItem;
@@ -38,7 +38,7 @@ const configSlice = createSlice({
     setDownstreamMessage(state, { payload }) {
       state.downstreamQueue = {
         ...state.downstreamQueue,
-        message: state.downstreamQueue.message + payload.chunk,
+        content: state.downstreamQueue.content + payload.chunk,
       };
     },
     setHistory(state, { payload }) {
@@ -46,7 +46,11 @@ const configSlice = createSlice({
       state.history = nextHistory;
     },
     appendHistory(state, { payload }) {
-      state.history.push({ id: uid(), ...extractOptionSet(payload.message), ...payload });
+      if (payload.options && payload.options.length > 0) {
+        state.history.push({ id: uid(), content: payload.content, options: payload.options, role: payload.role });
+      } else {
+        state.history.push({ id: uid(), ...extractOptionSet(payload.content), role: payload.role });
+      }
     },
     resetHistory(state) {
       state.history = initialState.history;

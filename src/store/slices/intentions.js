@@ -17,8 +17,8 @@ const intentionsSlice = createSlice({
     setIsEmailLoading(state, { payload }) {
       state.email.isLoading = payload;
     },
-    setIsEmailFieldVisible(state, { payload }) {
-      state.email.isEmailFieldVisible = payload;
+    setIsEmailFormVisible(state, { payload }) {
+      state.email.isFormVisible = payload;
     },
     setIsPaymentButtonVisible(state, { payload }) {
       state.payment.isPaymentButtonVisible = payload;
@@ -53,7 +53,7 @@ export const getResponseIntentions = state => state.intentions.response;
 export const { setEmail, setEmailSuccess,
   setIsPaymentSuccessful, setPaymentFormVisibility,
   setEmailError, setIsEmailLoading,
-  setIsEmailFieldVisible, setIsPaymentButtonVisible,
+  setIsEmailFormVisible, setIsPaymentButtonVisible,
   setLink, setResponse, setResponseFormVisibility,
   setResponseLoadingStatus,
 } = intentionsSlice.actions;

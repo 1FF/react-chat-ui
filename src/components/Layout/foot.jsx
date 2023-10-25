@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import intent from '@/services/intentions';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { ResponseForm, EmailForm } from '@/components/Form/';
-import { getEmailIntentions, getLinkIntentions, getPaymentIntentions, setIsPaymentButtonVisible, setIsPaymentSuccessful, setLink, setPaymentFormVisibility } from '@/store/slices/intentions';
+import { getEmailIntentions, getLinkIntentions, getPaymentIntentions, getResponseIntentions, setIsPaymentButtonVisible, setIsPaymentSuccessful, setLink, setPaymentFormVisibility } from '@/store/slices/intentions';
 import { PaymentButton, Link } from '@/components/Payment';
 import { appendHistory } from '@/store/slices/stream';
 import { roles } from '@/config/roles';
@@ -14,8 +14,8 @@ import { getMeta } from '@/store/slices/meta';
 
 export const LayoutFoot = () => {
   const dispatch = useAppDispatch();
-  const { isEmailFieldVisible, currentEmail } = useAppSelector(getEmailIntentions);
-  const { isFormVisible: isResponseFormVisible } = useAppSelector(state => state.intentions.response);
+  const { isFormVisible: isEmailFormVisible, currentEmail } = useAppSelector(getEmailIntentions);
+  const { isFormVisible: isResponseFormVisible } = useAppSelector(getResponseIntentions);
   const { cid, systemType, marketing } = useAppSelector(getMeta);
   const { translations } = useAppSelector(getConfig);
   const { isPaymentButtonVisible, isPaymentFormVisible } = useAppSelector(getPaymentIntentions);
@@ -36,7 +36,7 @@ export const LayoutFoot = () => {
 
   const onPaymentSuccess = () => {
     // TODO: set in store to be persisted the GO THROUGH QUIZ button
-    dispatch(appendHistory({ role: roles.assistant, message: translations.tm1226 }));
+    dispatch(appendHistory({ role: roles.assistant, content: translations.tm1226 }));
     dispatch(setIsPaymentSuccessful(true));
     dispatch(setIsPaymentButtonVisible(false));
     dispatch(setLink({ href: '/', isVisible: true, text: translations.tm530 }));
@@ -85,7 +85,7 @@ export const LayoutFoot = () => {
           />
         ) }
 
-      { isEmailFieldVisible && <EmailForm /> }
+      { isEmailFormVisible && <EmailForm /> }
       { isResponseFormVisible && <ResponseForm /> }
 
       { isPaymentButtonVisible && (
