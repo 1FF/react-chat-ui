@@ -3,7 +3,8 @@ import { tv } from 'tailwind-variants';
 
 export const streamBase = /*tw*/ tv({
   slots: {
-    base: 'tw--flex-1 tw--px-4 tw--py-2 tw--overflow-y-scroll',
+    base: 'tw--px-4 tw--w-full tw--h-full tw--py-2 tw--overflow-y-scroll tw--flex tw--flex-col-reverse tw--translate-z-0',
+    second: 'tw--mt-0 tw--mb-auto'
   },
 });
 
@@ -38,7 +39,7 @@ export const flickerEffect = /* tw */ tv({
 
 export const streamBubble = /*tw*/ tv({
   slots: {
-    base: 'tw--relative tw--max-w-xs tw--px-4 tw--py-3',
+    base: 'tw--relative tw--max-w-xs tw--px-4 tw--py-3 tw--whitespace-pre-wrap',
     action: 'tw--absolute tw--bottom-[-16px] tw--right-[-10px]'
   },
   variants: {

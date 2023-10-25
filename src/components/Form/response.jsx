@@ -18,7 +18,7 @@ export const ResponseForm = () => {
   const [timerId, setTimerId] = useState(null);
 
   const handleInputChange = (e) => {
-    setCurrentResponse(e.target.value.trim());
+    setCurrentResponse(e.target.value);
     setTimerToSendMessage();
   };
 

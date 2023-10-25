@@ -4,13 +4,14 @@ import { useAppDispatch, useAppSelector } from '@/hooks';
 import { ResponseForm, EmailForm } from '@/components/Form/';
 import { getEmailIntentions, getLinkIntentions, getPaymentIntentions, getResponseIntentions, setIsPaymentButtonVisible, setIsPaymentSuccessful, setLink, setPaymentFormVisibility } from '@/store/slices/intentions';
 import { PaymentButton, Link } from '@/components/Payment';
-import { appendHistory } from '@/store/slices/stream';
+import { appendHistory, getStream } from '@/store/slices/stream';
 import { roles } from '@/config/roles';
 import { PaymentScene } from '@/components/Scenes/payment';
 import { getConfig } from '@/store/slices/config';
 import { track } from '@/plugins/socketio';
 import { customEvents } from '@/config/analytics';
 import { getMeta } from '@/store/slices/meta';
+import { Ellipsis } from '@/components/Stream/ellipsis';
 
 export const LayoutFoot = () => {
   const dispatch = useAppDispatch();
@@ -20,6 +21,8 @@ export const LayoutFoot = () => {
   const { translations } = useAppSelector(getConfig);
   const { isPaymentButtonVisible, isPaymentFormVisible } = useAppSelector(getPaymentIntentions);
   const { isVisible: isCtaVisible, text: ctaText, href: ctaHref } = useAppSelector(getLinkIntentions);
+  const { isLoading } = useAppSelector(getStream);
+
   const ctaAfterPayButton = useRef(null);
   const [disabled, setDisabled] = useState(false);
 
@@ -72,9 +75,9 @@ export const LayoutFoot = () => {
   };
 
   return (
-    <>
+    <div>
       { isPaymentFormVisible && <PaymentScene onClose={ onClosePaymentForm } /> }
-
+      { isLoading && <Ellipsis /> }
       { isCtaVisible
         && (
           <Link
@@ -95,7 +98,7 @@ export const LayoutFoot = () => {
           disabled={ disabled }
         />
       ) }
-    </>
+    </div>
   );
 };
 
