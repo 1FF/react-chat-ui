@@ -47,6 +47,8 @@ export const stream = {
   status: null,
   error: null,
   isLoading: false,
+  shouldSendUnsent: false,
+  unsent: [],
 };
 
 export const intentions = {

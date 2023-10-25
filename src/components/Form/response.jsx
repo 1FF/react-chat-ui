@@ -1,47 +1,45 @@
 import { useState } from 'react';
-import { isNonEmptyStr } from '@/utils';
-import { getResponseIntentions, setResponse, setResponseLoadingStatus } from '@/store/slices/intentions';
+import { getResponseIntentions } from '@/store/slices/intentions';
 import { getConfig } from '@/store/slices/config';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { Input } from '@/components/Input';
 import { IconBtn } from '@/components/Button';
 
+import { appendUnsent, setShouldSendUnsent } from '@/store/slices/stream';
 import { layoutFoot as variant } from '../Layout/variants';
 
-// DEV NOTE: Keep the form as close as possible to the email form so we can extract an abstract component on a later stage
 export const ResponseForm = () => {
   const dispatch = useAppDispatch();
-  const { themeId: theme } = useAppSelector(getConfig);
+  const hasStreamError = false;
+  const { themeId: theme, translations } = useAppSelector(getConfig);
   const { isLoading, error } = useAppSelector(getResponseIntentions);
   const { base, input, button } = variant({ theme });
-
   const [response, setCurrentResponse] = useState('');
-  const [isValidResponse, setIsValidResponse] = useState(true);
+  const [timerId, setTimerId] = useState(null);
 
   const handleInputChange = (e) => {
-    const currentValue = e.target.value.trim();
-    setCurrentResponse(currentValue);
-    setIsValidResponse(true);
+    setCurrentResponse(e.target.value.trim());
+    setTimerToSendMessage();
   };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-
-    if (isNonEmptyStr(response)) {
-      setIsValidResponse(false);
-      return;
-    }
-
-    dispatch(setResponseLoadingStatus(true));
-    dispatch(setResponse(response));
+    dispatch(appendUnsent(response));
     setCurrentResponse('');
-    setIsValidResponse(true);
+    setTimerToSendMessage();
+  };
+
+  const setTimerToSendMessage = () => {
+    clearTimeout(timerId);
+    const currentId = setTimeout(() => {
+      dispatch(setShouldSendUnsent(true));
+    }, 3000);
+    setTimerId(currentId);
   };
 
   return (
     <>
-      { /* DEV NOTE: Fix this validation response messages on a later stage || Abstract the form as it different only by the placeholder and type values */ }
-      { (!isValidResponse || error) && <div className="tw--pl-[35px] tw--text-[#ff0043] tw--font-medium">{ error || 'Invalid response' }</div> }
+      { hasStreamError && <div className="tw--pl-[35px] tw--text-[#ff0043] tw--font-medium">{ error || 'Please enter text' }</div> }
       <form className={ base() } onSubmit={ handleFormSubmit }>
         <div className={ input() }>
           <Input

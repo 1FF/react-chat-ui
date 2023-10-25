@@ -66,6 +66,15 @@ const configSlice = createSlice({
     },
     resetIsLoading(state) {
       state.isLoading = initialState.isLoading;
+    },
+    appendUnsent(state, { payload }) {
+      state.unsent = [...state.unsent, payload];
+    },
+    resetUnsent(state) {
+      state.unsent = initialState.unsent;
+    },
+    setShouldSendUnsent(state, { payload }) {
+      state.shouldSendUnsent = payload;
     }
   },
 });
@@ -77,6 +86,7 @@ export const { setUpstreamItem, setDownstreamItem,
   resetDownstreamItem, setDownstreamMessage,
   resetUpstreamItem, setHistory, resetHistory,
   appendHistory, setTextToParse, resetTextToParse,
-  setIsLoading, resetIsLoading
+  setIsLoading, resetIsLoading, appendUnsent, resetUnsent,
+  setShouldSendUnsent
 } = configSlice.actions;
 export default configSlice.reducer;

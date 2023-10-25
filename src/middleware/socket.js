@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import { io } from 'socket.io-client';
 import { config as socketConfig, events, roles } from '@/config';
-import { appendHistory, resetDownstreamItem, resetIsLoading, resetTextToParse, resetUpstreamItem, setDownstreamItem, setDownstreamMessage, setHistory, setIsLoading, setTextToParse, setUpstreamItem } from '@/store/slices/stream';
+import { appendHistory, appendUnsent, resetDownstreamItem, resetIsLoading, resetTextToParse, resetUnsent, resetUpstreamItem, setDownstreamItem, setDownstreamMessage, setHistory, setIsLoading, setShouldSendUnsent, setTextToParse, setUpstreamItem } from '@/store/slices/stream';
 import { getQueryParam } from '@/utils';
 import { extractOptionSet } from '@/utils/formatting';
 import intent from '@/services/intentions';
@@ -38,6 +38,21 @@ const chatMiddleware = store => next => action => {
         customerUuid: meta.cid
       });
     }
+  }
+
+  if (appendUnsent.match(action) && action.payload) {
+    store.dispatch(appendHistory({ role: roles.user, content: action.payload }));
+  }
+
+  if (setShouldSendUnsent.match(action) && action.payload && stream.unsent.length) {
+    socket.emit(events.chat, {
+      role: roles.user,
+      message: stream.unsent.join('\n'),
+      term: getQueryParam(window.location.search, 'utm_chat'),
+      user_id: meta.cid,
+    });
+
+    store.dispatch(resetUnsent());
   }
 
   const hasNoUserMessages = !stream.history.some(item => item.role === roles.user);
