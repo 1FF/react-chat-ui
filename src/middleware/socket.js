@@ -19,7 +19,6 @@ import { baseEvents, customEvents } from '@/config/analytics';
 let socket;
 
 const chatMiddleware = store => next => action => {
-  // here we listen for actions applied to the store and do stuff with the socket
   const { meta, config, stream, intentions } = store.getState();
   if (setUpstreamItem.match(action)) {
     store.dispatch(appendHistory({
@@ -57,7 +56,7 @@ const chatMiddleware = store => next => action => {
       term: getQueryParam(window.location.search, 'utm_chat'),
       user_id: meta.cid,
     });
-
+    store.dispatch(setIsLoading());
     store.dispatch(resetUnsent());
   }
 
@@ -109,6 +108,11 @@ const chatMiddleware = store => next => action => {
     });
   }
 
+  if (setHistory.match(action)) {
+    const { intentions } = store.getState();
+    store.dispatch(setResponseFormVisibility(!intentions.link.isVisible && !intentions.email.isFormVisible && !intentions.payment.isPaymentFormVisible && extractOptionSet(action.payload[action.payload.length - 1].content).options.length === 0));
+  }
+
   if (!setConfig.match(action)) {
     return next(action);
   }
@@ -130,9 +134,11 @@ const chatMiddleware = store => next => action => {
       const link = constructLink(data.history[lastIdx].content);
 
       if (link) {
-        store.dispatch(setLink({ isVisible: true,
+        store.dispatch(setLink({
+          isVisible: true,
           href: link,
-          text: 'Link' }));
+          text: config.translations.ctaTextContent
+        }));
       }
 
       data.history[lastIdx].isSpecial = checkForSpecialPhrases(data.history[lastIdx].content);
@@ -145,9 +151,6 @@ const chatMiddleware = store => next => action => {
       }
 
       store.dispatch(setHistory(data.history));
-
-      const { intentions } = store.getState();
-      store.dispatch(setResponseFormVisibility(!intentions.link.isVisible && !intentions.email.isFormVisible && !intentions.payment.isPaymentFormVisible && extractOptionSet(data.history[lastIdx].content).options.length === 0));
     } else {
       socket.emit(events.chat, {
         role: roles.assistant,
@@ -166,14 +169,15 @@ const chatMiddleware = store => next => action => {
   });
 
   socket.on(events.streamData, ({ chunk }) => {
-    const { stream, meta } = store.getState();
+    const { stream, meta, config } = store.getState();
     const { textToParse, downstreamQueue } = stream;
     const link = constructLink(textToParse) || constructLink(downstreamQueue.content);
 
     if (link) {
-      store.dispatch(setLink({ isVisible: true,
+      store.dispatch(setLink({
+        isVisible: true,
         href: link,
-        text: 'Link'
+        text: config.translations.ctaTextContent
       }));
     }
 

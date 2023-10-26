@@ -44,6 +44,7 @@ const initialConfig = {
       role: 'AI-powered nutritionist',
       imgSrc: 'https://storage.1forfit.com/4oZrkOwbOQcSIGJopBG5qsf0CmBbVDKDqflzEkXq.jpg',
       displayInStream: true,
+      // initialMessage: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you.',
       initialMessage: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you. [yes|no|continue]',
     },
     chatUrl: 'https://yourketo.ngrok.io',
@@ -72,7 +73,11 @@ const initialConfig = {
         'Decision travels back to us.',
         'Waiting your payment to be verified and complete.'
       ],
-      payButton: 'Secure payment'
+      payButton: 'Secure payment',
+      ctaTextContent: 'Create Your Menu!',
+      mealButton: 'Create your meal plan',
+      error: 'Oops something went wrong.',
+      tm505: 'Please enter valid email address',
     }
   },
 };

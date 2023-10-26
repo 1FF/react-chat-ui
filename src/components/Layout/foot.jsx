@@ -42,7 +42,7 @@ export const LayoutFoot = () => {
     dispatch(appendHistory({ role: roles.assistant, content: translations.tm1226 }));
     dispatch(setIsPaymentSuccessful(true));
     dispatch(setIsPaymentButtonVisible(false));
-    dispatch(setLink({ href: '/', isVisible: true, text: translations.tm530 }));
+    dispatch(setLink({ href: '/', isVisible: true, text: translations.ctaTextContent }));
     setIsPaymentContainerVisible(false);
 
     // // in case the user does not click on take the quiz button
