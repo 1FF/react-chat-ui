@@ -41,12 +41,19 @@ export const formatDateByLocale = (val, locale = undefined, options = dateFormat
  *
  * @param {string} val - The input string from which the link will be extracted.
  * @param {string} userId - The user ID used for query parameter construction.
- * @param {boolean} [hasQuery=false] - Indicates whether to append query parameters.
  * @example constructLink('here is a link to a diet website https://usa.example.com', '12311231a2', hasQueryParams('https://usa.example.com'));
  * //output: https://usa.example.com/?utm_chat=salesmen-keto-redirect&chatSeen=true&cid=12311231a2
  * @returns {string|boolean} The extracted link with optional query parameters or `false` if no link is found.
  */
-export const constructLink = (val, userId, hasQuery = false) => {
+export const constructLink = (val, userId) => {
+  const hasQueryParams = (url) => {
+    // Regular expression pattern to match query parameters
+    const pattern = /[?&]([^=#]+)=([^&#]*)/g;
+
+    // Check if the pattern matches any query parameters
+    return pattern.test(url);
+  };
+
   // matching example: 'Secure site: https://www.example.com' will give [ https://www.example.com ]
   const REGEX_URL = /\b((?:https?:\/\/|www\.)[^\s/$.?#][^\s{}[\]()<>]*)\b/gi;
   let search = '';
@@ -67,7 +74,7 @@ export const constructLink = (val, userId, hasQuery = false) => {
     return false;
   }
 
-  if (hasQuery) {
+  if (hasQueryParams(link)) {
     return link;
   }
 

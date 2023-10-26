@@ -7,7 +7,7 @@ import { isNonEmptyArr } from '@/utils';
 import { Btn, IconBtn } from '@/components/Button';
 import { Link } from '@/components/Link';
 import { flickerEffect, streamBubble as variant } from './variants';
-import { replaceStringInCurlyBracketsWithStrong } from './modifiers';
+import { textModifier } from './modifiers';
 
 export const StreamBubble = ({ item = {} }) => {
   const dispatch = useAppDispatch();
@@ -39,7 +39,7 @@ export const StreamBubble = ({ item = {} }) => {
 
   return (
     <div className={ base() }>
-      <span className={ baseFlicker() }>{ replaceStringInCurlyBracketsWithStrong(item.content) }</span>
+      <span className={ baseFlicker() }>{ textModifier(item.content) }</span>
       { displayOptionList && <div className="tw--flex tw--flex-col"><OptionList items={ item.options } /></div> }
       { displayActionButton && (
         <div className={ action() }>

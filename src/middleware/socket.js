@@ -1,11 +1,17 @@
 /* eslint-disable no-undef */
 import { io } from 'socket.io-client';
 import { config as socketConfig, events, roles } from '@/config';
-import { appendHistory, appendUnsent, resetDownstreamItem, resetIsLoading, resetTextToParse, resetUnsent, resetUpstreamItem, setDownstreamItem, setDownstreamMessage, setHistory, setIsLoading, setShouldSendUnsent, setTextToParse, setUpstreamItem } from '@/store/slices/stream';
+import { appendHistory, appendUnsent,
+  resetDownstreamItem, resetIsLoading,
+  resetTextToParse, resetUnsent,
+  resetUpstreamItem, setDownstreamItem, setDownstreamMessage,
+  setHistory, setIsLoading,
+  setShouldSendUnsent, setTextToParse,
+  setUpstreamItem } from '@/store/slices/stream';
 import { getQueryParam } from '@/utils';
-import { extractOptionSet } from '@/utils/formatting';
+import { constructLink, extractOptionSet } from '@/utils/formatting';
 import intent from '@/services/intentions';
-import { setIsEmailFormVisible, setIsPaymentButtonVisible, setResponseFormVisibility } from '@/store/slices/intentions';
+import { setIsEmailFormVisible, setIsPaymentButtonVisible, setLink, setResponseFormVisibility } from '@/store/slices/intentions';
 import { setConfig, setConnectedToSocket, setTranslations } from '@/store/slices/config';
 import { track } from '@/plugins/socketio';
 import { baseEvents, customEvents } from '@/config/analytics';
@@ -118,9 +124,17 @@ const chatMiddleware = store => next => action => {
 
   socket.on(events.chatHistory, (data) => {
     store.dispatch(resetIsLoading());
-    const { config, meta, intentions } = store.getState();
+    const { config, meta } = store.getState();
     if (data.history.length) {
       const lastIdx = data.history.length - 1;
+      const link = constructLink(data.history[lastIdx].content);
+
+      if (link) {
+        store.dispatch(setLink({ isVisible: true,
+          href: link,
+          text: 'Link' }));
+      }
+
       data.history[lastIdx].isSpecial = checkForSpecialPhrases(data.history[lastIdx].content);
 
       if (data.history[lastIdx].content.includes(intent.type.email)) store.dispatch(setIsEmailFormVisible(true));
@@ -131,6 +145,8 @@ const chatMiddleware = store => next => action => {
       }
 
       store.dispatch(setHistory(data.history));
+
+      const { intentions } = store.getState();
       store.dispatch(setResponseFormVisibility(!intentions.link.isVisible && !intentions.email.isFormVisible && !intentions.payment.isPaymentFormVisible && extractOptionSet(data.history[lastIdx].content).options.length === 0));
     } else {
       socket.emit(events.chat, {
@@ -152,6 +168,14 @@ const chatMiddleware = store => next => action => {
   socket.on(events.streamData, ({ chunk }) => {
     const { stream, meta } = store.getState();
     const { textToParse, downstreamQueue } = stream;
+    const link = constructLink(textToParse) || constructLink(downstreamQueue.content);
+
+    if (link) {
+      store.dispatch(setLink({ isVisible: true,
+        href: link,
+        text: 'Link'
+      }));
+    }
 
     if (textToParse.includes(intent.type.email)) {
       store.dispatch(resetTextToParse());
