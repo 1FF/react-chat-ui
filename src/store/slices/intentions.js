@@ -40,7 +40,7 @@ const intentionsSlice = createSlice({
       state.response.value = payload;
     },
     setResponseFormVisibility(state, { payload }) {
-      state.response.isFormVisible = payload;
+      state.response.isFormVisible = !payload.intentions.link.isVisible && !payload.intentions.email.isFormVisible && !payload.intentions.payment.isFormVisible && !payload.intentions.payment.isButtonVisible && payload.options.length === 0;
     },
     setResponseLoadingStatus(state, { payload }) {
       state.response.isLoading = payload;

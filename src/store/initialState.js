@@ -1,15 +1,3 @@
-import { baseEventsArr, customEventsArr } from '@/config/analytics';
-
-const baseEvents = baseEventsArr.reduce((acc, cur) => {
-  acc[cur] = { executed: false };
-  return acc;
-}, {});
-
-const customEvents = customEventsArr.reduce((acc, cur) => {
-  acc[cur] = { executed: false };
-  return acc;
-}, {});
-
 export const meta = {
   pd: null,
   cid: null,
@@ -31,7 +19,6 @@ export const config = {
   chatUrl: null,
   enableDevTools: false,
   isPluginMode: false,
-  connectedToSocket: false,
 };
 
 export const chat = {
@@ -44,6 +31,8 @@ export const chat = {
   isLoading: false,
   shouldSendUnsent: false,
   unsent: [],
+  connected: false,
+  closed: false,
 };
 
 export const intentions = {
@@ -76,11 +65,4 @@ export const intentions = {
   }
 };
 
-export const analytics = {
-  events: {
-    ...baseEvents,
-    ...customEvents,
-  }
-};
-
-export default { meta, config, analytics, intentions, chat };
+export default { meta, config, intentions, chat };

@@ -4,14 +4,15 @@ import { useAppDispatch, useAppSelector } from '@/hooks';
 import { ResponseForm, EmailForm } from '@/components/Form/';
 import { getEmailIntentions, getLinkIntentions, getPaymentIntentions, getResponseIntentions, setIsPaymentButtonVisible, setIsPaymentSuccessful, setLink, setPaymentFormVisibility, setPaymentIntentError } from '@/store/slices/intentions';
 import { PaymentButton, Link } from '@/components/Payment';
-import { appendHistory, getStream } from '@/store/slices/chat';
+import { appendHistory, getStream, setClosed } from '@/store/slices/chat';
 import { roles } from '@/config/roles';
 import { PaymentScene } from '@/components/Scenes/payment';
 import { getConfig } from '@/store/slices/config';
-import { track } from '@/plugins/socketio';
+import { track } from '@/services/tracking';
 import { customEvents } from '@/config/analytics';
 import { getMeta } from '@/store/slices/meta';
 import { Ellipsis } from '@/components/Stream/ellipsis';
+import { CHAT_SEEN_KEY } from '@/config/env';
 
 export const LayoutFoot = () => {
   const dispatch = useAppDispatch();
@@ -61,10 +62,7 @@ export const LayoutFoot = () => {
     setDisabled(true);
   };
 
-  const onClickCtaPay = (e) => {
-    // TODO must check what happen when cta is clicked;
-    console.log('clicked redirect', e.currentTarget);
-
+  const onClickCtaPay = () => {
     track({
       eventType: customEvents.linkClicked,
       systemType,
@@ -73,10 +71,8 @@ export const LayoutFoot = () => {
       email: current
     });
 
-    // this.mainContainer.innerHTML = '';
-    // scroll.add();
-    // this.closeSocket();
-    // localStorage.setItem(CHAT_SEEN_KEY, true);
+    dispatch(setClosed());
+    localStorage.setItem(CHAT_SEEN_KEY, true);
   };
 
   return (

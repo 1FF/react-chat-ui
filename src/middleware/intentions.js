@@ -1,5 +1,5 @@
 import { customEvents } from '@/config/analytics';
-import { track } from '@/plugins/socketio';
+import { track } from '@/services/tracking';
 import intent from '@/services/intentions';
 import { setIsEmailLoading, setEmailSuccess, setIsEmailFormVisible, setEmailError, setLink } from '@/store/slices/intentions';
 import { setPd, setMarketing } from '@/store/slices/meta';
@@ -69,7 +69,6 @@ export const intentionsMiddleware = store => next => {
   dataIntervalChecker('marketing', store, setMarketing);
   dataIntervalChecker('__pd', store, setPd);
 
-  // add logic to listen when correct email is being submitted
   return action => {
     if (setLink.match(action) && action.payload.isVisible) {
       const { meta, intentions } = store.getState();

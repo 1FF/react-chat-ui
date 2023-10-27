@@ -3,32 +3,30 @@ import { uid } from 'uid';
 import { chat as initialState } from '@/store/initialState';
 import { extractOptionSet } from '@/utils/formatting';
 import { getQueryParam } from '@/utils';
+import { roles } from '@/config';
 
 const configSlice = createSlice({
   name: 'chat',
   initialState,
   reducers: {
     setOutgoing(state, { payload }) {
-      const nextQueueItem = {
+      state.outgoing = {
         term: getQueryParam(window.location.search, 'utm_chat'),
         user_id: localStorage.getItem('__cid'),
-        role: 'user',
+        role: roles.user,
         message: payload,
       };
-      state.outgoing = nextQueueItem;
     },
     resetOutgoing(state) {
       state.outgoing = initialState.outgoing;
     },
     setIncoming(state, { payload }) {
-      const nextQueueItem = {
+      state.incoming = {
         term: getQueryParam(window.location.search, 'utm_chat'),
         user_id: localStorage.getItem('__cid'),
-        role: 'assistant',
+        role: roles.assistant,
         content: payload,
       };
-
-      state.incoming = nextQueueItem;
     },
     setError(state, { payload }) {
       state.error = payload;
@@ -46,8 +44,7 @@ const configSlice = createSlice({
       };
     },
     setHistory(state, { payload }) {
-      const nextHistory = payload.map((item) => ({ ...item, id: uid(), role: item.role, ...extractOptionSet(item.content) }));
-      state.history = nextHistory;
+      state.history = payload.map((item) => ({ ...item, id: uid(), role: item.role, ...extractOptionSet(item.content) }));
     },
     appendHistory(state, { payload }) {
       if (payload.options && payload.options.length > 0) {
@@ -79,7 +76,13 @@ const configSlice = createSlice({
     },
     setShouldSendUnsent(state, { payload }) {
       state.shouldSendUnsent = payload;
-    }
+    },
+    setConnected(state, { payload }) {
+      state.connected = payload;
+    },
+    setClosed(state) {
+      state.closed = true;
+    },
   },
 });
 
@@ -92,5 +95,7 @@ export const { setOutgoing, setIncoming,
   appendHistory, setTextToParse, resetTextToParse,
   setIsLoading, resetIsLoading, appendUnsent, resetUnsent,
   setShouldSendUnsent, setError, resetError,
+  setConnected, setClosed
 } = configSlice.actions;
+
 export default configSlice.reducer;
