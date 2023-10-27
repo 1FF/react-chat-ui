@@ -10,6 +10,7 @@ export const intentionsMiddleware = store => next => {
     const { meta, intentions } = store.getState();
 
     store.dispatch(setIsEmailLoading(false));
+    store.dispatch(setEmailError(''));
     store.dispatch(setOutgoing(intentions.email.current));
 
     // DEV: setEmailSuccess this status is for us to know if mail is validated in the endpoint
