@@ -6,7 +6,7 @@ const intentionsSlice = createSlice({
   initialState,
   reducers: {
     setEmail(state, { payload }) {
-      state.email.currentEmail = payload;
+      state.email.current = payload;
     },
     setEmailSuccess(state, { payload }) {
       state.email.success = payload;
@@ -21,13 +21,16 @@ const intentionsSlice = createSlice({
       state.email.isFormVisible = payload;
     },
     setIsPaymentButtonVisible(state, { payload }) {
-      state.payment.isPaymentButtonVisible = payload;
+      state.payment.isButtonVisible = payload;
     },
     setPaymentFormVisibility(state, { payload }) {
-      state.payment.isPaymentFormVisible = payload;
+      state.payment.isFormVisible = payload;
     },
     setIsPaymentSuccessful(state, { payload }) {
-      state.payment.isPaymentSuccessful = payload;
+      state.payment.isSuccessful = payload;
+    },
+    setPaymentIntentError(state, { payload }) {
+      state.payment.error = payload;
     },
     setLink(state, { payload }) {
       state.link = { ...state.link, ...payload };
@@ -55,7 +58,7 @@ export const { setEmail, setEmailSuccess,
   setEmailError, setIsEmailLoading,
   setIsEmailFormVisible, setIsPaymentButtonVisible,
   setLink, setResponse, setResponseFormVisibility,
-  setResponseLoadingStatus,
+  setResponseLoadingStatus, setPaymentIntentError
 } = intentionsSlice.actions;
 
 export default intentionsSlice.reducer;

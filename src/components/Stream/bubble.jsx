@@ -1,7 +1,7 @@
 import { object } from 'prop-types';
 import { useAppSelector, useAppDispatch } from '@/hooks';
 import { getConfig } from '@/store/slices/config';
-import { appendHistory, getCurrentPointer, getStream, setUpstreamItem } from '@/store/slices/stream';
+import { appendHistory, getCurrentPointer, getStream, setOutgoing } from '@/store/slices/chat';
 import { isNonEmptyArr } from '@/utils';
 
 import { Btn, IconBtn } from '@/components/Button';
@@ -13,14 +13,14 @@ export const StreamBubble = ({ item = {} }) => {
   const dispatch = useAppDispatch();
   const { themeId: theme } = useAppSelector(getConfig);
   const currentPointer = useAppSelector(getCurrentPointer);
-  const { downstreamQueue } = useAppSelector(getStream);
+  const { incoming } = useAppSelector(getStream);
   const displayOptionList = isNonEmptyArr(item.options) && item.id === currentPointer && !item.isSpecial;
   const { base, action } = variant({ theme, type: item.role });
-  const { base: baseFlicker } = flickerEffect({ isTyping: !!downstreamQueue && !item.id, theme });
+  const { base: baseFlicker } = flickerEffect({ isTyping: !!incoming && !item.id, theme });
   const displayActionButton = false; // DEV NOTE: get from store state
 
   const setOption = (val) => {
-    dispatch(setUpstreamItem(val));
+    dispatch(setOutgoing(val));
   };
 
   const setMessage = (val) => {

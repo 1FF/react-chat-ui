@@ -26,12 +26,7 @@ export const config = {
     initialMessage: '',
     displayInStream: false,
   },
-  translations: {
-    emailPlaceholder: '',
-    tm526: '',
-    tm715: '',
-    tm716: '',
-  },
+  translations: {},
   themeId: null,
   chatUrl: null,
   enableDevTools: false,
@@ -39,9 +34,9 @@ export const config = {
   connectedToSocket: false,
 };
 
-export const stream = {
-  upstreamQueue: null,
-  downstreamQueue: null,
+export const chat = {
+  outgoing: null,
+  incoming: null,
   textToParse: '',
   history: [],
   status: null,
@@ -53,10 +48,10 @@ export const stream = {
 
 export const intentions = {
   email: {
+    current: '',
     success: false,
     error: false,
     isFormVisible: false,
-    currentEmail: '',
     isLoading: false,
   },
   response: {
@@ -66,9 +61,10 @@ export const intentions = {
     error: false,
   },
   payment: {
-    isPaymentButtonVisible: false,
-    isPaymentFormVisible: false,
-    isPaymentSuccessful: false
+    isButtonVisible: false,
+    isFormVisible: false,
+    isSuccessful: false,
+    error: false
   },
   messaging: {
     isVisible: false
@@ -87,4 +83,4 @@ export const analytics = {
   }
 };
 
-export default { meta, config, analytics, intentions, stream };
+export default { meta, config, analytics, intentions, chat };

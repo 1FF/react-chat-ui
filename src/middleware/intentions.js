@@ -3,14 +3,14 @@ import { track } from '@/plugins/socketio';
 import intent from '@/services/intentions';
 import { setIsEmailLoading, setEmailSuccess, setIsEmailFormVisible, setEmailError, setLink } from '@/store/slices/intentions';
 import { setPd, setMarketing } from '@/store/slices/meta';
-import { appendHistory, setUpstreamItem } from '@/store/slices/stream';
+import { appendHistory, setOutgoing } from '@/store/slices/chat';
 
 export const intentionsMiddleware = store => next => {
   intent.core.on(intent.type.emailSuccess, () => {
     const { meta, intentions } = store.getState();
 
     store.dispatch(setIsEmailLoading(false));
-    store.dispatch(setUpstreamItem(intentions.email.currentEmail));
+    store.dispatch(setOutgoing(intentions.email.current));
 
     // DEV: setEmailSuccess this status is for us to know if mail is validated in the endpoint
     store.dispatch(setEmailSuccess(true));
@@ -20,7 +20,7 @@ export const intentionsMiddleware = store => next => {
       systemType: meta.systemType,
       utmParams: meta.marketing.lastUtmParams,
       customerUuid: meta.cid,
-      email: intentions.email.currentEmail
+      email: intentions.email.current
     });
   });
 
@@ -45,7 +45,7 @@ export const intentionsMiddleware = store => next => {
         systemType: meta.systemType,
         utmParams: meta.marketing.lastUtmParams,
         customerUuid: meta.cid,
-        email: intentions.email.currentEmail
+        email: intentions.email.current
       });
 
       // DEV NOTE: this must be persisted so on refresh the message with options is still part of the history;
@@ -61,7 +61,7 @@ export const intentionsMiddleware = store => next => {
         systemType: meta.systemType,
         utmParams: meta.marketing.lastUtmParams,
         customerUuid: meta.cid,
-        email: intentions.email.currentEmail
+        email: intentions.email.current
       });
     }
   });
@@ -79,7 +79,7 @@ export const intentionsMiddleware = store => next => {
         systemType: meta.systemType,
         utmParams: meta.marketing.lastUtmParams,
         customerUuid: meta.cid,
-        email: intentions.email.currentEmail
+        email: intentions.email.current
       });
     }
     next(action);

@@ -6,7 +6,7 @@ export const Ellipsis = () => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { dotFirst, dotSecond, dotThird } = variant({ theme });
   return (
-    <div>
+    <div className="tw--ml-7">
       <span className={ dotFirst() } />
       <span className={ dotSecond() } />
       <span className={ dotThird() } />

@@ -1,28 +1,26 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { uid } from 'uid';
-import { stream as initialState } from '@/store/initialState';
+import { chat as initialState } from '@/store/initialState';
 import { extractOptionSet } from '@/utils/formatting';
 import { getQueryParam } from '@/utils';
 
 const configSlice = createSlice({
-  name: 'stream',
+  name: 'chat',
   initialState,
   reducers: {
-    // for SENDING messages
-    setUpstreamItem(state, { payload }) {
+    setOutgoing(state, { payload }) {
       const nextQueueItem = {
         term: getQueryParam(window.location.search, 'utm_chat'),
         user_id: localStorage.getItem('__cid'),
         role: 'user',
         message: payload,
       };
-      state.upstreamQueue = nextQueueItem;
+      state.outgoing = nextQueueItem;
     },
-    resetUpstreamItem(state) {
-      state.upstreamQueue = initialState.upstreamQueue;
+    resetOutgoing(state) {
+      state.outgoing = initialState.outgoing;
     },
-    // for RECEIVING messages
-    setDownstreamItem(state, { payload }) {
+    setIncoming(state, { payload }) {
       const nextQueueItem = {
         term: getQueryParam(window.location.search, 'utm_chat'),
         user_id: localStorage.getItem('__cid'),
@@ -30,15 +28,21 @@ const configSlice = createSlice({
         content: payload,
       };
 
-      state.downstreamQueue = nextQueueItem;
+      state.incoming = nextQueueItem;
     },
-    resetDownstreamItem(state) {
-      state.downstreamQueue = initialState.downstreamQueue;
+    setError(state, { payload }) {
+      state.error = payload;
     },
-    setDownstreamMessage(state, { payload }) {
-      state.downstreamQueue = {
-        ...state.downstreamQueue,
-        content: state.downstreamQueue.content + payload.chunk,
+    resetError(state) {
+      state.error = initialState.error;
+    },
+    resetIncoming(state) {
+      state.incoming = initialState.incoming;
+    },
+    addIncomingChunk(state, { payload }) {
+      state.incoming = {
+        ...state.incoming,
+        content: state.incoming.content + payload.chunk,
       };
     },
     setHistory(state, { payload }) {
@@ -79,14 +83,14 @@ const configSlice = createSlice({
   },
 });
 
-export const getCurrentPointer = (state) => state.stream.history[state.stream.history.length - 1].id;
-export const getStream = state => state.stream;
+export const getCurrentPointer = (state) => state.chat.history[state.chat.history.length - 1].id;
+export const getStream = state => state.chat;
 
-export const { setUpstreamItem, setDownstreamItem,
-  resetDownstreamItem, setDownstreamMessage,
-  resetUpstreamItem, setHistory, resetHistory,
+export const { setOutgoing, setIncoming,
+  resetIncoming, addIncomingChunk,
+  resetOutgoing, setHistory, resetHistory,
   appendHistory, setTextToParse, resetTextToParse,
   setIsLoading, resetIsLoading, appendUnsent, resetUnsent,
-  setShouldSendUnsent
+  setShouldSendUnsent, setError, resetError,
 } = configSlice.actions;
 export default configSlice.reducer;

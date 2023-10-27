@@ -2,9 +2,9 @@ import { useRef, useState } from 'react';
 import intent from '@/services/intentions';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { ResponseForm, EmailForm } from '@/components/Form/';
-import { getEmailIntentions, getLinkIntentions, getPaymentIntentions, getResponseIntentions, setIsPaymentButtonVisible, setIsPaymentSuccessful, setLink, setPaymentFormVisibility } from '@/store/slices/intentions';
+import { getEmailIntentions, getLinkIntentions, getPaymentIntentions, getResponseIntentions, setIsPaymentButtonVisible, setIsPaymentSuccessful, setLink, setPaymentFormVisibility, setPaymentIntentError } from '@/store/slices/intentions';
 import { PaymentButton, Link } from '@/components/Payment';
-import { appendHistory, getStream } from '@/store/slices/stream';
+import { appendHistory, getStream } from '@/store/slices/chat';
 import { roles } from '@/config/roles';
 import { PaymentScene } from '@/components/Scenes/payment';
 import { getConfig } from '@/store/slices/config';
@@ -15,13 +15,15 @@ import { Ellipsis } from '@/components/Stream/ellipsis';
 
 export const LayoutFoot = () => {
   const dispatch = useAppDispatch();
-  const { isFormVisible: isEmailFormVisible, currentEmail } = useAppSelector(getEmailIntentions);
   const { isFormVisible: isResponseFormVisible } = useAppSelector(getResponseIntentions);
   const { cid, systemType, marketing } = useAppSelector(getMeta);
   const { translations } = useAppSelector(getConfig);
-  const { isPaymentButtonVisible, isPaymentFormVisible } = useAppSelector(getPaymentIntentions);
   const { isVisible: isCtaVisible, text: ctaText, href: ctaHref } = useAppSelector(getLinkIntentions);
   const { isLoading } = useAppSelector(getStream);
+  const { error: streamError } = useAppSelector(store => store.chat);
+  const { isFormVisible: isEmailFormVisible, current, error: emailError } = useAppSelector(getEmailIntentions);
+  const { isButtonVisible: isPaymentButtonVisible, isFormVisible: isPaymentFormVisible, error: paymentIntentError } = useAppSelector(getPaymentIntentions);
+  const error = streamError || emailError || paymentIntentError;
 
   const ctaAfterPayButton = useRef(null);
   const [disabled, setDisabled] = useState(false);
@@ -45,14 +47,17 @@ export const LayoutFoot = () => {
     dispatch(setLink({ href: '/', isVisible: true, text: translations.ctaTextContent }));
     setIsPaymentContainerVisible(false);
 
-    // // in case the user does not click on take the quiz button
     setTimeout(() => {
       ctaAfterPayButton.current.click();
     }, 7000);
   };
 
+  const onError = (message) => {
+    dispatch(setPaymentIntentError(message));
+  };
+
   const initializePaymentForm = () => {
-    intent.core.emit(intent.type.payment, { setIsPaymentContainerVisible, onPaymentSuccess });
+    intent.core.emit(intent.type.payment, { setIsPaymentContainerVisible, onPaymentSuccess, onError });
     setDisabled(true);
   };
 
@@ -65,7 +70,7 @@ export const LayoutFoot = () => {
       systemType,
       utmParams: marketing.lastUtmParams,
       customerUuid: cid,
-      email: currentEmail
+      email: current
     });
 
     // this.mainContainer.innerHTML = '';
@@ -76,6 +81,7 @@ export const LayoutFoot = () => {
 
   return (
     <div>
+      { error && <div className="tw--pl-[35px] tw--text-[#ff0043] tw--font-medium">{ error }</div> }
       { isPaymentFormVisible && <PaymentScene onClose={ onClosePaymentForm } /> }
       { isLoading && <Ellipsis /> }
       { isCtaVisible

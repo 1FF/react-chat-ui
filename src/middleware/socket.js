@@ -2,12 +2,12 @@
 import { io } from 'socket.io-client';
 import { config as socketConfig, events, roles } from '@/config';
 import { appendHistory, appendUnsent,
-  resetDownstreamItem, resetIsLoading,
-  resetTextToParse, resetUnsent,
-  resetUpstreamItem, setDownstreamItem, setDownstreamMessage,
+  resetIncoming, resetIsLoading,
+  resetError, resetTextToParse, resetUnsent,
+  resetOutgoing, setIncoming, addIncomingChunk,
   setHistory, setIsLoading,
-  setShouldSendUnsent, setTextToParse,
-  setUpstreamItem } from '@/store/slices/stream';
+  setShouldSendUnsent, setError, setTextToParse,
+  setOutgoing } from '@/store/slices/chat';
 import { getQueryParam } from '@/utils';
 import { constructLink, extractOptionSet } from '@/utils/formatting';
 import intent from '@/services/intentions';
@@ -19,8 +19,8 @@ import { baseEvents, customEvents } from '@/config/analytics';
 let socket;
 
 const chatMiddleware = store => next => action => {
-  const { meta, config, stream, intentions } = store.getState();
-  if (setUpstreamItem.match(action)) {
+  const { meta, config, chat, intentions } = store.getState();
+  if (setOutgoing.match(action)) {
     store.dispatch(appendHistory({
       role: roles.user,
       content: action.payload,
@@ -34,8 +34,9 @@ const chatMiddleware = store => next => action => {
       term: getQueryParam(window.location.search, 'utm_chat'),
       user_id: meta.cid,
     });
+    console.log('emit-chat', { connected: socket.connected, socketQueue: socket.sendBuffer });
 
-    if (isFirstUserMessage(stream.history)) {
+    if (isFirstUserMessage(chat.history)) {
       track({
         eventType: customEvents.firstMessage,
         systemType: meta.systemType,
@@ -49,19 +50,19 @@ const chatMiddleware = store => next => action => {
     store.dispatch(appendHistory({ role: roles.user, content: action.payload }));
   }
 
-  if (setShouldSendUnsent.match(action) && action.payload && stream.unsent.length) {
+  if (setShouldSendUnsent.match(action) && action.payload && chat.unsent.length) {
     socket.emit(events.chat, {
       role: roles.user,
-      message: stream.unsent.join('\n'),
+      message: chat.unsent.join('\n'),
       term: getQueryParam(window.location.search, 'utm_chat'),
       user_id: meta.cid,
     });
+    console.log('emit-chat', { connected: socket.connected, socketQueue: socket.sendBuffer });
     store.dispatch(setIsLoading());
-    store.dispatch(resetUnsent());
   }
 
-  const hasNoUserMessages = !stream.history.some(item => item.role === roles.user);
-  const lastMessage = stream.history[stream.history.length - 1];
+  const hasNoUserMessages = !chat.history.some(item => item.role === roles.user);
+  const lastMessage = chat.history[chat.history.length - 1];
   if (hasNoUserMessages && appendHistory.match(action) && action.payload.role === roles.user && lastMessage.options.length) {
     const buttonSequence = lastMessage.options.findIndex((item) => item.value === action.payload.message) + 1;
     track({
@@ -87,7 +88,7 @@ const chatMiddleware = store => next => action => {
         systemType: meta.systemType,
         utmParams: meta.marketing.lastUtmParams,
         customerUuid: meta.cid,
-        email: intentions.email.currentEmail
+        email: intentions.email.current
       };
 
       data.eventType = baseEvents.addToCart;
@@ -104,13 +105,13 @@ const chatMiddleware = store => next => action => {
       systemType: meta.systemType,
       utmParams: meta.marketing.lastUtmParams,
       customerUuid: meta.cid,
-      email: intentions.email.currentEmail
+      email: intentions.email.current
     });
   }
 
   if (setHistory.match(action)) {
     const { intentions } = store.getState();
-    store.dispatch(setResponseFormVisibility(!intentions.link.isVisible && !intentions.email.isFormVisible && !intentions.payment.isPaymentFormVisible && extractOptionSet(action.payload[action.payload.length - 1].content).options.length === 0));
+    store.dispatch(setResponseFormVisibility(!intentions.link.isVisible && !intentions.email.isFormVisible && !intentions.payment.isFormVisible && extractOptionSet(action.payload[action.payload.length - 1].content).options.length === 0));
   }
 
   if (!setConfig.match(action)) {
@@ -126,12 +127,17 @@ const chatMiddleware = store => next => action => {
     store.dispatch(setConnectedToSocket());
   });
 
-  socket.on(events.chatHistory, (data) => {
+  socket.on(events.chatHistory, ({ history, errors }) => {
     store.dispatch(resetIsLoading());
-    const { config, meta } = store.getState();
-    if (data.history.length) {
-      const lastIdx = data.history.length - 1;
-      const link = constructLink(data.history[lastIdx].content);
+    const { config, meta, chat } = store.getState();
+
+    if (errors.length && !chat.error) {
+      store.dispatch(setError(errors[0]));
+    }
+
+    if (history.length) {
+      const lastIdx = history.length - 1;
+      const link = constructLink(history[lastIdx].content);
 
       if (link) {
         store.dispatch(setLink({
@@ -141,16 +147,16 @@ const chatMiddleware = store => next => action => {
         }));
       }
 
-      data.history[lastIdx].isSpecial = checkForSpecialPhrases(data.history[lastIdx].content);
+      history[lastIdx].isSpecial = checkForSpecialPhrases(history[lastIdx].content);
 
-      if (data.history[lastIdx].content.includes(intent.type.email)) store.dispatch(setIsEmailFormVisible(true));
+      if (history[lastIdx].content.includes(intent.type.email)) store.dispatch(setIsEmailFormVisible(true));
 
-      if (data.history[lastIdx].content.includes(intent.type.payment)) {
+      if (history[lastIdx].content.includes(intent.type.payment)) {
         store.dispatch(setIsPaymentButtonVisible(true));
-        data.history[lastIdx].content += meta.pd.displayPlanPrice + ' ' + config.translations.billingFrequencyTmsg;
+        history[lastIdx].content += meta.pd.displayPlanPrice + ' ' + config.translations.billingFrequencyTmsg;
       }
 
-      store.dispatch(setHistory(data.history));
+      store.dispatch(setHistory(history));
     } else {
       socket.emit(events.chat, {
         role: roles.assistant,
@@ -164,14 +170,24 @@ const chatMiddleware = store => next => action => {
 
   socket.on(events.streamStart, () => {
     store.dispatch(resetIsLoading());
-    store.dispatch(resetUpstreamItem());
-    store.dispatch(setDownstreamItem(''));
+    store.dispatch(resetOutgoing());
+    store.dispatch(setIncoming(''));
+    store.dispatch(resetUnsent());
+    store.dispatch(resetError());
   });
 
-  socket.on(events.streamData, ({ chunk }) => {
-    const { stream, meta, config } = store.getState();
-    const { textToParse, downstreamQueue } = stream;
-    const link = constructLink(textToParse) || constructLink(downstreamQueue.content);
+  socket.on(events.streamData, ({ chunk, messages, errors }) => {
+    const { chat, meta, config } = store.getState();
+    const { textToParse, incoming } = chat;
+    const link = constructLink(textToParse, meta.cid) || constructLink(incoming.content, meta.cid);
+
+    if (messages.length > chat.history.length) {
+      store.dispatch(setHistory(messages));
+    }
+
+    if (errors.length && !chat.error) {
+      store.dispatch(setError(errors[0]));
+    }
 
     if (link) {
       store.dispatch(setLink({
@@ -190,7 +206,7 @@ const chatMiddleware = store => next => action => {
       store.dispatch(resetTextToParse());
       store.dispatch(setIsPaymentButtonVisible(true));
       const { config } = store.getState();
-      store.dispatch(setDownstreamItem(downstreamQueue.content + meta.pd.displayPlanPrice + ' ' + config.translations.billingFrequencyTmsg));
+      store.dispatch(setIncoming(incoming.content + meta.pd.displayPlanPrice + ' ' + config.translations.billingFrequencyTmsg));
     }
 
     if (chunk.includes('[')) {
@@ -203,25 +219,27 @@ const chatMiddleware = store => next => action => {
       return;
     }
 
-    store.dispatch(setDownstreamMessage({ chunk }));
+    store.dispatch(addIncomingChunk({ chunk }));
   });
 
   socket.on(events.streamEnd, () => {
-    const { stream, intentions } = store.getState();
-    const { options } = extractOptionSet(stream.textToParse);
+    const { chat, intentions } = store.getState();
+    const { options } = extractOptionSet(chat.textToParse);
     const data = {
-      ...store.getState().stream.downstreamQueue,
+      ...store.getState().chat.incoming,
       options
     };
 
     store.dispatch(appendHistory(data));
-    store.dispatch(resetDownstreamItem());
+    store.dispatch(resetIncoming());
     store.dispatch(resetTextToParse());
-    store.dispatch(setResponseFormVisibility(!intentions.link.isVisible && !intentions.email.isFormVisible && !intentions.payment.isPaymentFormVisible && options.length === 0));
+    store.dispatch(setResponseFormVisibility(!intentions.link.isVisible && !intentions.email.isFormVisible && !intentions.payment.isFormVisible && options.length === 0));
   });
 
   socket.on(events.streamError, () => {
+    const { config } = store.getState();
     store.dispatch(resetIsLoading());
+    store.dispatch(setError(config.translations.error));
     console.log('streamError');
   });
 
