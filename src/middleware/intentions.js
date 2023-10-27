@@ -6,6 +6,15 @@ import { setPd, setMarketing } from '@/store/slices/meta';
 import { appendHistory, setOutgoing } from '@/store/slices/chat';
 
 export const intentionsMiddleware = store => next => {
+  const setPaymentDataTranslationAccordingly = (data) => {
+    const { meta } = store.getState();
+    data.billingFrequencyTmsg = data.billingOptionType === 'one-time'
+      ? meta.pd.oneTimer
+      : meta.pd.subscriberBillingFrequency.replace('{1}', data.frequencyInMonths);
+
+    return data;
+  };
+
   intent.core.on(intent.type.emailSuccess, () => {
     const { meta, intentions } = store.getState();
 
@@ -68,7 +77,7 @@ export const intentionsMiddleware = store => next => {
   });
 
   dataIntervalChecker('marketing', store, setMarketing);
-  dataIntervalChecker('__pd', store, setPd);
+  dataIntervalChecker('__pd', store, setPd, setPaymentDataTranslationAccordingly);
 
   return action => {
     if (setLink.match(action) && action.payload.isVisible) {
@@ -86,11 +95,22 @@ export const intentionsMiddleware = store => next => {
   };
 };
 
-const dataIntervalChecker = (key, store, setValue) => {
+const dataIntervalChecker = (key, store, setValue, transformData = null) => {
   const intervalId = setInterval(() => {
-    const data = JSON.parse(localStorage.getItem(key));
-    if (data) {
-      store.dispatch(setValue(data));
+    let storedItem = localStorage.getItem(key);
+
+    try {
+      storedItem = JSON.parse(storedItem);
+    } catch (e) {
+      storedItem = localStorage.getItem(key);
+    }
+
+    if (transformData && storedItem) {
+      storedItem = transformData(storedItem);
+    }
+
+    if (storedItem) {
+      store.dispatch(setValue(storedItem));
       clearInterval(intervalId);
     }
   }, 1000);

@@ -4,8 +4,15 @@ import { tv } from 'tailwind-variants';
 export const streamBase = /*tw*/ tv({
   slots: {
     base: 'tw--px-4 tw--w-full tw--h-full tw--py-2 tw--overflow-y-scroll tw--flex tw--flex-col-reverse tw--translate-z-0',
-    second: 'tw--mt-0 tw--mb-auto'
+    second: 'tw--mt-0 tw--mb-auto',
+    date: 'tw--text-center tw--text-sm tw--mb-1 tw--opacity-40 tw--mt-20'
   },
+  variants: {
+    theme: {
+      light: 'tw--text-light-zephyr',
+      dark: 'tw--text-dark-zephyr'
+    }
+  }
 });
 
 export const streamHead = /*tw*/ tv({

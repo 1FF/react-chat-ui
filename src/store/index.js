@@ -11,6 +11,7 @@ import storage from 'redux-persist/lib/storage';
 const persistConfig = {
   key: 'root',
   storage,
+  blacklist: ['chat', 'intentions'],
 };
 
 // eslint-disable-next-line import/prefer-default-export

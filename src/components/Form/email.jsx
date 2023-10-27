@@ -38,6 +38,7 @@ export const EmailForm = () => {
         <Input
           type="email"
           name="email"
+          e2e="email-input"
           value={ email }
           placeholder={ translations.emailPlaceholder }
           onChange={ handleInputChange }
@@ -45,7 +46,7 @@ export const EmailForm = () => {
         />
       </div>
       <div className={ button() }>
-        <IconBtn onClick={ handleFormSubmit }>
+        <IconBtn onClick={ handleFormSubmit } e2e="email-validate-btn">
           <svg
             fill="currentColor" viewBox="0 0 24 24"
             width="20px" height="20px"

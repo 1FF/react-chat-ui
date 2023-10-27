@@ -12,19 +12,9 @@ export { intent } from '@/services/intentions';
 const initialConfig = {
   meta: {
     pd: {
-      amount: '29.90',
-      amountInUSD: 29.9,
-      upfrontAmount: null,
-      currency: 'USD',
-      trial_in_days: 0,
-      period: 'M',
-      frequency: 1,
-      frequencyInMonths: 1,
-      billingOptionType: 'subscription',
-      planId: '59c45291-1e02-43ce-820d-1576b4eb96d3',
-      provider: 'primer',
-      isDisplayPricePlan: true,
-      displayPlanPrice: '$29.90',
+      subscriberBillingFrequency: 'Billed every {1} month(s)',
+      oneTimer: 'Total price to be charged',
+      billingFrequencyTmsg: '',
     },
     cid: '23c7cdcf-4d90-4ea1-aab0-c73f8426dc1d',
     systemType: 'test',
@@ -44,7 +34,7 @@ const initialConfig = {
       role: 'AI-powered nutritionist',
       imgSrc: 'https://storage.1forfit.com/4oZrkOwbOQcSIGJopBG5qsf0CmBbVDKDqflzEkXq.jpg',
       displayInStream: true,
-      // initialMessage: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you.',
+      welcome: 'chat for 1 min',
       initialMessage: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you. [yes|no|continue]',
     },
     chatUrl: 'https://yourketo.ngrok.io',
@@ -56,11 +46,6 @@ const initialConfig = {
       tm716: 'Entered email already exists, choose below to proceed',
       tm530: 'Take the quiz',
       tm1224: 'Payment in progress...',
-      // tm566 -> removing backEndVars undefined variable
-      subscriberBillingFrequency: 'Billed every {1} month(s)',
-      // tm241 -> removing backEndVars undefined variable
-      oneTimer: 'Total price to be charged',
-      billingFrequencyTmsg: '',
       paymentHeaderTxt1: '<span class="font-bold block text-tau">SECURITY</span> verified',
       paymentHeaderTxt2: 'secured payments',
       loaderTexts: [

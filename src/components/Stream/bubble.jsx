@@ -6,6 +6,7 @@ import { isNonEmptyArr } from '@/utils';
 
 import { Btn, IconBtn } from '@/components/Button';
 import { Link } from '@/components/Link';
+import { roles } from '@/config';
 import { flickerEffect, streamBubble as variant } from './variants';
 import { textModifier } from './modifiers';
 
@@ -39,7 +40,7 @@ export const StreamBubble = ({ item = {} }) => {
 
   return (
     <div className={ base() }>
-      <span className={ baseFlicker() }>{ textModifier(item.content) }</span>
+      <span className={ baseFlicker() } data-e2e={ item.role === roles.assistant ? 'stream-assistant-msg' : '' }>{ textModifier(item.content) }</span>
       { displayOptionList && <div className="tw--flex tw--flex-col"><OptionList items={ item.options } /></div> }
       { displayActionButton && (
         <div className={ action() }>

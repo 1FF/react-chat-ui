@@ -34,7 +34,6 @@ const chatMiddleware = store => next => action => {
       term: getQueryParam(window.location.search, 'utm_chat'),
       user_id: meta.cid,
     });
-    console.log('emit-chat', { connected: socket.connected, socketQueue: socket.sendBuffer });
 
     if (isFirstUserMessage(chat.history)) {
       track({
@@ -63,7 +62,6 @@ const chatMiddleware = store => next => action => {
       term: getQueryParam(window.location.search, 'utm_chat'),
       user_id: meta.cid,
     });
-    console.log('emit-chat', { connected: socket.connected, socketQueue: socket.sendBuffer });
     store.dispatch(setIsLoading());
   }
 
@@ -80,14 +78,6 @@ const chatMiddleware = store => next => action => {
   }
 
   if (setIsPaymentButtonVisible.match(action)) {
-    const translations = {
-      billingFrequencyTmsg: meta.pd.billingOptionType === 'one-time'
-        ? config.translations.oneTimer
-        : config.translations.subscriberBillingFrequency.replace('{1}', meta.pd.frequencyInMonths)
-    };
-
-    store.dispatch(setTranslations(translations));
-
     if (action.payload === true) {
       const data = {
         eventType: null,
@@ -163,7 +153,7 @@ const chatMiddleware = store => next => action => {
 
       if (lastMessage.content.includes(intent.type.payment)) {
         store.dispatch(setIsPaymentButtonVisible(true));
-        lastMessage.content += meta.pd.displayPlanPrice + ' ' + config.translations.billingFrequencyTmsg;
+        lastMessage.content += meta.pd.displayPlanPrice + ' ' + meta.pd.billingFrequencyTmsg;
       }
 
       store.dispatch(setHistory(history));
@@ -215,8 +205,7 @@ const chatMiddleware = store => next => action => {
     if (textToParse.includes(intent.type.payment)) {
       store.dispatch(resetTextToParse());
       store.dispatch(setIsPaymentButtonVisible(true));
-      const { config } = store.getState();
-      store.dispatch(setIncoming(incoming.content + meta.pd.displayPlanPrice + ' ' + config.translations.billingFrequencyTmsg));
+      store.dispatch(setIncoming(incoming.content + meta.pd.displayPlanPrice + ' ' + meta.pd.billingFrequencyTmsg));
     }
 
     if (chunk.includes('[')) {
@@ -250,7 +239,6 @@ const chatMiddleware = store => next => action => {
     const { config } = store.getState();
     store.dispatch(resetIsLoading());
     store.dispatch(setError(config.translations.error));
-    console.log('streamError');
   });
 
   socket.on(events.disconnect, () => {

@@ -242,3 +242,25 @@ export const isExpired = (date, maxHours = 24) => {
 
   return elapsedHours >= maxHours;
 };
+
+/**
+ * Formats a date string according to the locale, including the date and time.
+ *
+ * @param {string} dateString - The date string to be formatted.
+ * @returns {string} - The formatted date and time string.
+ */
+export function formatDateByLocale(dateString) {
+  const date = new Date(dateString);
+
+  const options = {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+  };
+
+  const formattedDate = date.toLocaleDateString(undefined, options);
+
+  return `${formattedDate}`.toUpperCase();
+}

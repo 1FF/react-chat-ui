@@ -87,6 +87,7 @@ export const LayoutFoot = () => {
             text={ ctaText }
             onClick={ onClickCtaPay }
             href={ ctaHref }
+            e2e="quiz-trigger-btn"
           />
         ) }
 
@@ -98,6 +99,7 @@ export const LayoutFoot = () => {
           text={ translations.payButton }
           onClick={ initializePaymentForm }
           disabled={ disabled }
+          e2e="payment-form-trigger-btn"
         />
       ) }
     </div>
