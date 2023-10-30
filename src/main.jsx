@@ -34,7 +34,7 @@ const initialConfig = {
       role: 'AI-powered nutritionist',
       imgSrc: 'https://storage.1forfit.com/4oZrkOwbOQcSIGJopBG5qsf0CmBbVDKDqflzEkXq.jpg',
       displayInStream: true,
-      welcome: 'chat for 1 min',
+      welcome: 'Welcome to our live support. We\'re here to understand your requirements and suggest the best Keto diet suited for you.',
       initialMessage: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you. [yes|no|continue]',
     },
     chatUrl: 'https://yourketo.ngrok.io',

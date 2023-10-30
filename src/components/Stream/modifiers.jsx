@@ -13,7 +13,7 @@ export const replaceLinksWithAnchors = (val) => {
       return (
         <a
           key={ `link-idx-${Math.random()}` }
-          className="underline"
+          className="tw--underline"
           href={ urlWithParams }
         >
           { part }

@@ -23,8 +23,8 @@ export const icon = /*tw*/ tv({
   },
   variants: {
     theme: {
-      light: null,
-      dark: null,
+      light: { base: 'tw--text-light-status' },
+      dark: { base: 'tw--text-dark-seraph' },
     },
     outlined: {
       true: 'tw--p-0.5 tw--bg-white tw--rounded-full tw--shadow',

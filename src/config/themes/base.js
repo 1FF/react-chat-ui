@@ -1,32 +1,27 @@
-// --font-weight-normal: 400; // will be replaced with tw--font-normal
-// --font-weight-bold: 600; // will be replaced with tw--font-semibold
-
 export const light = {
   colors: {
     lumina: '#f0f2f5',
-    whisper: '#ffffff', // tw--white
+    whisper: '#ffffff',
     seraph: '#21bb5a',
     ember: '#cacadb',
-    zephyr: '#2b3139',
+    zephyr: {
+      100: 'rgb(43, 49, 57)',
+      200: 'rgba(43, 49, 57,0.1)',
+      600: 'rgba(43, 49, 57,0.6)',
+      800: 'rgba(43, 49, 57,0.8)',
+    },
     enigma: '#ffae19',
-    glaze: '#21bb5a', // tw--light-seraph
+    glaze: '#21bb5a',
     glazeText: '#151226',
-    glazeBg: '#ffffff', // tw--white
-    sigma: '#0f0e1e', // (0.2 opacity)
-    zeta: '#0f0e1e', // tw--light-sigma (0.6 opacity)
-
-    status: '#21bb5a', // tw--light-seraph
+    glazeBg: '#ffffff',
+    sigma: '#0f0e1e',
+    zeta: '#0f0e1e',
+    status: '#21bb5a',
     loader: '#f6f8fa',
-    dots: '#21bb5a', // tw--light-seraph
+    dots: '#21bb5a',
     neon: '#019aff',
-    // loading-dots: -24px 0 rgba(202, 202, 219, 0.6), 24px 0 rgba(202, 202, 219, 0.6); // tw--light-ember (0.6 opacity)
-    'pale-dots': '#cacadb', // tw--light-ember (0.6 opacity)
-    'iota-dots': '#21bb5a', // tw--light-seraph
-
-    // text-color: '#0f0e1e'; will be replaced with // tw--light-sigma
-    'pay-bg': '#ffffff', // tw--white
-    'pay-color': '#0f0e1e', // tw--light-sigma
-
+    'pale-dots': '#cacadb',
+    'iota-dots': '#21bb5a',
     overlay: 'rgba(15, 14, 30, 0.2)',
     beta: '#f6f8fa',
   },
@@ -38,26 +33,24 @@ export const dark = {
     whisper: '#151226',
     seraph: '#f53373',
     ember: '#cacadb',
-    zephyr: '#ffffff', // tw--white
+    zephyr: {
+      100: '#ffffff',
+      200: 'rgba(255, 255, 255,0.1)',
+      600: 'rgba(255, 255, 255,0.6)',
+      800: 'rgba(255, 255, 255,0.8)',
+    },
     enigma: '#ffae19',
     glaze: '#b3bac6',
-    glazeText: '#151226', // glaze-text
+    glazeText: '#151226',
     glazeBg: '#b3bac6',
-    sigma: '#0f0e1e', // (0.2 opacity)
-    zeta: '#ffffff', // tw--white (0.6 opacity)
-
+    sigma: '#0f0e1e',
+    zeta: '#ffffff',
     status: '#21bb5a',
-    loader: '#252239', // was loader-bg // tw--dark-lumina
+    loader: '#252239',
     dots: '#f53374',
     neon: '#019aff',
-
-    // --loading-dots: -24px 0 rgba(255, 255, 255, 0.5), 24px 0 rgba(255, 255, 255, 0.5); // tw--white (0.5 opacity)
-    'pale-dots': '#ffffff', // (0.5 opacity)
-    'iota-dots': '#21bb5a', // same as status
-    // 'text-color': '#ffffff', // will be replaced by tw--text-white
-    // 'pay-bg': '#', // missing
-    // 'pay-color': '#', // missing
-
+    'pale-dots': '#ffffff',
+    'iota-dots': '#21bb5a',
     overlay: 'rgba(15, 14, 30, 0.9)',
     beta: '#252239'
   },

@@ -6,14 +6,16 @@ import { profile as variant } from './variants';
 
 export const Profile = ({ orientation = 'horizontal', minimized = false }) => {
   const { aiProfile, themeId: theme } = useAppSelector(getConfig);
-  const { base, avatar, info, name, role } = variant({ theme, orientation, minimized });
+  const { base, avatar, info, name, role, imgWrapper } = variant({ theme, orientation, minimized });
 
   return (
     <div className={ base() }>
-      <img
-        className={ avatar() }
-        src={ aiProfile.imgSrc } alt="img"
-      />
+      <span className={ imgWrapper() }>
+        <img
+          className={ avatar() }
+          src={ aiProfile.imgSrc } alt="img"
+        />
+      </span>
       <div className={ info() }>
         <div className={ name() }>{ aiProfile.name }</div>
         <div className={ role() }>{ aiProfile.role }</div>

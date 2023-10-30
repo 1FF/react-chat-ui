@@ -5,60 +5,74 @@ export const profile = /*tw*/ tv({
   slots: {
     base: 'tw--flex tw--items-center',
     avatar: 'tw--rounded-full',
-    info: 'tw--pl-3',
-    name: 'tw--font-semibold',
-    role: 'tw--text-opacity-80',
+    info: '',
+    name: '',
+    role: '',
+    imgWrapper: ''
   },
   variants: {
     theme: {
       light: {
-        role: 'tw--text-light-zephyr',
+        role: '',
       },
       dark: {
-        role: 'tw--text-dark-zephyr',
+        role: '',
       },
     },
     orientation: {
       horizontal: {
         base: 'tw--flex-row',
         avatar: 'tw--shrink',
+        name: 'tw--text-xl/7 tw--font-bold',
+        info: 'tw--pl-[10px]'
       },
       vertical: {
         base: 'tw--flex-col tw--text-center',
-        role: 'tw--text-opacity-60',
-      },
-    },
-    minimized: {
-      false: {
-        avatar: 'tw--h-14',
-        name: 'tw--text-xl/7',
-        role: 'tw--text-lg/6',
-      },
-      true: {
-        avatar: 'tw--w-10',
-        name: 'tw--text-sm/5',
-        role: 'tw--text-xs/3',
+        name: 'tw--text-[24px] tw--font-semibold',
       },
     },
   },
   compoundSlots: [
     {
-      slots: ['avatar'],
+      slots: ['role'],
       orientation: 'vertical',
-      minimized: false,
-      class: 'tw--h-16',
+      theme: 'light',
+      class: 'tw--text-light-zephyr-600'
     },
     {
-      slots: ['name'],
-      orientation: 'vertical',
-      minimized: false,
-      class: 'tw--font-medium tw--text-2xl/8',
+      slots: ['role'],
+      orientation: 'horizontal',
+      theme: 'light',
+      class: 'tw--text-light-zephyr-800'
     },
     {
       slots: ['role'],
       orientation: 'vertical',
+      theme: 'dark',
+      class: 'tw--text-dark-zephyr-600'
+    },
+    {
+      slots: ['role'],
+      orientation: 'horizontal',
+      theme: 'dark',
+      class: 'tw--text-dark-zephyr-800'
+    },
+    {
+      slots: ['imgWrapper'],
+      orientation: 'horizontal',
       minimized: false,
-      class: 'tw--text-lg/8',
+      class: 'tw--relative tw--h-fit after:tw--absolute after:tw--w-[10px] after:tw--h-[10px] after:tw--bottom-0 after:tw--left-[37px] after:tw--z-10 after:tw--rounded-full after:tw--bg-light-iota-dots' },
+    {
+      slots: ['avatar'],
+      orientation: 'horizontal',
+      minimized: false,
+      class: 'tw--h-[50px]',
+    },
+    {
+      slots: ['avatar'],
+      orientation: 'vertical',
+      minimized: false,
+      class: 'tw--h-[60px]',
     },
   ],
 });

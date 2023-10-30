@@ -4,17 +4,17 @@ import { tv } from 'tailwind-variants';
 export const layoutBase = /*tw*/ tv({
   slots: {
     base: 'tw--flex tw--self-stretch tw--justify-self-stretch tw--items-stretch tw--justify-center tw--overflow-hidden tw--h-full',
-    wrapper: 'tw--flex tw--flex-col tw--w-full md:tw--max-w-3xl tw--max-h-screen tw--border-x tw--h-full',
+    wrapper: 'tw--flex tw--flex-col tw--w-full md:tw--max-w-[800px] tw--max-h-screen tw--h-full',
   },
   variants: {
     theme: {
       light: {
         base: 'tw--bg-light-lumina',
-        wrapper: 'tw--bg-light-whisper tw--text-light-zephyr tw--border-light-ember tw--border-opacity-30',
+        wrapper: 'tw--bg-light-whisper tw--text-light-zephyr-100',
       },
       dark: {
         base: 'tw--bg-dark-lumina',
-        wrapper: 'tw--bg-dark-whisper tw--text-white tw--border-black',
+        wrapper: 'tw--bg-dark-whisper tw--text-white',
       }
     },
     minimized: {
@@ -25,12 +25,12 @@ export const layoutBase = /*tw*/ tv({
 
 export const layoutHead = /*tw*/ tv({
   slots: {
-    base: 'tw--flex tw--px-4 tw--py-2 tw--shadow-[0_2px_7px_-6px]',
+    base: 'tw--flex tw--px-5 tw--py-[11px] tw--shadow-[-1px_2px_5px_0]',
   },
   variants: {
     theme: {
-      light: 'tw--shadow-light-zephyr',
-      dark: 'tw--shadow-dark-zephyr',
+      light: 'tw--shadow-light-zephyr-200',
+      dark: 'tw--shadow-dark-zephyr-200',
     },
   },
 });

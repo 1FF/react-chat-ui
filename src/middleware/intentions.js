@@ -8,6 +8,7 @@ import { appendHistory, setOutgoing } from '@/store/slices/chat';
 export const intentionsMiddleware = store => next => {
   const setPaymentDataTranslationAccordingly = (data) => {
     const { meta } = store.getState();
+    if (!meta.pd) return;
     data.billingFrequencyTmsg = data.billingOptionType === 'one-time'
       ? meta.pd.oneTimer
       : meta.pd.subscriberBillingFrequency.replace('{1}', data.frequencyInMonths);
@@ -36,7 +37,7 @@ export const intentionsMiddleware = store => next => {
 
   intent.core.on(intent.type.emailError, (response) => {
     const { meta, intentions, config } = store.getState();
-    const { tm716, tm526, tm715 } = config.translations;
+    const { tm716, tm526, tm715, tm505 } = config.translations;
 
     store.dispatch(setIsEmailLoading(false));
 
@@ -64,7 +65,7 @@ export const intentionsMiddleware = store => next => {
     }
 
     if (response.status === 422) {
-      store.dispatch(setEmailError(response.errors.email[0]));
+      store.dispatch(setEmailError(response.errors.email[0] || tm505));
 
       track({
         eventType: customEvents.emailWrong,
