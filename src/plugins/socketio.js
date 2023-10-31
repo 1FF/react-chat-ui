@@ -2,7 +2,7 @@
 import { io } from 'socket.io-client';
 
 let socket = null;
-const webSocketServerUrl = import.meta.env.VITE_WEBSOCKET_URL;
+const webSocketServerUrl = '';
 
 if (
   webSocketServerUrl
