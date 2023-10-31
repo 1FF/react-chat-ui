@@ -10,7 +10,7 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v4
         with:
@@ -29,4 +29,4 @@ jobs:
           git add .
           git status
           git commit -m "Build $PACKAGE_VERSION"
-          git push
+          git push origin main
