@@ -16,7 +16,8 @@ jobs:
         with:
           node-version: '18.14.0'
           registry-url: 'https://registry.npmjs.org'
-
+      - name: Set default branch.
+        run: git remote set-head origin --auto
       - name: Bump version, build, commit, and merge changes
         run: |
           npm ci
