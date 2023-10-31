@@ -1,16 +1,15 @@
-import { useDispatch } from 'react-redux';
 import { useState } from 'react';
 import { intent } from '@/services/intentions';
 import { getEmailIntentions, setEmail, setIsEmailLoading } from '@/store/slices/intentions';
 import { getConfig } from '@/store/slices/config';
-import { useAppSelector } from '@/hooks';
+import { useAppDispatch, useAppSelector } from '@/hooks';
 import { Input } from '@/components/Input';
 import { IconBtn } from '@/components/Button';
 
 import { layoutFoot as variant } from '../Layout/variants';
 
 export const EmailForm = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { themeId: theme, translations } = useAppSelector(getConfig);
   const { isLoading, error } = useAppSelector(getEmailIntentions);
   const { base, input, button } = variant({ theme });

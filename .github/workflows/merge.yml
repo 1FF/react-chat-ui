@@ -1,0 +1,33 @@
+name: Publish Package to npmjs
+on:
+  pull_request: 
+    types: [closed]
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      # Setup .npmrc file to publish to npm
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Bump version, build, commit, and merge changes
+        run: |
+          npm version patch
+          PACKAGE_VERSION=$(node -pe "require('./package.json').version")
+          npm run build
+          git add .
+          git commit -m "Build $PACKAGE_VERSION"
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git checkout main
+          if [[ "${{ github.event_name }}" == "pull_request" && "${{ github.event.action }}" == "closed" && $(echo "${{ github.event.pull_request.labels.*.name }}" | grep -q "merge"; echo $?) -eq 0 ]]; then
+              git merge --no-ff ${{ github.head_ref }}
+          else
+              git merge --no-ff ${{ github.ref }}
+          fi
+          git push origin main
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
