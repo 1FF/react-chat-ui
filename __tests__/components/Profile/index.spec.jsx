@@ -16,7 +16,8 @@ describe('Profile Component', () => {
       avatar: jest.fn(),
       info: jest.fn(),
       role: jest.fn(),
-      name: jest.fn()
+      name: jest.fn(),
+      imgWrapper: jest.fn(),
     });
   });
 
