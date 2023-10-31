@@ -25,6 +25,8 @@ jobs:
           npm version patch
           PACKAGE_VERSION=$(node -pe "require('./package.json').version")
           npm run build
+          git status
           git add .
+          git status
           git commit -m "Build $PACKAGE_VERSION"
           git push
