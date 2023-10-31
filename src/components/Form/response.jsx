@@ -23,7 +23,11 @@ export const ResponseForm = () => {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    dispatch(appendUnsent(response));
+
+    if (response.trim()) {
+      dispatch(appendUnsent(response));
+    }
+
     setCurrentResponse('');
     setTimerToSendMessage();
   };

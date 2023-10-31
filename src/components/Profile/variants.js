@@ -3,7 +3,7 @@ import { tv } from 'tailwind-variants';
 
 export const profile = /*tw*/ tv({
   slots: {
-    base: 'tw--flex tw--items-center',
+    base: 'tw--flex tw--items-center tw--select-none',
     avatar: 'tw--rounded-full',
     info: '',
     name: '',
@@ -21,7 +21,7 @@ export const profile = /*tw*/ tv({
     },
     orientation: {
       horizontal: {
-        base: 'tw--flex-row',
+        base: 'tw--flex-row tw--text-left',
         avatar: 'tw--shrink',
         name: 'tw--text-xl/7 tw--font-bold',
         info: 'tw--pl-[10px]'
@@ -37,7 +37,7 @@ export const profile = /*tw*/ tv({
       slots: ['role'],
       orientation: 'vertical',
       theme: 'light',
-      class: 'tw--text-light-zephyr-600'
+      class: 'tw--text-light-zephyr-600 tw--font-medium'
     },
     {
       slots: ['role'],

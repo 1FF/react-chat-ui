@@ -30,18 +30,18 @@ export const StreamBubble = ({ item = {} }) => {
 
   const OptionList = ({ items = [] }) => (
     items.map(({ id, label, value, link, noStream }) => (
-      <div key={ id } className="tw--my-2">
+      <span key={ id }>
         { link
           ? (<Link text={ label } href={ link } />)
           : (<Btn text={ label } onClick={ noStream ? () => setMessage(value) : () => setOption(value) } />) }
-      </div>
+      </span>
     ))
   );
 
   return (
     <div className={ base() }>
       <span className={ baseFlicker() } data-e2e={ item.role === roles.assistant ? 'stream-assistant-msg' : '' }>{ textModifier(item.content) }</span>
-      { displayOptionList && <div className="tw--flex tw--flex-col"><OptionList items={ item.options } /></div> }
+      { displayOptionList && <div className="tw--flex tw--flex-col tw--pt-[30px] tw--space-y-[10px]"><OptionList items={ item.options } /></div> }
       { displayActionButton && (
         <div className={ action() }>
           <IconBtn outlined>

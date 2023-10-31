@@ -12,4 +12,8 @@
   .tw--translate-z-0 * {
     transform: translateZ(0);
   }
+  
+  .select-none {
+    user-select: none;
+  }
 }

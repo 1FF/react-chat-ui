@@ -11,7 +11,7 @@ import { getQueryParam, isExpired } from '@/utils';
 import { constructLink, extractOptionSet } from '@/utils/formatting';
 import intent from '@/services/intentions';
 import { setIsEmailFormVisible, setIsPaymentButtonVisible, setLink, setResponseFormVisibility } from '@/store/slices/intentions';
-import { setConfig, setTranslations } from '@/store/slices/config';
+import { setConfig } from '@/store/slices/config';
 import { track } from '@/services/tracking';
 import { baseEvents, customEvents } from '@/config/analytics';
 import { CHAT_SEEN_KEY } from '@/config/env';
@@ -19,7 +19,7 @@ import { CHAT_SEEN_KEY } from '@/config/env';
 let socket;
 
 const chatMiddleware = store => next => action => {
-  const { meta, config, chat, intentions } = store.getState();
+  const { meta, chat, intentions } = store.getState();
   if (setOutgoing.match(action)) {
     store.dispatch(appendHistory({
       role: roles.user,
@@ -164,7 +164,7 @@ const chatMiddleware = store => next => action => {
         user_id: meta.cid,
         message: config.aiProfile.initialMessage
       });
-      store.dispatch(setHistory([{ role: roles.assistant, content: config.aiProfile.initialMessage }]));
+      store.dispatch(setHistory([{ role: roles.assistant, content: config.aiProfile.initialMessage, time: new Date() }]));
     }
   });
 

@@ -18,7 +18,7 @@ export const streamBase = /*tw*/ tv({
 export const streamHead = /*tw*/ tv({
   slots: {
     base: 'tw--flex tw--flex-col tw--items-center tw--w-full tw--mx-auto tw--pt-5 tw--pb-10',
-    title: 'tw--pb-[30px] tw--max-w-[400px] tw--text-center tw--mx-[30px]',
+    title: 'tw--pb-[30px] tw--max-w-[400px] tw--text-center tw--mx-[30px] select-none',
   },
   variants: {
     theme: {
@@ -35,7 +35,7 @@ export const streamRow = /*tw*/ tv({
 
 export const flickerEffect = /* tw */ tv({
   slots: {
-    base: 'after:tw--inline-block after:tw--ml-1 after:tw--h-4 after:tw--w-1',
+    base: 'after:tw--inline-block after:tw--ml-1 after:tw--h-4 after:tw--w-1 select-none',
   },
   variants: {
     isTyping: {
@@ -51,7 +51,7 @@ export const flickerEffect = /* tw */ tv({
 
 export const streamBubble = /*tw*/ tv({
   slots: {
-    base: 'tw--relative tw--max-w-xs tw--px-4 tw--py-3 tw--whitespace-pre-wrap tw--rounded-[20px] tw--mb-5',
+    base: 'tw--relative tw--max-w-xs tw--px-[15px] tw--py-[11px] tw--whitespace-pre-wrap tw--rounded-[20px] tw--mb-5',
     action: 'tw--absolute tw--bottom-[-16px] tw--right-[-10px]'
   },
   variants: {
