@@ -1,12 +1,18 @@
 name: Merge new version
 on:
-  pull_request: 
-    types: [closed]
+  push:
+    branches: [ main ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ main ]
 jobs:
   merge:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v4
         with:
           node-version: '18.14.0'
@@ -14,19 +20,11 @@ jobs:
 
       - name: Bump version, build, commit, and merge changes
         run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
           npm version patch
           PACKAGE_VERSION=$(node -pe "require('./package.json').version")
           npm run build
           git add .
           git commit -m "Build $PACKAGE_VERSION"
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          git checkout main
-          if [[ "${{ github.event_name }}" == "pull_request" && "${{ github.event.action }}" == "closed" && $(echo "${{ github.event.pull_request.labels.*.name }}" | grep -q "merge"; echo $?) -eq 0 ]]; then
-              git merge --no-ff ${{ github.head_ref }}
-          else
-              git merge --no-ff ${{ github.ref }}
-          fi
-          git push origin main
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          git push
