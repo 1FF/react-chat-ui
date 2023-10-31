@@ -1,4 +1,4 @@
-name: Publish Package to npmjs
+name: Merge new version
 on:
   pull_request: 
     types: [closed]
@@ -6,11 +6,10 @@ jobs:
   merge:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      # Setup .npmrc file to publish to npm
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '18.14.0'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Bump version, build, commit, and merge changes
