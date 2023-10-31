@@ -3,31 +3,31 @@ on:
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ main ]
-    # types: [ closed ]
+    types: [ closed ]
 jobs:
   merge:
     permissions:
       contents: write
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
       # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v4
         with:
           node-version: '18.14.0'
           registry-url: 'https://registry.npmjs.org'
-      - name: Set default branch.
-        run: git remote set-head origin --auto
       - name: Bump version, build, commit, and merge changes
         run: |
           npm ci
           git config user.name github-actions
           git config user.email github-actions@github.com
-          npm version patch
+          npm version patch --no-git-tag-version
           PACKAGE_VERSION=$(node -pe "require('./package.json').version")
           npm run build
-          git status
           git add .
-          git status
           git commit -m "Build $PACKAGE_VERSION"
-          git push origin main
+          git push origin ${{ github.event.pull_request.head.ref }}
