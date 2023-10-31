@@ -1,4 +1,4 @@
-name: Merge new version
+name: Post-merge
 on:
   pull_request:
     # The branches below must be a subset of the branches above
@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
+          ref: main
 
       # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v4
@@ -30,4 +30,4 @@ jobs:
           npm run build
           git add .
           git commit -m "Build $PACKAGE_VERSION"
-          git push origin ${{ github.event.pull_request.head.ref }}
+          git push origin main
