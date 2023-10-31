@@ -5,6 +5,7 @@ on:
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ main ]
+    types: [ closed ]
 jobs:
   merge:
     permissions:
@@ -20,6 +21,7 @@ jobs:
 
       - name: Bump version, build, commit, and merge changes
         run: |
+          npm ci
           git config user.name github-actions
           git config user.email github-actions@github.com
           npm version patch
