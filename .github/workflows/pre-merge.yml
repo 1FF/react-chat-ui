@@ -21,8 +21,6 @@ jobs:
       - name: Bump version, build, commit, and merge changes
         run: |
           npm ci
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
           npm version patch --no-git-tag-version
           PACKAGE_VERSION=$(node -pe "require('./package.json').version")
           npm run build
