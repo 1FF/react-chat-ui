@@ -5,7 +5,7 @@ import { getConfig } from '@/store/slices/config';
 import { icon as variant } from './variants';
 
 // eslint-disable-next-line react/prop-types
-export const IconBtn = ({ children, outlined = false, onClick = null }) => {
+export const IconBtn = ({ children, outlined = false, onClick = null, e2e = null }) => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { base } = variant({ theme, outlined });
 
@@ -13,6 +13,7 @@ export const IconBtn = ({ children, outlined = false, onClick = null }) => {
     <button
       onClick={ onClick }
       className={ base() }
+      data-e2e={ e2e }
       type="button"
     >
       { children }

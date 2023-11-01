@@ -5,7 +5,6 @@ const configSlice = createSlice({
   name: 'config',
   initialState,
   reducers: {
-    // DEV NOTE: note that immer makes these immutable under the hood
     setConfig(state, { payload }) {
       state.aiProfile = { ...initialState.aiProfile, ...payload.aiProfile };
       state.translations = { ...initialState.translations, ...payload.translations };
@@ -36,9 +35,6 @@ const configSlice = createSlice({
     setTranslations(state, { payload }) {
       state.translations = { ...state.translations, ...payload };
     },
-    setConnectedToSocket(state) {
-      state.connectedToSocket = true;
-    }
   }
 });
 
@@ -51,6 +47,5 @@ export const {
   setTheme, resetTheme,
   setDevToolsStatus, resetDevToolsStatus,
   togglePluginMode, setTranslations,
-  setConnectedToSocket
 } = configSlice.actions;
 export default configSlice.reducer;

@@ -1,15 +1,3 @@
-import { baseEventsArr, customEventsArr } from '@/config/analytics';
-
-const baseEvents = baseEventsArr.reduce((acc, cur) => {
-  acc[cur] = { executed: false };
-  return acc;
-}, {});
-
-const customEvents = customEventsArr.reduce((acc, cur) => {
-  acc[cur] = { executed: false };
-  return acc;
-}, {});
-
 export const meta = {
   pd: null,
   cid: null,
@@ -26,35 +14,33 @@ export const config = {
     initialMessage: '',
     displayInStream: false,
   },
-  translations: {
-    emailPlaceholder: '',
-    tm526: '',
-    tm715: '',
-    tm716: '',
-  },
+  translations: {},
   themeId: null,
   chatUrl: null,
   enableDevTools: false,
   isPluginMode: false,
-  connectedToSocket: false,
 };
 
-export const stream = {
-  upstreamQueue: null,
-  downstreamQueue: null,
+export const chat = {
+  outgoing: null,
+  incoming: null,
   textToParse: '',
   history: [],
   status: null,
   error: null,
   isLoading: false,
+  shouldSendUnsent: false,
+  unsent: [],
+  connected: false,
+  closed: false,
 };
 
 export const intentions = {
   email: {
+    current: '',
     success: false,
     error: false,
-    isEmailFieldVisible: false,
-    currentEmail: '',
+    isFormVisible: false,
     isLoading: false,
   },
   response: {
@@ -64,9 +50,10 @@ export const intentions = {
     error: false,
   },
   payment: {
-    isPaymentButtonVisible: false,
-    isPaymentFormVisible: false,
-    isPaymentSuccessful: false
+    isButtonVisible: false,
+    isFormVisible: false,
+    isSuccessful: false,
+    error: false
   },
   messaging: {
     isVisible: false
@@ -78,11 +65,4 @@ export const intentions = {
   }
 };
 
-export const analytics = {
-  events: {
-    ...baseEvents,
-    ...customEvents,
-  }
-};
-
-export default { meta, config, analytics, intentions, stream };
+export default { meta, config, intentions, chat };

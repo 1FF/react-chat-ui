@@ -1,5 +1,4 @@
 // DEV Note: will be depricated, replace with env vars
-
 export const STORAGE_KEY = 'history';
 export const CHAT_SEEN_KEY = 'chatSeen';
 export const ALREADY_REGISTERED_KEY = 'showAlreadyRegisteredUser';

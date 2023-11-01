@@ -1,10 +1,10 @@
-import { string, func } from 'prop-types';
+import { string, func, bool } from 'prop-types';
 import { useAppSelector } from '@/hooks';
 import { getConfig } from '@/store/slices/config';
 
 import { payment as variant } from './variants';
 
-export const PaymentButton = ({ text = null, onClick = null }) => {
+export const PaymentButton = ({ text = null, onClick = null, e2e = null, disabled = false }) => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { btn } = variant({ theme });
 
@@ -12,7 +12,9 @@ export const PaymentButton = ({ text = null, onClick = null }) => {
     <button
       onClick={ onClick }
       className={ btn() }
+      disabled={ disabled }
       type="button"
+      data-e2e={ e2e }
     >
       <svg
         width="24" height="24"
@@ -32,6 +34,8 @@ export const PaymentButton = ({ text = null, onClick = null }) => {
 PaymentButton.propTypes = {
   text: string.isRequired,
   onClick: func.isRequired,
+  disabled: bool,
+  e2e: string
 };
 
 export default PaymentButton;

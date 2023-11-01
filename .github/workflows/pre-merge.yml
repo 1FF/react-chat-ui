@@ -20,7 +20,6 @@ jobs:
       - name: Bump version, build, commit, and merge changes
         if: github.event.pull_request.merged == true
         run: |
-          echo "${{ secrets.WORKFLOW_GIT_ACCESS_TOKEN }}"
           npm ci
           git config user.name spont4e
           git config user.email spont4e@users.noreply.github.com

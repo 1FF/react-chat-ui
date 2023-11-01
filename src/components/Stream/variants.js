@@ -3,26 +3,39 @@ import { tv } from 'tailwind-variants';
 
 export const streamBase = /*tw*/ tv({
   slots: {
-    base: 'tw--flex-1 tw--px-4 tw--py-2 tw--overflow-y-scroll',
+    base: 'tw--pt-10 tw--w-full tw--h-full tw--pb-5 tw--px-5 tw--overflow-y-scroll tw--flex tw--flex-col-reverse tw--translate-z-0',
+    second: 'tw--mt-0 tw--mb-auto',
+    date: 'tw--text-center tw--text-sm tw--pb-[5px] tw--opacity-40'
   },
+  variants: {
+    theme: {
+      light: 'tw--text-light-zephyr-100',
+      dark: 'tw--text-dark-zephyr-100'
+    }
+  }
 });
 
 export const streamHead = /*tw*/ tv({
   slots: {
-    base: 'tw--flex tw--flex-col tw--items-center tw--w-full',
-    title: 'tw--pt-12 tw--pb-6 tw--text-lg',
+    base: 'tw--flex tw--flex-col tw--items-center tw--w-full tw--mx-auto tw--pt-5 tw--pb-10',
+    title: 'tw--pb-[30px] tw--max-w-[400px] tw--text-center tw--mx-[30px] select-none',
   },
+  variants: {
+    theme: {
+      light: { title: 'tw--font-medium' },
+    }
+  }
 });
 
 export const streamRow = /*tw*/ tv({
   slots: {
-    base: 'tw--grid tw--py-5',
+    base: 'tw--grid',
   },
 });
 
 export const flickerEffect = /* tw */ tv({
   slots: {
-    base: 'after:tw--inline-block after:tw--ml-1 after:tw--h-4 after:tw--w-1',
+    base: 'after:tw--inline-block after:tw--ml-1 after:tw--h-4 after:tw--w-1 select-none',
   },
   variants: {
     isTyping: {
@@ -30,25 +43,23 @@ export const flickerEffect = /* tw */ tv({
       false: 'after:tw--hidden'
     },
     theme: {
-      light: 'after:tw--bg-light-zephyr',
-      dark: 'after:tw--bg-dark-zephyr'
+      light: 'after:tw--bg-light-zephyr-100',
+      dark: 'after:tw--bg-dark-zephyr-100'
     }
   }
 });
 
 export const streamBubble = /*tw*/ tv({
   slots: {
-    base: 'tw--relative tw--max-w-xs tw--px-4 tw--py-3',
+    base: 'tw--relative tw--max-w-xs tw--px-[15px] tw--py-[11px] tw--whitespace-pre-wrap tw--rounded-[20px] tw--mb-5',
     action: 'tw--absolute tw--bottom-[-16px] tw--right-[-10px]'
   },
   variants: {
     theme: {
       light: {
-        base: 'tw--rounded-3xl',
         action: 'tw--text-light-seraph',
       },
       dark: {
-        base: 'tw--rounded-3xl',
         action: 'tw--text-dark-seraph',
       },
     },
@@ -98,12 +109,12 @@ export const ellipsis = tv({
   compoundSlots: [{
     slots: ['dotFirst', 'dotSecond', 'dotThird'],
     theme: 'light',
-    class: 'tw--bg-light-zephyr',
+    class: 'tw--bg-light-zephyr-100',
   },
   {
     slots: ['dotFirst', 'dotSecond', 'dotThird'],
     theme: 'dark',
-    class: 'tw--bg-dark-zephyr',
+    class: 'tw--bg-dark-zephyr-100',
   }]
 });
 

@@ -15,7 +15,7 @@ export const AppBase = ({ config = {} }) => {
   // Set defaults
   dispatch(setMeta(config.meta));
   dispatch(setConfig(config.app));
-  dispatch(setDevToolsStatus(process.env.NODE_ENV === 'development')); // DEV Note: set this in a global plugin
+  dispatch(setDevToolsStatus(false)); // DEV Note: set this in a global plugin process.env.NODE_ENV === 'development'
 
   return (
     <>
