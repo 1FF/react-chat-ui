@@ -1,8 +1,7 @@
 name: Pre-merge
 on:
-  push:
-    branches:
-      - master
+  pull_request:
+    types: [ closed ]
 jobs:
   pre-merge:
     permissions:
@@ -19,8 +18,11 @@ jobs:
           node-version: '18.14.0'
           registry-url: 'https://registry.npmjs.org'
       - name: Bump version, build, commit, and merge changes
+        if: github.event.pull_request.merged == true
         run: |
           npm ci
+          git config user.name spont4e
+          git config user.email spont4e@users.noreply.github.com
           npm version patch --no-git-tag-version
           PACKAGE_VERSION=$(node -pe "require('./package.json').version")
           npm run build
