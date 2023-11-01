@@ -1,7 +1,8 @@
 name: Pre-merge
 on:
-  merge_group:
-    types: [checks_requested]
+  push:
+    branches:
+      - master
 jobs:
   pre-merge:
     permissions:
@@ -10,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.WORKFLOW_GIT_ACCESS_TOKEN }}
 
       # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v4
@@ -20,11 +21,11 @@ jobs:
       - name: Bump version, build, commit, and merge changes
         run: |
           npm ci
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
           npm version patch --no-git-tag-version
           PACKAGE_VERSION=$(node -pe "require('./package.json').version")
           npm run build
           git add .
           git commit -m "Build $PACKAGE_VERSION"
-          git push origin ${{ github.event.pull_request.head.ref }}
+          git push origin master
