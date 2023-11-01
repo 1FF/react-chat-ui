@@ -1,9 +1,9 @@
-name: Post-merge
+name: Pre-merge
 on:
   merge_group:
     types: [checks_requested]
 jobs:
-  merge:
+  pre-merge:
     permissions:
       contents: write
     runs-on: ubuntu-latest
