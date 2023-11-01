@@ -1,19 +1,16 @@
-name: Post-merge
+name: Pre-merge
 on:
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [ main ]
-    types: [ closed ]
+  merge_group:
+    types: [checks_requested]
 jobs:
-  merge:
+  pre-merge:
     permissions:
       contents: write
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.event.pull_request.head.ref }}
 
       # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v4
@@ -30,4 +27,4 @@ jobs:
           npm run build
           git add .
           git commit -m "Build $PACKAGE_VERSION"
-          git push origin main
+          git push origin ${{ github.event.pull_request.head.ref }}
