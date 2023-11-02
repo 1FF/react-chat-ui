@@ -1,9 +1,9 @@
-name: Pre-merge
+name: Post-merge
 on:
   pull_request:
     types: [ closed ]
 jobs:
-  pre-merge:
+  post-merge:
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -21,11 +21,12 @@ jobs:
         if: github.event.pull_request.merged == true
         run: |
           npm ci
-          git config user.name spont4e
-          git config user.email spont4e@users.noreply.github.com
+          git config user.name "${{ github.event.pull_request.user.login }}"
+          git config user.email "${{ github.event.pull_request.user.login }}@users.noreply.github.com"
           npm version patch --no-git-tag-version
           PACKAGE_VERSION=$(node -pe "require('./package.json').version")
           npm run build
-          git add .
-          git commit -m "Build $PACKAGE_VERSION"
-          git push origin master
+          git commit -am "Build $PACKAGE_VERSION"
+          git push
+          git tag v$PACKAGE_VERSION
+          git push origin v$PACKAGE_VERSION

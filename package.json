@@ -1,12 +1,22 @@
 {
   "name": "1ff-react-chat-ui",
-  "private": true,
   "version": "0.0.0",
   "type": "module",
+  "description": "UI to chat",
   "module": "dist/index.es.js",
   "main": "dist/index.es.js",
   "exports": {
     ".": "./dist/index.es.js"
+  },
+  "keywords": [
+    "chatui",
+    "react",
+    "ai",
+    "frontend"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/1FF/react-chat-ui"
   },
   "files": [
     "/dist"
