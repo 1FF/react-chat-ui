@@ -47,7 +47,7 @@ export const ResponseForm = () => {
           type="response"
           name="response"
           value={ response }
-          placeholder="Type your answer ..."
+          placeholder="Write your message here..."
           onChange={ handleInputChange }
           isLoading={ isLoading }
         />

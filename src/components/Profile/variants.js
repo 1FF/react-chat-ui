@@ -23,7 +23,7 @@ export const profile = /*tw*/ tv({
       horizontal: {
         base: 'tw--flex-row tw--text-left',
         avatar: 'tw--shrink',
-        name: 'tw--text-xl/7 tw--font-bold',
+        name: 'tw--text-xl/7 tw--font-bold tw--leading-[30px]',
         info: 'tw--pl-[10px]'
       },
       vertical: {
@@ -61,7 +61,7 @@ export const profile = /*tw*/ tv({
       slots: ['imgWrapper'],
       orientation: 'horizontal',
       minimized: false,
-      class: 'tw--relative tw--h-fit after:tw--absolute after:tw--w-[10px] after:tw--h-[10px] after:tw--bottom-0 after:tw--left-[37px] after:tw--z-10 after:tw--rounded-full after:tw--bg-light-iota-dots' },
+      class: 'tw--relative tw--h-fit after:tw--absolute after:tw--w-[10px] after:tw--h-[10px] after:tw--bottom-[-2px] after:tw--left-[37px] after:tw--z-10 after:tw--rounded-full after:tw--bg-light-iota-dots' },
     {
       slots: ['avatar'],
       orientation: 'horizontal',

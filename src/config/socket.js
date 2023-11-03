@@ -12,6 +12,7 @@ export const events = {
   chat: 'chat',
   chatHistory: 'chat-history',
   connect: 'connect',
+  error: 'error',
   disconnect: 'disconnect',
   streamStart: 'stream-start',
   streamData: 'stream-data',

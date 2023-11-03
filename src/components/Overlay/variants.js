@@ -8,10 +8,10 @@ export const overlay = /*tw*/ tv({
   variants: {
     theme: {
       light: {
-        base: 'tw--bg-light-lumina'
+        base: 'tw--bg-light-whisper'
       },
       dark: {
-        base: 'tw--bg-dark-lumina'
+        base: 'tw--bg-dark-whisper'
       }
     }
   }
