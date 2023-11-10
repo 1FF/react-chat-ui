@@ -6351,7 +6351,7 @@ const ua = {
       initialMessage: "Do you want to lose weight? [Yes|No]"
     },
     chatUrl: "https://yourketo.ngrok.io",
-    themeId: "light",
+    themeId: "dark",
     translations: {
       emailPlaceholder: "Please enter your email",
       tm526: "Continue to my plan",
