@@ -7,6 +7,9 @@ import chatMiddleware from '@/middleware/socket';
 import intentionsMiddleware from '@/middleware/intentions';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+import disableReactDevTools from '@/utils/reactDevTools';
+
+disableReactDevTools();
 
 const persistConfig = {
   key: 'root',
@@ -14,7 +17,6 @@ const persistConfig = {
   blacklist: ['chat', 'intentions'],
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export const store = configureStore({
   reducer: persistReducer(persistConfig, combineReducers({
     meta: metaReducer,

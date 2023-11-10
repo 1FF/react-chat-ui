@@ -37,7 +37,7 @@ export const layoutHead = /*tw*/ tv({
 
 export const layoutFoot = /*tw*/ tv({
   slots: {
-    base: 'tw--flex tw--items-center tw--flex-wrap tw--px-5 tw--py-[11px]',
+    base: 'tw--flex tw--items-center tw--flex-wrap tw--px-5 tw--mt-[11px]',
     input: 'tw--flex-1 tw--pr-2',
     button: 'tw--flex tw--grow-0',
   },

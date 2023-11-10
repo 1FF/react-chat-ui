@@ -2,12 +2,12 @@ import { func, object, string } from 'prop-types';
 import payment from './variants';
 
 export const Link = ({ href, text, onClick, forwardedRef, e2e = null }) => {
-  const { btn } = payment();
+  const { link } = payment();
   return (
     <a
       href={ href } ref={ forwardedRef }
       onClick={ onClick }
-      className={ btn() }
+      className={ link() }
       data-e2e={ e2e }
     >{ text }
     </a>

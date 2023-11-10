@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import { object } from 'prop-types';
 import { useAppSelector, useAppDispatch } from '@/hooks';
 import { getConfig } from '@/store/slices/config';
@@ -40,7 +41,12 @@ export const StreamBubble = ({ item = {} }) => {
 
   return (
     <div className={ base() }>
-      <span className={ baseFlicker() } data-e2e={ item.role === roles.assistant ? 'stream-assistant-msg' : '' }>{ textModifier(item.content) }</span>
+      <span
+        className={ baseFlicker() }
+        { ...(item.role === roles.assistant ? { 'data-e2e': 'stream-assistant-msg' } : '') }
+      >
+        { textModifier(item.content) }
+      </span>
       { displayOptionList && <div className="tw--flex tw--flex-col tw--pt-[30px] tw--space-y-[10px]"><OptionList items={ item.options } /></div> }
       { displayActionButton && (
         <div className={ action() }>

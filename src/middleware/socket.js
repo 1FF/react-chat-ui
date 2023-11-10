@@ -1,13 +1,15 @@
 import { io } from 'socket.io-client';
 import { config as socketConfig, events, roles } from '@/config';
-import { appendHistory, appendUnsent,
+import {
+  appendHistory, appendUnsent,
   resetIncoming, resetIsLoading,
   resetError, resetTextToParse, resetUnsent,
   resetOutgoing, setIncoming, addIncomingChunk,
   setHistory, setIsLoading,
   setShouldSendUnsent, setError, setTextToParse,
-  setOutgoing, setConnected, setClosed } from '@/store/slices/chat';
-import { getQueryParam, isExpired } from '@/utils';
+  setOutgoing, setConnected, setClosed
+} from '@/store/slices/chat';
+import { checkForSpecialPhrases, getQueryParam, isExpired } from '@/utils';
 import { constructLink, extractOptionSet } from '@/utils/formatting';
 import intent from '@/services/intentions';
 import { setIsEmailFormVisible, setIsPaymentButtonVisible, setLink, setResponseFormVisibility } from '@/store/slices/intentions';
@@ -16,6 +18,7 @@ import { track } from '@/services/tracking';
 import { baseEvents, customEvents } from '@/config/analytics';
 import { CHAT_SEEN_KEY } from '@/config/env';
 
+const specialMessages = [intent.type.email, intent.type.payment];
 let socket;
 
 const chatMiddleware = store => next => action => {
@@ -45,6 +48,19 @@ const chatMiddleware = store => next => action => {
     }
   }
 
+  if (setTextToParse.match(action)) {
+    const { textToParse, incoming } = chat;
+    const currentText = textToParse + action.payload;
+    if (currentText.includes(intent.type.email)) {
+      store.dispatch(setIsEmailFormVisible(true));
+    }
+
+    if (currentText.includes(intent.type.payment)) {
+      store.dispatch(setIsPaymentButtonVisible(true));
+      store.dispatch(setIncoming(incoming.content + meta.pd.displayPlanPrice + ' ' + meta.pd.billingFrequencyTmsg));
+    }
+  }
+
   if (setClosed.match(action)) {
     document.querySelector('#chatbot-container').remove();
     document.body.classList.remove('scroll-stop');
@@ -62,13 +78,14 @@ const chatMiddleware = store => next => action => {
       term: getQueryParam(window.location.search, 'utm_chat'),
       user_id: meta.cid,
     });
+    store.dispatch(resetUnsent());
     store.dispatch(setIsLoading());
   }
 
   const hasNoUserMessages = !chat.history.some(item => item.role === roles.user);
   const lastMessage = chat.history[chat.history.length - 1];
   if (hasNoUserMessages && appendHistory.match(action) && action.payload.role === roles.user && lastMessage.options.length) {
-    const buttonSequence = lastMessage.options.findIndex((item) => item.value === action.payload.message) + 1;
+    const buttonSequence = lastMessage.options.findIndex((item) => item.value === action.payload.content) + 1;
     track({
       eventType: customEvents.buttonClick + buttonSequence,
       systemType: meta.systemType,
@@ -114,12 +131,12 @@ const chatMiddleware = store => next => action => {
     return next(action);
   }
 
+  store.dispatch(setIsLoading());
   socket = io.connect(action.payload.chatUrl, socketConfig);
 
   socket.on('connect', () => {
     const { meta } = store.getState();
     socket.emit(events.chatHistory, { user_id: meta.cid });
-    store.dispatch(setIsLoading());
     store.dispatch(setConnected(true));
   });
 
@@ -133,29 +150,7 @@ const chatMiddleware = store => next => action => {
 
     if (history.length) {
       const lastMessage = history[history.length - 1];
-      const link = constructLink(lastMessage.content);
-
-      if (mustHideChat(lastMessage)) {
-        store.dispatch(setClosed(true));
-      }
-
-      if (link) {
-        store.dispatch(setLink({
-          isVisible: true,
-          href: link,
-          text: config.translations.ctaTextContent
-        }));
-      }
-
-      lastMessage.isSpecial = checkForSpecialPhrases(lastMessage.content);
-
-      if (lastMessage.content.includes(intent.type.email)) store.dispatch(setIsEmailFormVisible(true));
-
-      if (lastMessage.content.includes(intent.type.payment)) {
-        store.dispatch(setIsPaymentButtonVisible(true));
-        lastMessage.content += meta.pd.displayPlanPrice + ' ' + meta.pd.billingFrequencyTmsg;
-      }
-
+      updateContent({ lastMessage, store });
       store.dispatch(setHistory(history));
     } else {
       socket.emit(events.chat, {
@@ -172,14 +167,25 @@ const chatMiddleware = store => next => action => {
     store.dispatch(resetIsLoading());
     store.dispatch(resetOutgoing());
     store.dispatch(setIncoming(''));
-    store.dispatch(resetUnsent());
     store.dispatch(resetError());
   });
 
+  socket.on(`${events.chat}-${meta.cid}`, (data) => {
+    const { options, content } = extractOptionSet(data.message);
+    const isSpecial = checkForSpecialPhrases(data.message, specialMessages);
+    updateContent({ lastMessage: { content: data.message }, store });
+    const { intentions } = store.getState();
+
+    store.dispatch(resetIsLoading());
+    store.dispatch(resetError());
+    store.dispatch(appendHistory({ content, options, role: roles.assistant, isSpecial }));
+    store.dispatch(setResponseFormVisibility({ intentions, options }));
+  });
+
   socket.on(events.streamData, ({ chunk, messages, errors }) => {
-    const { chat, meta, config } = store.getState();
+    const { chat, config } = store.getState();
     const { textToParse, incoming } = chat;
-    const link = constructLink(textToParse, meta.cid) || constructLink(incoming.content, meta.cid);
+    const link = constructLink(textToParse) || constructLink(incoming.content);
 
     if (messages.length > chat.history.length) {
       store.dispatch(setHistory(messages));
@@ -193,19 +199,9 @@ const chatMiddleware = store => next => action => {
       store.dispatch(setLink({
         isVisible: true,
         href: link,
-        text: config.translations.ctaTextContent
+        text: config.translations.mealButton
       }));
-    }
-
-    if (textToParse.includes(intent.type.email)) {
-      store.dispatch(resetTextToParse());
-      store.dispatch(setIsEmailFormVisible(true));
-    }
-
-    if (textToParse.includes(intent.type.payment)) {
-      store.dispatch(resetTextToParse());
-      store.dispatch(setIsPaymentButtonVisible(true));
-      store.dispatch(setIncoming(incoming.content + meta.pd.displayPlanPrice + ' ' + meta.pd.billingFrequencyTmsg));
+      store.dispatch(setResponseFormVisibility({ isFormVisible: false }));
     }
 
     if (chunk.includes('[')) {
@@ -224,34 +220,31 @@ const chatMiddleware = store => next => action => {
   socket.on(events.streamEnd, () => {
     const { chat, intentions } = store.getState();
     const { options } = extractOptionSet(chat.textToParse);
-    const data = {
-      ...store.getState().chat.incoming,
-      options
-    };
-
-    store.dispatch(appendHistory(data));
+    const isSpecial = options.some(item => checkForSpecialPhrases(item.value, specialMessages));
+    store.dispatch(appendHistory({
+      ...chat.incoming,
+      options,
+      isSpecial
+    }));
     store.dispatch(resetIncoming());
     store.dispatch(resetTextToParse());
     store.dispatch(setResponseFormVisibility({ intentions, options }));
   });
 
-  socket.on(events.streamError, () => {
+  const onError = () => {
     const { config } = store.getState();
     store.dispatch(resetIsLoading());
     store.dispatch(setError(config.translations.error));
-  });
+  };
+
+  socket.on(events.streamError, onError);
+  socket.on(events.error, onError);
 
   socket.on(events.disconnect, () => {
     store.dispatch(setConnected(false));
   });
 
   next(action);
-};
-
-const checkForSpecialPhrases = (string) => {
-  const specialMessages = [intent.type.email, intent.type.payment];
-  const specialRegex = specialMessages.map(keyword => new RegExp(`\\[?${keyword}\\]?`));
-  return specialRegex.some(regex => string.match(regex));
 };
 
 const mustHideChat = ({ time, role }) => {
@@ -271,5 +264,31 @@ const mustHideChat = ({ time, role }) => {
 };
 
 const isFirstUserMessage = (messages) => messages.filter(obj => obj.role === roles.user).length === 1;
+
+const updateContent = ({ lastMessage, store }) => {
+  const { meta, config } = store.getState();
+  const link = constructLink(lastMessage.content);
+
+  if (mustHideChat(lastMessage)) {
+    store.dispatch(setClosed(true));
+  }
+
+  if (link) {
+    store.dispatch(setLink({
+      isVisible: true,
+      href: link,
+      text: config.translations.mealButton
+    }));
+  }
+
+  lastMessage.isSpecial = checkForSpecialPhrases(lastMessage.content, specialMessages);
+
+  if (lastMessage.content.includes(intent.type.email)) store.dispatch(setIsEmailFormVisible(true));
+
+  if (lastMessage.content.includes(intent.type.payment)) {
+    store.dispatch(setIsPaymentButtonVisible(true));
+    lastMessage.content += meta.pd.displayPlanPrice + ' ' + meta.pd.billingFrequencyTmsg;
+  }
+};
 
 export default chatMiddleware;

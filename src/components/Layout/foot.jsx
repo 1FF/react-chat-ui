@@ -76,7 +76,7 @@ export const LayoutFoot = () => {
   };
 
   return (
-    <div>
+    <div className="tw--space-y-[11px] tw--pb-[11px]">
       { error && <div className="tw--pl-[35px] tw--text-[#ff0043] tw--font-medium">{ error }</div> }
       { isPaymentFormVisible && <PaymentScene onClose={ onClosePaymentForm } /> }
       { isLoading && <Ellipsis /> }

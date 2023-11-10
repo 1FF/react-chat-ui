@@ -8,11 +8,15 @@
   font-family: inherit !important;
 }
 
+.spaced-letters {
+  letter-spacing: 2px;
+}
+
 @layer utilities {
   .tw--translate-z-0 * {
     transform: translateZ(0);
   }
-  
+
   .select-none {
     user-select: none;
   }

@@ -264,3 +264,8 @@ export function formatDateByLocale(dateString) {
 
   return `${formattedDate}`.toUpperCase();
 }
+
+export const checkForSpecialPhrases = (string, specialMessages) => {
+  const specialRegex = specialMessages.map(keyword => new RegExp(`\\[?${keyword}\\]?`));
+  return specialRegex.some(regex => string.match(regex));
+};

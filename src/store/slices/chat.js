@@ -47,11 +47,21 @@ const configSlice = createSlice({
       state.history = payload.map((item) => ({ ...item, id: uid(), role: item.role, ...extractOptionSet(item.content) }));
     },
     appendHistory(state, { payload }) {
-      if (payload.options && payload.options.length > 0) {
-        state.history.push({ id: uid(), content: payload.content, options: payload.options, role: payload.role });
-      } else {
-        state.history.push({ id: uid(), ...extractOptionSet(payload.content), role: payload.role });
+      let bubbleContent;
+
+      if (payload.role === roles.assistant) {
+        if (payload.options && payload.options.length > 0) {
+          bubbleContent = { content: payload.content, options: payload.options, isSpecial: payload.isSpecial };
+        } else {
+          bubbleContent = { ...extractOptionSet(payload.content), isSpecial: payload.isSpecial };
+        }
       }
+
+      if (payload.role === roles.user) {
+        bubbleContent = { content: payload.content };
+      }
+
+      state.history.push({ id: uid(), ...bubbleContent, role: payload.role });
     },
     resetHistory(state) {
       state.history = initialState.history;

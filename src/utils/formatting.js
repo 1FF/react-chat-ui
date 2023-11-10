@@ -45,7 +45,7 @@ export const formatDateByLocale = (val, locale = undefined, options = dateFormat
  * //output: https://usa.example.com/?utm_chat=salesmen-keto-redirect&chatSeen=true&cid=12311231a2
  * @returns {string|boolean} The extracted link with optional query parameters or `false` if no link is found.
  */
-export const constructLink = (val, userId) => {
+export const constructLink = (val) => {
   const hasQueryParams = (url) => {
     // Regular expression pattern to match query parameters
     const pattern = /[?&]([^=#]+)=([^&#]*)/g;
@@ -62,7 +62,7 @@ export const constructLink = (val, userId) => {
     search = new URLSearchParams(window.location.search);
 
     search.append(CHAT_SEEN_KEY, 'true');
-    search.append(CID, userId);
+    search.append(CID, localStorage.getItem('__cid'));
     search = '/?' + search;
   }
 

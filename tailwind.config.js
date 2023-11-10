@@ -9,7 +9,7 @@ export default {
   ],
   theme: {
     fontFamily: {
-      sans: ['Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+      sans: ['Plus Jakarta Sans', 'Roboto', 'Mulish', 'Exo', 'Helvetica', 'Arial', 'sans-serif'],
     },
     colors,
     boxShadow,
@@ -118,7 +118,11 @@ export default {
       'dark-shadow-dots': 'dark-shadow-dots 2s linear infinite',
       'text-spin': 'text-spin 30s linear infinite',
     },
-    extend: {},
+    extend: {
+      screens: {
+        customXs: '350px',
+      },
+    },
   },
   plugins: [],
 };
