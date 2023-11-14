@@ -185,7 +185,7 @@ const chatMiddleware = store => next => action => {
   socket.on(events.streamData, ({ chunk, messages, errors }) => {
     const { chat, config } = store.getState();
     const { textToParse, incoming } = chat;
-    const link = constructLink(textToParse) || constructLink(incoming.content);
+    const link = constructLink(textToParse) || constructLink(incoming.content) || constructLink(chunk);
 
     if (messages.length > chat.history.length) {
       store.dispatch(setHistory(messages));
