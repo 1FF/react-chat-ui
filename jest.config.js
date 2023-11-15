@@ -8,6 +8,7 @@ export default {
   testPathIgnorePatterns: ['/node_modules/', '/build/', '<rootDir>/__tests__/setupTests.js', '<rootDir>/__tests__/mocks/*'],
   setupFilesAfterEnv: ['<rootDir>/__tests__/setupTests.js'],
   moduleNameMapper: {
+    '\\.(css|less)$': '<rootDir>/__tests__/mocks/styleMock.js',
     '^@/(.*)$': '<rootDir>/src/$1',
   },
 };
