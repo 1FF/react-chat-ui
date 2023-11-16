@@ -1,8 +1,11 @@
 /* eslint-env jest */
 
 import AppBase from '@/components/AppBase';
+import { events } from '@/config';
+import { formatDateByLocale } from '@/utils';
 import renderWithProviders from '@/utils/storeMockWrapper';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import mockio, { serverSocket, cleanUp, io } from 'socket.io-client';
 
 const initialConfig = {
   meta: {
@@ -63,11 +66,60 @@ const initialConfig = {
   },
 };
 
-describe.only('AppBase', () => {
-  it('Renders with the state passed properly to the elements', async () => {
-    renderWithProviders(<AppBase config={ initialConfig } />);
+const history = [
+  {
+    role: 'assistant',
+    content: 'Do you want to lose weight?\n[Yes|No]',
+    time: 1700119723000
+  },
+  {
+    role: 'user',
+    content: 'no',
+    time: 1700119723000
+  },
+  {
+    role: 'assistant',
+    content: 'How are you?',
+    time: 1700119723000
+  },
+  {
+    role: 'user',
+    content: 'Good',
+    time: 1700119723000
+  },
+];
 
+describe('AppBase', () => {
+  let root;
+  it('Renders with the state passed properly to the elements', async () => {
+    // Arrange
+    waitFor(() => {
+      root = renderWithProviders(<AppBase config={ initialConfig } />);
+    });
     const items = await screen.findAllByText(initialConfig.app.aiProfile.welcome);
+    const name = await screen.findAllByText(initialConfig.app.aiProfile.name);
+    const expectedDate = formatDateByLocale(history[0].time);
+    const date = await screen.findAllByText(expectedDate);
+
+    // DEV NOTE: this is due to socket instance duplication;
+    // serverSocket.emit('connect');
+
+    // Act
+    serverSocket.emit(events.chatHistory, { history, errors: [] });
+
+    const doc = root.container.querySelector('[data-e2e="stream-assistant-msg-date"]');
+    console.log(doc);
+
+    // Assert
     expect(items).toHaveLength(1);
+    expect(date).toHaveLength(1);
+    expect(name).toHaveLength(2);
+    expect(root.store.getState().meta).toStrictEqual(initialConfig.meta);
+    expect(root.store.getState().config.aiProfile).toStrictEqual(initialConfig.app.aiProfile);
+    expect(root.store.getState().config.translations).toStrictEqual(initialConfig.app.translations);
+    expect(root.store.getState().chat.history.length).toStrictEqual(history.length);
+
+    const firstMessage = root.store.getState().chat.history[0];
+    expect(firstMessage.options.length).toEqual(2);
   });
 });

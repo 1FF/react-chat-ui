@@ -14,7 +14,7 @@ export const StreamBase = () => {
   const { history, incoming } = useAppSelector(getChat);
   const { base, second, date } = variant({ theme });
   const firstMessage = history && history.length > 0 && history[0];
-
+console.log(firstMessage);
   return (
     <div className={ base() }>
       <div className={ second() }>

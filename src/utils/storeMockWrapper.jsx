@@ -7,6 +7,8 @@ import metaReducer from '@/store/slices/meta';
 import configReducer from '@/store/slices/config';
 import chatReducer from '@/store/slices/chat';
 import intentionsReducer from '@/store/slices/intentions';
+import chatMiddleware from '@/middleware/socket';
+import intentionsMiddleware from '@/middleware/intentions';
 
 function renderWithProviders(
   ui,
@@ -20,6 +22,7 @@ function renderWithProviders(
         chat: chatReducer,
         config: configReducer,
       },
+      middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }).concat(chatMiddleware, intentionsMiddleware),
       preloadedState }),
     ...renderOptions
   } = {}
@@ -27,7 +30,6 @@ function renderWithProviders(
   // eslint-disable-next-line react/prop-types
   const Wrapper = ({ children }) => <Provider store={ store }>{ children }</Provider>;
 
-  // Return an object with the store and all of RTL's query functions
   return { store, ...render(ui, { wrapper: Wrapper, ...renderOptions }) };
 }
 

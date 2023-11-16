@@ -5,10 +5,10 @@ export default {
   transform: {
     '^.+\\.(js|jsx)$': 'babel-jest',
   },
-  testPathIgnorePatterns: ['/node_modules/', '/build/', '<rootDir>/__tests__/setupTests.js', '<rootDir>/__tests__/mocks/*'],
+  testPathIgnorePatterns: ['/node_modules/', '/build/', '<rootDir>/__tests__/setupTests.js'],
   setupFilesAfterEnv: ['<rootDir>/__tests__/setupTests.js'],
   moduleNameMapper: {
-    '\\.(css|less)$': '<rootDir>/__tests__/mocks/styleMock.js',
+    '\\.(css|less)$': '<rootDir>/__mocks__/styleMock.js',
     '^@/(.*)$': '<rootDir>/src/$1',
   },
 };
