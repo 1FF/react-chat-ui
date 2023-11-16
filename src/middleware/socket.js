@@ -159,7 +159,6 @@ const chatMiddleware = store => next => action => {
         user_id: meta.cid,
         message: config.aiProfile.initialMessage
       });
-      store.dispatch(setHistory([{ role: roles.assistant, content: config.aiProfile.initialMessage, time: new Date() }]));
     }
   });
 
