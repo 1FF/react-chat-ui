@@ -53,7 +53,10 @@ export const ResponseForm = () => {
   };
 
   return (
-    <form className={ base() } onSubmit={ handleFormSubmit }>
+    <form
+      className={ base() } onSubmit={ handleFormSubmit }
+      data-e2e="user-form"
+    >
       <div className={ input() }>
         <Input
           disabled={ !connected }

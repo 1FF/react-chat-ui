@@ -40,7 +40,10 @@ export const EmailForm = () => {
   };
 
   return (
-    <form className={ base() } onSubmit={ handleFormSubmit }>
+    <form
+      className={ base() } onSubmit={ handleFormSubmit }
+      data-e2e="email-form"
+    >
       <div className={ input() }>
         <Input
           e2e="email-input"
