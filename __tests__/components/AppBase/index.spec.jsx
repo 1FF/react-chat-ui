@@ -5,6 +5,7 @@ import { events } from '@/config';
 import { formatDateByLocale } from '@/utils';
 import renderWithProviders from '@/utils/storeMockWrapper';
 import { screen, waitFor } from '@testing-library/react';
+import { act } from 'react-dom/test-utils';
 import mockio, { serverSocket, cleanUp, io } from 'socket.io-client';
 
 const initialConfig = {
@@ -93,33 +94,37 @@ describe('AppBase', () => {
   let root;
   it('Renders with the state passed properly to the elements', async () => {
     // Arrange
-    waitFor(() => {
+    await waitFor(() => {
       root = renderWithProviders(<AppBase config={ initialConfig } />);
     });
+
     const items = await screen.findAllByText(initialConfig.app.aiProfile.welcome);
     const name = await screen.findAllByText(initialConfig.app.aiProfile.name);
     const expectedDate = formatDateByLocale(history[0].time);
-    const date = await screen.findAllByText(expectedDate);
 
     // DEV NOTE: this is due to socket instance duplication;
     // serverSocket.emit('connect');
 
     // Act
-    serverSocket.emit(events.chatHistory, { history, errors: [] });
+    act(() => {
+      serverSocket.emit(events.chatHistory, { history, errors: [] });
+    });
 
-    const doc = root.container.querySelector('[data-e2e="stream-assistant-msg-date"]');
-    console.log(doc);
+    const dateElement = root.container.querySelector('[data-e2e="stream-assistant-msg-date"]');
+    const historyElements = root.container.querySelectorAll('[data-e2e="history-item"]');
 
     // Assert
-    expect(items).toHaveLength(1);
-    expect(date).toHaveLength(1);
-    expect(name).toHaveLength(2);
-    expect(root.store.getState().meta).toStrictEqual(initialConfig.meta);
-    expect(root.store.getState().config.aiProfile).toStrictEqual(initialConfig.app.aiProfile);
-    expect(root.store.getState().config.translations).toStrictEqual(initialConfig.app.translations);
-    expect(root.store.getState().chat.history.length).toStrictEqual(history.length);
+    expect(dateElement.textContent).toEqual(expectedDate);
+    expect(historyElements.length).toEqual(history.length);
 
-    const firstMessage = root.store.getState().chat.history[0];
-    expect(firstMessage.options.length).toEqual(2);
+    expect(items).toHaveLength(1);
+    expect(name).toHaveLength(2);
+
+    const { meta, config, chat } = root.store.getState();
+    expect(meta).toStrictEqual(initialConfig.meta);
+    expect(config.aiProfile).toStrictEqual(initialConfig.app.aiProfile);
+    expect(config.translations).toStrictEqual(initialConfig.app.translations);
+    expect(chat.history.length).toStrictEqual(history.length);
+    expect(chat.history[0].options.length).toEqual(2);
   });
 });
