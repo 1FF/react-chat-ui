@@ -5141,7 +5141,10 @@ const br = (e, n) => n.map((s) => new RegExp(`\\[?${s}\\]?`)).some((s) => e.matc
       e.closed = !0;
     }
   }
-}), ps = (e) => e.chat.history[e.chat.history.length - 1].id, Pr = (e) => e.chat, {
+}), ps = (e) => {
+  var n;
+  return (n = e.chat.history[e.chat.history.length - 1]) == null ? void 0 : n.id;
+}, Pr = (e) => e.chat, {
   setOutgoing: jr,
   setIncoming: rn,
   resetIncoming: hs,
