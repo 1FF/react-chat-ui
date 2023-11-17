@@ -96,7 +96,7 @@ const configSlice = createSlice({
   },
 });
 
-export const getCurrentPointer = (state) => state.chat.history[state.chat.history.length - 1].id;
+export const getCurrentPointer = (state) => state.chat.history[state.chat.history.length - 1]?.id;
 export const getStream = state => state.chat;
 
 export const { setOutgoing, setIncoming,
