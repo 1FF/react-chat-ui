@@ -218,10 +218,11 @@ const chatMiddleware = store => next => action => {
 
   socket.on(events.streamEnd, () => {
     const { chat, intentions } = store.getState();
-    const { options } = extractOptionSet(chat.textToParse);
+    const { content, options } = extractOptionSet(chat.textToParse);
     const isSpecial = options.some(item => checkForSpecialPhrases(item.value, specialMessages));
     store.dispatch(appendHistory({
       ...chat.incoming,
+      content: chat.incoming.content + content,
       options,
       isSpecial
     }));
