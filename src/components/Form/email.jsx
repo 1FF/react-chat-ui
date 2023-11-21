@@ -17,7 +17,7 @@ export const EmailForm = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      inputElement.current.focus();
+      inputElement.current?.focus();
     }, 500);
   }, []);
 

@@ -4,7 +4,7 @@ import { getConfig } from '@/store/slices/config';
 
 import { basic as variant } from './variants';
 
-export const Btn = ({ text = null, onClick = null }) => {
+export const Btn = ({ text = null, onClick = null, e2e = null }) => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { base } = variant({ theme });
 
@@ -13,6 +13,7 @@ export const Btn = ({ text = null, onClick = null }) => {
       onClick={ onClick }
       className={ base() }
       type="button"
+      data-e2e={ e2e }
     >
       { text }
     </button>
@@ -22,6 +23,7 @@ export const Btn = ({ text = null, onClick = null }) => {
 Btn.propTypes = {
   text: string.isRequired,
   onClick: func,
+  e2e: string,
 };
 
 export default Btn;

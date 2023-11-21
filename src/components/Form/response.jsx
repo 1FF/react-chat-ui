@@ -23,7 +23,7 @@ export const ResponseForm = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      inputElement.current.focus();
+      inputElement.current?.focus();
     }, 500);
   }, []);
 

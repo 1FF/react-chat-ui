@@ -6,32 +6,26 @@ import renderWithProviders from '@/utils/storeMockWrapper';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import mockio, { serverSocket, cleanup, io } from 'socket.io-client';
-// DEV NOTE: this must be moved into another directory
-import { initialConfig, history, historyWithLink } from '@/chatMocks';
-import { CHAT_SEEN_KEY } from '@/config/env';
+import { initialConfig, history as defaultHistory, historyWithLink, historyWithEmailIntent, historyWithPaymentIntent, pd, streamedMessage, streamedMessageWithLink, streamedMessageWithEmailIntent, streamedMessageWithPaymentIntent } from '@/chatMocks';
+import { CHAT_SEEN_KEY, STORING_CHECKER_INTERVAL } from '@/config/env';
+import { intent } from '@/main';
+import initialState from '@/store/initialState';
 
+jest.useFakeTimers();
+
+let root;
+const spies = [];
 describe('AppBase, chat-history event and execute properly', () => {
-  let root;
-
-  afterEach(() => {
-    localStorage.clear();
-    cleanup();
-  });
+  beforeEach(localSetup);
+  afterEach(localTearDown);
 
   test('on chat-history event state is shown and saved properly', async () => {
-    // Arrange
-    await waitFor(() => {
-      root = renderWithProviders(<AppBase config={ initialConfig } />);
-    });
-
     const items = await screen.findAllByText(initialConfig.app.aiProfile.welcome);
     const name = await screen.findAllByText(initialConfig.app.aiProfile.name);
-    const expectedDate = formatDateByLocale(history[0].time);
+    const expectedDate = formatDateByLocale(defaultHistory[0].time);
 
     // Act
-    act(() => {
-      serverSocket.emit(events.chatHistory, { history, errors: [] });
-    });
+    act(dispatchSocketChange);
 
     const dateElement = root.container.querySelector('[data-e2e="stream-assistant-msg-date"]');
     const historyElements = root.container.querySelectorAll('[data-e2e="history-item"]');
@@ -40,7 +34,7 @@ describe('AppBase, chat-history event and execute properly', () => {
 
     // Assert
     expect(dateElement.textContent).toEqual(expectedDate);
-    expect(historyElements.length).toEqual(history.length);
+    expect(historyElements.length).toEqual(defaultHistory.length);
     expect(userFormElement).not.toBeNull();
     expect(emailFormElement).toBeNull();
 
@@ -51,21 +45,13 @@ describe('AppBase, chat-history event and execute properly', () => {
     expect(meta).toStrictEqual(initialConfig.meta);
     expect(config.aiProfile).toStrictEqual(initialConfig.app.aiProfile);
     expect(config.translations).toStrictEqual(initialConfig.app.translations);
-    expect(chat.history.length).toStrictEqual(history.length);
+    expect(chat.history.length).toStrictEqual(defaultHistory.length);
     expect(chat.history[0].options.length).toEqual(2);
   });
 
   test('on chat-history event state is shown and link is visualized', async () => {
-    // Arrange
-    await waitFor(() => {
-      root = renderWithProviders(<AppBase config={ initialConfig } />);
-    });
-
     // Act
-    act(() => {
-      serverSocket.emit('connect');
-      serverSocket.emit(events.chatHistory, { history: historyWithLink, errors: [] });
-    });
+    act(() => dispatchSocketChange(historyWithLink));
 
     const historyElements = root.container.querySelectorAll('[data-e2e="history-item"]');
     const userFormElement = root.container.querySelector('[data-e2e="user-form"]');
@@ -90,16 +76,12 @@ describe('AppBase, chat-history event and execute properly', () => {
   test('on link click chat is hidden link is hidden', async () => {
     // Arrange
     const nodeElem = { remove: jest.fn() };
-    jest.spyOn(document, 'querySelector').mockImplementation(() => nodeElem);
-    await waitFor(() => {
-      root = renderWithProviders(<AppBase config={ initialConfig } />);
-    });
+    const querySelectorSpy = jest.spyOn(document, 'querySelector');
+    spies.push(querySelectorSpy);
+    querySelectorSpy.mockImplementation(() => nodeElem);
 
     // Act
-    act(() => {
-      serverSocket.emit('connect');
-      serverSocket.emit(events.chatHistory, { history: historyWithLink, errors: [] });
-    });
+    act(() => dispatchSocketChange(historyWithLink));
 
     const linkQuiz = root.container.querySelector('[data-e2e="quiz-trigger-btn"]');
     fireEvent.click(linkQuiz);
@@ -112,19 +94,159 @@ describe('AppBase, chat-history event and execute properly', () => {
     expect(chat.closed).toBeTruthy();
   });
 
-  test('on special message [email_intent] to show email form', async () => {
-    // Arrange
-    await waitFor(() => {
-      root = renderWithProviders(<AppBase config={ initialConfig } />);
-    });
-
+  test(`on special message [${intent.type.email}] to show email form`, async () => {
     // Act
-    act(() => {
-      serverSocket.emit('connect');
-      serverSocket.emit(events.chatHistory, { history: historyWithLink, errors: [] });
-    });
+    act(() => dispatchSocketChange(historyWithEmailIntent));
+
+    const emailFormElement = root.container.querySelector('[data-e2e="email-form"]');
+    const userFormElement = root.container.querySelector('[data-e2e="user-form"]');
 
     // Assert
+    const { intentions } = root.store.getState();
+    expect(emailFormElement).toBeInTheDocument();
+    expect(userFormElement).toBeNull();
+    expect(intentions.response.isFormVisible).toBe(false);
+    expect(intentions.payment.isButtonVisible).toBe(false);
+    expect(intentions.email.isFormVisible).toBe(true);
   });
-  test.todo('on special message [email_intent] to initialize payment button');
+
+  test(`on special message [${intent.type.payment}] to show payment button and special message with price`, async () => {
+    // Act
+    act(() => {
+      jest.advanceTimersByTime(STORING_CHECKER_INTERVAL);
+      dispatchSocketChange(historyWithPaymentIntent);
+    });
+
+    const emailFormElement = root.container.querySelector('[data-e2e="email-form"]');
+    const userFormElement = root.container.querySelector('[data-e2e="user-form"]');
+    const paymentButtonElement = root.container.querySelector('[data-e2e="payment-form-trigger-btn"]');
+
+    // Assert
+    const { intentions, chat } = root.store.getState();
+    expect(emailFormElement).toBeNull();
+    expect(userFormElement).toBeNull();
+    expect(paymentButtonElement).toBeInTheDocument();
+    expect(intentions.response.isFormVisible).toBe(false);
+    expect(intentions.email.isFormVisible).toBe(false);
+    expect(intentions.payment.isButtonVisible).toBe(true);
+    expect(chat.history[chat.history.length - 1].content).toContain(pd.displayPlanPrice);
+  });
+
+  test('on click payment button intent is being emitted and button is disabled', async () => {
+    // Act
+    act(() => dispatchSocketChange(historyWithPaymentIntent));
+
+    const paymentButtonElement = root.container.querySelector('[data-e2e="payment-form-trigger-btn"]');
+    fireEvent.click(paymentButtonElement);
+
+    // Assert
+    expect(intent.core.emit).toHaveBeenCalledTimes(1);
+    expect(paymentButtonElement).toBeDisabled();
+  });
 });
+
+describe('AppBase, streaming events execute properly', () => {
+  beforeEach(localSetup);
+  afterEach(localTearDown);
+  test('message receival through streamStart streamData streamEnd work for streamed data without any special arguments', () => {
+    // Arrange
+    const initialHistory = root.store.getState().chat.history;
+
+    // Act
+    act(() => dispatchStreaming(['hello']));
+
+    // Assert
+    const { chat, intentions } = root.store.getState();
+    expect(chat.isLoading).toBe(initialState.chat.isLoading);
+    expect(chat.outgoing).toBe(initialState.chat.outgoing);
+    expect(chat.incoming).toBe(initialState.chat.incoming);
+    expect(chat.error).toBe(initialState.chat.error);
+    expect(chat.textToParse).toBe(initialState.chat.textToParse);
+    expect(intentions.response.isFormVisible).toBe(true);
+    expect(chat.history.length > initialHistory.length).toBeTruthy();
+  });
+
+  test('message receival through streamStart streamData streamEnd work for message with square brackets', () => {
+    // Act
+    act(() => dispatchStreaming(streamedMessage));
+
+    const userFormElement = root.container.querySelector('[data-e2e="user-form"]');
+    const optionButtonElements = root.container.querySelectorAll('[data-e2e="option-button"]');
+
+    // Assert
+    const { chat, intentions } = root.store.getState();
+    expect(chat.history[0].options.length > 0).toBeTruthy();
+    expect(optionButtonElements).toHaveLength(chat.history[0].options.length);
+    expect(intentions.response.isFormVisible).toBe(false);
+    expect(userFormElement).toBeNull();
+  });
+
+  test('message receival through streamStart streamData streamEnd work for message with link', () => {
+    // Act
+    act(() => dispatchStreaming(streamedMessageWithLink));
+
+    const linkQuiz = root.container.querySelector('[data-e2e="quiz-trigger-btn"]');
+    const historyElements = root.container.querySelectorAll('[data-e2e="history-item"]');
+    const userFormElement = root.container.querySelector('[data-e2e="user-form"]');
+    const emailFormElement = root.container.querySelector('[data-e2e="email-form"]');
+    const lastMessageElement = historyElements[historyElements.length - 1].querySelector('a');
+
+    // Assert
+    expect(linkQuiz).toBeInTheDocument();
+    expect(userFormElement).not.toBeInTheDocument();
+    expect(emailFormElement).not.toBeInTheDocument();
+    expect(lastMessageElement).toBeInTheDocument();
+  });
+
+  test(`message receival through streamStart streamData streamEnd work for message with [${intent.type.email}]`, () => {
+    // Act
+    act(() => dispatchStreaming(streamedMessageWithEmailIntent));
+
+    const emailFormElement = root.container.querySelector('[data-e2e="email-form"]');
+    const userFormElement = root.container.querySelector('[data-e2e="user-form"]');
+
+    // Assert
+    expect(emailFormElement).toBeInTheDocument();
+    expect(userFormElement).not.toBeInTheDocument();
+  });
+
+  test(`message receival through streamStart streamData streamEnd work for message with [${intent.type.payment}]`, () => {
+    // Act
+    act(() => dispatchStreaming(streamedMessageWithPaymentIntent));
+
+    const paymentButtonElement = root.container.querySelector('[data-e2e="payment-form-trigger-btn"]');
+
+    // Assert
+    expect(paymentButtonElement).toBeVisible();
+  });
+});
+
+function dispatchSocketChange(history = defaultHistory) {
+  serverSocket.emit('connect');
+  serverSocket.emit(events.chatHistory, { history, errors: [], region: 'frankfurt' });
+}
+
+function dispatchStreaming(chunks) {
+  serverSocket.emit('connect');
+  serverSocket.emit(events.streamStart);
+  chunks.forEach(chunk => serverSocket.emit(events.streamData, { chunk, messages: [], errors: [] }));
+  serverSocket.emit(events.streamEnd);
+}
+
+async function localSetup() {
+  localStorage.setItem('__pd', JSON.stringify(pd));
+  spies.push(jest.spyOn(intent.core, 'emit'));
+
+  const intentOnSpy = jest.spyOn(intent.core, 'on');
+  spies.push(intentOnSpy);
+  intentOnSpy.mockReturnValue(() => true);
+  await waitFor(() => {
+    root = renderWithProviders(<AppBase config={ initialConfig } />);
+  });
+}
+
+function localTearDown() {
+  localStorage.clear();
+  spies.forEach(spy => spy.mockRestore());
+  cleanup();
+}

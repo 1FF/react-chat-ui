@@ -23,11 +23,9 @@ export const io = {
     return socket;
   }
 };
-// Additional helpers, not included in the real socket.io-client, just for our test.
-// to emulate server emit.
+
 export const serverSocket = { emit };
 
-// cleanup helper
 export function cleanup() {
   EVENTS = {};
 }
