@@ -1,5 +1,6 @@
 import ReactBotClient from '@/main';
 import { intent } from '@/services/intentions';
+import { faker } from '@faker-js/faker';
 
 // example entry point for the plugin
 document.addEventListener('DOMContentLoaded', () => {
@@ -14,7 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
       displayPlanPrice: '$29.90', }));
   }, 5000);
 
-  localStorage.setItem('__cid', '1f5d7b4d-3485-40a7-891d-67ecf2a94838');
+  // eslint-disable-next-line no-unused-expressions
+  !localStorage.getItem('__cid') && localStorage.setItem('__cid', faker.datatype.uuid());
   ReactBotClient({ root: document.querySelector('#root') });
   // example implementation from the plugin user side
   intent.core.on(intent.type.email, (data) => {

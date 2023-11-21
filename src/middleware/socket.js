@@ -132,7 +132,8 @@ const chatMiddleware = store => next => action => {
   }
 
   store.dispatch(setIsLoading());
-  socket = io.connect(action.payload.chatUrl, socketConfig);
+
+  socket = io.connect(action.payload.chatUrl, { query: 'cid=' + meta.cid, ...socketConfig });
 
   socket.on('connect', () => {
     const { meta } = store.getState();
@@ -159,6 +160,7 @@ const chatMiddleware = store => next => action => {
         user_id: meta.cid,
         message: config.aiProfile.initialMessage
       });
+      store.dispatch(setHistory([{ role: roles.assistant, content: config.aiProfile.initialMessage, time: new Date() }]));
     }
   });
 
@@ -218,10 +220,11 @@ const chatMiddleware = store => next => action => {
 
   socket.on(events.streamEnd, () => {
     const { chat, intentions } = store.getState();
-    const { options } = extractOptionSet(chat.textToParse);
+    const { content, options } = extractOptionSet(chat.textToParse);
     const isSpecial = options.some(item => checkForSpecialPhrases(item.value, specialMessages));
     store.dispatch(appendHistory({
       ...chat.incoming,
+      content: chat.incoming.content + content,
       options,
       isSpecial
     }));
