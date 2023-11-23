@@ -269,3 +269,12 @@ export const checkForSpecialPhrases = (string, specialMessages) => {
   const specialRegex = specialMessages.map(keyword => new RegExp(`\\[?${keyword}\\]?`));
   return specialRegex.some(regex => string.match(regex));
 };
+
+export const bsonId = () => {
+  const timestamp = (new Date().getTime() / 1000 || 0).toString(16);
+  const machineId = '000000000000';
+  const processId = '00';
+  const counter = Math.floor(Math.random() * 16777216).toString(16).padStart(6, '0');
+
+  return `${timestamp}${machineId}${processId}${counter}`;
+};

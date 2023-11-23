@@ -16,7 +16,7 @@ const initialConfig = {
       oneTimer: 'Total price to be charged',
       billingFrequencyTmsg: '',
     },
-    cid: '23c7cdcf-4d90-4ea1-aab0-c73f8426dc1d',
+    cid: localStorage.getItem('__cid'),
     systemType: 'test',
     marketing: {
       utmParams: { utm_chat: 'db-sales-nopresetquestions' },

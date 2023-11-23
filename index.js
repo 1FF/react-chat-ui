@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 5000);
 
   // eslint-disable-next-line no-unused-expressions
-  !localStorage.getItem('__cid') && localStorage.setItem('__cid', faker.datatype.uuid());
+  !localStorage.getItem('__cid') && localStorage.setItem('__cid', faker.string.uuid());
   ReactBotClient({ root: document.querySelector('#root') });
   // example implementation from the plugin user side
   intent.core.on(intent.type.email, (data) => {

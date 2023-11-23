@@ -1,15 +1,19 @@
 import { io } from 'socket.io-client';
 import { config as socketConfig, events, roles } from '@/config';
 import {
-  appendHistory, appendUnsent,
+  appendHistory,
   resetIncoming, resetIsLoading,
-  resetError, resetTextToParse, resetUnsent,
+  resetError, resetTextToParse,
   resetOutgoing, setIncoming, addIncomingChunk,
   setHistory, setIsLoading,
-  setShouldSendUnsent, setError, setTextToParse,
-  setOutgoing, setConnected, setClosed
+  setTypingTimeoutExpired, setError,
+  setOutgoing, setConnected,
+  setClosed, setTextToParse,
+  getLastUserMessage,
+  updateMessageStatus,
+  resendMessage,
 } from '@/store/slices/chat';
-import { checkForSpecialPhrases, getQueryParam, isExpired } from '@/utils';
+import { bsonId, checkForSpecialPhrases, getQueryParam, isExpired } from '@/utils';
 import { constructLink, extractOptionSet } from '@/utils/formatting';
 import intent from '@/services/intentions';
 import { setIsEmailFormVisible, setIsPaymentButtonVisible, setLink, setResponseFormVisibility } from '@/store/slices/intentions';
@@ -23,15 +27,65 @@ let socket;
 
 const chatMiddleware = store => next => action => {
   const { meta, chat, intentions } = store.getState();
+
+  const onError = () => {
+    const { config } = store.getState();
+    const lastMessage = getLastUserMessage(store.getState());
+    if (lastMessage) {
+      store.dispatch(updateMessageStatus({ id: lastMessage.id, groupId: lastMessage.groupId, resend: true, sent: false }));
+      store.dispatch(resetIsLoading());
+      store.dispatch(setError(config.translations.error));
+    }
+  };
+
+  const handleMessageSending = (data) => {
+    if (data.role === roles.user) {
+      store.dispatch(setIsLoading());
+    }
+
+    if (socket && socket.connected) {
+      // for the purpose of acknowledgement the ack part when accepting event must be executed
+      // so that the timeout does not fire this will mean that the server is okay;
+      socket.volatile.emit(events.chat, data, withTimeout(onError));
+      return;
+    }
+
+    onError();
+  };
+
+  const handleMessageResending = (data) => {
+    store.dispatch(updateMessageStatus({ id: data.id, groupId: data.groupId, resend: false, sent: true }));
+    store.dispatch(setIsLoading());
+
+    const onResendError = () => {
+      const { config } = store.getState();
+      store.dispatch(updateMessageStatus({ id: data.id, groupId: data.groupId, resend: true, sent: false }));
+      store.dispatch(resetIsLoading());
+      store.dispatch(setError(config.translations.error));
+    };
+
+    if (socket && socket.connected) {
+      // for the purpose of acknowledgement the ack part when accepting event must be executed
+      // so that the timeout does not fire this will mean that the server is okay;
+      socket.volatile.emit(events.chat, {
+        role: roles.user,
+        message: data.groupId ? chat.history.filter(item => item.groupId === data.groupId).map(item => item.content).join('\n') : data.content,
+        term: getQueryParam(window.location.search, 'utm_chat'),
+        user_id: meta.cid,
+      }, withTimeout(onResendError));
+    } else {
+      onResendError();
+    }
+  };
+
   if (setOutgoing.match(action)) {
     store.dispatch(appendHistory({
       role: roles.user,
       content: action.payload,
+      id: bsonId(),
     }));
 
-    store.dispatch(setIsLoading());
-
-    socket.emit(events.chat, {
+    handleMessageSending({
       role: roles.user,
       message: action.payload,
       term: getQueryParam(window.location.search, 'utm_chat'),
@@ -67,19 +121,15 @@ const chatMiddleware = store => next => action => {
     socket.close();
   }
 
-  if (appendUnsent.match(action) && action.payload) {
-    store.dispatch(appendHistory({ role: roles.user, content: action.payload }));
-  }
-
-  if (setShouldSendUnsent.match(action) && action.payload && chat.unsent.length) {
-    socket.emit(events.chat, {
+  if (setTypingTimeoutExpired.match(action) && action.payload) {
+    handleMessageSending({
       role: roles.user,
-      message: chat.unsent.join('\n'),
+      message: chat.history
+        .filter(message => message.role === roles.user && message.groupId === chat.lastGroupId)
+        .map(message => message.content).join('\n'),
       term: getQueryParam(window.location.search, 'utm_chat'),
-      user_id: meta.cid,
+      user_id: meta.cid
     });
-    store.dispatch(resetUnsent());
-    store.dispatch(setIsLoading());
   }
 
   const hasNoUserMessages = !chat.history.some(item => item.role === roles.user);
@@ -127,6 +177,10 @@ const chatMiddleware = store => next => action => {
     store.dispatch(setResponseFormVisibility({ intentions, options: extractOptionSet(action.payload[action.payload.length - 1].content).options }));
   }
 
+  if (resendMessage.match(action)) {
+    handleMessageResending(action.payload);
+  }
+
   if (!setConfig.match(action)) {
     return next(action);
   }
@@ -137,6 +191,7 @@ const chatMiddleware = store => next => action => {
 
   socket.on('connect', () => {
     const { meta } = store.getState();
+    socket.sendBuffer = [];
     socket.emit(events.chatHistory, { user_id: meta.cid });
     store.dispatch(setConnected(true));
   });
@@ -145,8 +200,11 @@ const chatMiddleware = store => next => action => {
     store.dispatch(resetIsLoading());
     const { config, meta, chat } = store.getState();
 
-    if (errors.length && !chat.error) {
+    if (chat.error) return;
+
+    if (errors.length) {
       store.dispatch(setError(errors[0]));
+      return;
     }
 
     if (history.length) {
@@ -154,20 +212,20 @@ const chatMiddleware = store => next => action => {
       updateContent({ lastMessage, store });
       store.dispatch(setHistory(history));
     } else {
-      socket.emit(events.chat, {
+      handleMessageSending({
         role: roles.assistant,
         term: getQueryParam(window.location.search, 'utm_chat'),
         user_id: meta.cid,
         message: config.aiProfile.initialMessage
       });
-      store.dispatch(setHistory([{ role: roles.assistant, content: config.aiProfile.initialMessage, time: new Date() }]));
+      store.dispatch(setHistory([{ role: roles.assistant, content: config.aiProfile.initialMessage, time: new Date(), id: bsonId() }]));
     }
   });
 
   socket.on(events.streamStart, () => {
     store.dispatch(resetIsLoading());
     store.dispatch(resetOutgoing());
-    store.dispatch(setIncoming(''));
+    store.dispatch(setIncoming());
     store.dispatch(resetError());
   });
 
@@ -183,14 +241,10 @@ const chatMiddleware = store => next => action => {
     store.dispatch(setResponseFormVisibility({ intentions, options }));
   });
 
-  socket.on(events.streamData, ({ chunk, messages, errors }) => {
+  socket.on(events.streamData, ({ chunk, errors, id }) => {
     const { chat, config } = store.getState();
     const { textToParse, incoming } = chat;
     const link = constructLink(textToParse) || constructLink(incoming.content) || constructLink(chunk);
-
-    if (messages.length > chat.history.length) {
-      store.dispatch(setHistory(messages));
-    }
 
     if (errors.length && !chat.error) {
       store.dispatch(setError(errors[0]));
@@ -215,7 +269,7 @@ const chatMiddleware = store => next => action => {
       return;
     }
 
-    store.dispatch(addIncomingChunk({ chunk }));
+    store.dispatch(addIncomingChunk({ chunk, id }));
   });
 
   socket.on(events.streamEnd, () => {
@@ -232,12 +286,6 @@ const chatMiddleware = store => next => action => {
     store.dispatch(resetTextToParse());
     store.dispatch(setResponseFormVisibility({ intentions, options }));
   });
-
-  const onError = () => {
-    const { config } = store.getState();
-    store.dispatch(resetIsLoading());
-    store.dispatch(setError(config.translations.error));
-  };
 
   socket.on(events.streamError, onError);
   socket.on(events.error, onError);
@@ -291,6 +339,22 @@ const updateContent = ({ lastMessage, store }) => {
     store.dispatch(setIsPaymentButtonVisible(true));
     lastMessage.content += meta.pd.displayPlanPrice + ' ' + meta.pd.billingFrequencyTmsg;
   }
+};
+
+const withTimeout = (onTimeout, timeout = 5000) => {
+  let called = false;
+  const timer = setTimeout(() => {
+    if (called) return;
+    called = true;
+    onTimeout();
+  }, timeout);
+
+  // this part is executed by the server according to socket io docs
+  return () => {
+    if (called) return;
+    called = true;
+    clearTimeout(timer);
+  };
 };
 
 export default chatMiddleware;

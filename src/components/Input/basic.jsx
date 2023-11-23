@@ -1,10 +1,10 @@
-import { string, func, bool } from 'prop-types';
+import { string, func, bool, object } from 'prop-types';
 import { useAppSelector } from '@/hooks';
 import { getConfig } from '@/store/slices/config';
 
 import { basic as variant } from './variants';
 
-export const Input = ({ type, ref = null, placeholder = '', onChange = null, onKeyUp = null, isLoading = false, value = null, e2e = null }) => {
+export const Input = ({ type, passRef = null, placeholder = '', onChange = null, onKeyUp = null, isLoading = false, value = null, e2e = null, disabled = false }) => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { base, input, loader, spin } = variant({ theme });
 
@@ -12,14 +12,14 @@ export const Input = ({ type, ref = null, placeholder = '', onChange = null, onK
     <div className={ base() }>
       <input
         className={ input() }
-        type={ type }
-        disabled={ isLoading }
-        ref={ ref }
-        placeholder={ placeholder }
+        data-e2e={ e2e }
+        disabled={ isLoading || disabled }
         onChange={ onChange }
         onKeyUp={ onKeyUp }
+        placeholder={ placeholder }
+        ref={ passRef }
+        type={ type }
         value={ value }
-        data-e2e={ e2e }
       />
 
       { isLoading && (
@@ -33,12 +33,13 @@ export const Input = ({ type, ref = null, placeholder = '', onChange = null, onK
 
 Input.propTypes = {
   type: string.isRequired,
-  ref: string,
+  passRef: object,
   value: string,
   placeholder: string,
   onChange: func,
   onKeyUp: func,
   isLoading: bool,
+  disabled: bool,
   e2e: string,
 };
 

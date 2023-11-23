@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { uid } from 'uid';
 import { chat as initialState } from '@/store/initialState';
 import { extractOptionSet } from '@/utils/formatting';
 import { getQueryParam } from '@/utils';
@@ -25,14 +24,8 @@ const configSlice = createSlice({
         term: getQueryParam(window.location.search, 'utm_chat'),
         user_id: localStorage.getItem('__cid'),
         role: roles.assistant,
-        content: payload,
+        content: payload || '',
       };
-    },
-    setError(state, { payload }) {
-      state.error = payload;
-    },
-    resetError(state) {
-      state.error = initialState.error;
     },
     resetIncoming(state) {
       state.incoming = initialState.incoming;
@@ -41,10 +34,11 @@ const configSlice = createSlice({
       state.incoming = {
         ...state.incoming,
         content: state.incoming.content + payload.chunk,
+        id: payload.id,
       };
     },
     setHistory(state, { payload }) {
-      state.history = payload.map((item) => ({ ...item, id: uid(), role: item.role, ...extractOptionSet(item.content) }));
+      state.history = payload.map((item) => ({ ...item, id: item.id, role: item.role, ...extractOptionSet(item.content) }));
     },
     appendHistory(state, { payload }) {
       let bubbleContent;
@@ -58,10 +52,10 @@ const configSlice = createSlice({
       }
 
       if (payload.role === roles.user) {
-        bubbleContent = { content: payload.content };
+        bubbleContent = { content: payload.content, groupId: payload.groupId };
       }
 
-      state.history.push({ id: uid(), ...bubbleContent, role: payload.role });
+      state.history.push({ id: payload.id, ...bubbleContent, role: payload.role });
     },
     resetHistory(state) {
       state.history = initialState.history;
@@ -78,14 +72,8 @@ const configSlice = createSlice({
     resetIsLoading(state) {
       state.isLoading = initialState.isLoading;
     },
-    appendUnsent(state, { payload }) {
-      state.unsent = [...state.unsent, payload];
-    },
-    resetUnsent(state) {
-      state.unsent = initialState.unsent;
-    },
-    setShouldSendUnsent(state, { payload }) {
-      state.shouldSendUnsent = payload;
+    setTypingTimeoutExpired(state, { payload }) {
+      state.typingTimeoutExpired = payload;
     },
     setConnected(state, { payload }) {
       state.connected = payload;
@@ -93,19 +81,48 @@ const configSlice = createSlice({
     setClosed(state) {
       state.closed = true;
     },
+    updateMessageStatus(state, { payload }) {
+      //  payload =  {
+      //   id, groupId, resend, sent;
+      // }
+      state.history = state.history.map(item => {
+        if (payload.groupId === item.groupId) {
+          item = { ...item, resend: payload.resend, sent: payload.sent };
+        }
+        if (item.id === payload.id) {
+          item = { ...item, resend: payload.resend, sent: payload.sent };
+        }
+        return item;
+      });
+    },
+    setLastGroupPointer(state, { payload }) {
+      state.lastGroupId = payload;
+    },
+    resendMessage(state, { payload }) {
+      console.log('resend DISPATCH');
+      state.history = state.history.map(item => item);
+    },
+    setError(state, { payload }) {
+      state.error = payload;
+    },
+    resetError(state) {
+      state.error = initialState.error;
+    },
   },
 });
 
-export const getCurrentPointer = (state) => state.chat.history[state.chat.history.length - 1]?.id;
-export const getStream = state => state.chat;
+export const getLastUserMessage = (state) => state.chat.history.findLast(item => item.role === roles.user);
+export const getCurrentPointer = (state) => state.chat.incoming?.id || state.chat.history[state.chat.history.length - 1]?.id;
+export const getChat = state => state.chat;
 
 export const { setOutgoing, setIncoming,
   resetIncoming, addIncomingChunk,
   resetOutgoing, setHistory, resetHistory,
   appendHistory, setTextToParse, resetTextToParse,
-  setIsLoading, resetIsLoading, appendUnsent, resetUnsent,
-  setShouldSendUnsent, setError, resetError,
-  setConnected, setClosed
+  setIsLoading, resetIsLoading, setLastGroupPointer,
+  setTypingTimeoutExpired, setError, resetError,
+  setConnected, setClosed, updateMessageStatus,
+  resendMessage
 } = configSlice.actions;
 
 export default configSlice.reducer;
