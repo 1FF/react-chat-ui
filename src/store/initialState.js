@@ -1,4 +1,4 @@
-import { bsonId } from '@/utils';
+import { uid } from 'uid';
 
 export const meta = {
   pd: null,
@@ -32,7 +32,7 @@ export const chat = {
   error: null,
   isLoading: false,
   typingTimeoutExpired: false,
-  lastGroupId: bsonId(),
+  lastGroupId: uid(),
   connected: false,
   closed: false,
 };

@@ -3,6 +3,7 @@ import { getConfig } from '@/store/slices/config';
 
 import { getChat } from '@/store/slices/chat';
 import { formatDateByLocale } from '@/utils';
+import { uid } from 'uid';
 import { StreamHead } from './head';
 import { StreamRow } from './row';
 import { streamBase as variant } from './variants';
@@ -19,8 +20,8 @@ export const StreamBase = () => {
       <div className={ second() }>
         <StreamHead titleTxt={ aiProfile.welcome } />
         { firstMessage && <div className={ date() } data-e2e="stream-assistant-msg-date">{ formatDateByLocale(firstMessage.time) }</div> }
-        { history.map((message) => (
-          <StreamRow key={ message.id } item={ message } />)
+        { history.map((message, index) => (
+          <StreamRow key={ uid() } item={ { ...message, isLast: index === history.length - 1 } } />)
         ) }
         { incoming && <StreamRow item={ incoming } /> }
       </div>

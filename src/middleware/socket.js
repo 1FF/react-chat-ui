@@ -12,8 +12,9 @@ import {
   getLastUserMessage,
   updateMessageStatus,
   resendMessage,
+  setLastQuestionId,
 } from '@/store/slices/chat';
-import { bsonId, checkForSpecialPhrases, getQueryParam, isExpired } from '@/utils';
+import { checkForSpecialPhrases, getQueryParam, isExpired } from '@/utils';
 import { constructLink, extractOptionSet } from '@/utils/formatting';
 import intent from '@/services/intentions';
 import { setIsEmailFormVisible, setIsPaymentButtonVisible, setLink, setResponseFormVisibility } from '@/store/slices/intentions';
@@ -82,7 +83,6 @@ const chatMiddleware = store => next => action => {
     store.dispatch(appendHistory({
       role: roles.user,
       content: action.payload,
-      id: bsonId(),
     }));
 
     handleMessageSending({
@@ -209,7 +209,7 @@ const chatMiddleware = store => next => action => {
 
     if (history.length) {
       const lastMessage = history[history.length - 1];
-      updateContent({ lastMessage, store });
+      updateForAnySpecialMessage({ lastMessage, store });
       store.dispatch(setHistory(history));
     } else {
       handleMessageSending({
@@ -218,7 +218,7 @@ const chatMiddleware = store => next => action => {
         user_id: meta.cid,
         message: config.aiProfile.initialMessage
       });
-      store.dispatch(setHistory([{ role: roles.assistant, content: config.aiProfile.initialMessage, time: new Date(), id: bsonId() }]));
+      store.dispatch(setHistory([{ role: roles.assistant, content: config.aiProfile.initialMessage, time: new Date() }]));
     }
   });
 
@@ -232,7 +232,7 @@ const chatMiddleware = store => next => action => {
   socket.on(`${events.chat}-${meta.cid}`, (data) => {
     const { options, content } = extractOptionSet(data.message);
     const isSpecial = checkForSpecialPhrases(data.message, specialMessages);
-    updateContent({ lastMessage: { content: data.message }, store });
+    updateForAnySpecialMessage({ lastMessage: { content: data.message }, store });
     const { intentions } = store.getState();
 
     store.dispatch(resetIsLoading());
@@ -241,7 +241,7 @@ const chatMiddleware = store => next => action => {
     store.dispatch(setResponseFormVisibility({ intentions, options }));
   });
 
-  socket.on(events.streamData, ({ chunk, errors, id }) => {
+  socket.on(events.streamData, ({ chunk, errors, question_id, answer_id }) => {
     const { chat, config } = store.getState();
     const { textToParse, incoming } = chat;
     const link = constructLink(textToParse) || constructLink(incoming.content) || constructLink(chunk);
@@ -269,7 +269,7 @@ const chatMiddleware = store => next => action => {
       return;
     }
 
-    store.dispatch(addIncomingChunk({ chunk, id }));
+    store.dispatch(addIncomingChunk({ chunk, id: answer_id, question_id }));
   });
 
   socket.on(events.streamEnd, () => {
@@ -282,6 +282,7 @@ const chatMiddleware = store => next => action => {
       options,
       isSpecial
     }));
+    store.dispatch(setLastQuestionId(chat.incoming.question_id));
     store.dispatch(resetIncoming());
     store.dispatch(resetTextToParse());
     store.dispatch(setResponseFormVisibility({ intentions, options }));
@@ -315,7 +316,7 @@ const mustHideChat = ({ time, role }) => {
 
 const isFirstUserMessage = (messages) => messages.filter(obj => obj.role === roles.user).length === 1;
 
-const updateContent = ({ lastMessage, store }) => {
+const updateForAnySpecialMessage = ({ lastMessage, store }) => {
   const { meta, config } = store.getState();
   const link = constructLink(lastMessage.content);
 

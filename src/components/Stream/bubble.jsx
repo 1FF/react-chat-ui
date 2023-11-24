@@ -2,7 +2,7 @@
 import { object } from 'prop-types';
 import { useAppSelector, useAppDispatch } from '@/hooks';
 import { getConfig } from '@/store/slices/config';
-import { appendHistory, getCurrentPointer, getChat, resendMessage, setOutgoing } from '@/store/slices/chat';
+import { appendHistory, getChat, resendMessage, setOutgoing } from '@/store/slices/chat';
 import { isNonEmptyArr } from '@/utils';
 
 import { Btn, IconBtn } from '@/components/Button';
@@ -14,11 +14,10 @@ import { textModifier } from './modifiers';
 export const StreamBubble = ({ item = {} }) => {
   const dispatch = useAppDispatch();
   const { themeId: theme } = useAppSelector(getConfig);
-  const currentPointer = useAppSelector(getCurrentPointer);
   const { incoming } = useAppSelector(getChat);
-  const displayOptionList = isNonEmptyArr(item.options) && item.id === currentPointer && !item.isSpecial;
+  const displayOptionList = isNonEmptyArr(item.options) && item.isLast && !item.isSpecial;
   const { base, action } = variant({ theme, type: item.role });
-  const { base: baseFlicker } = flickerEffect({ isTyping: !!incoming && item.role !== roles.user && item.id === currentPointer, theme });
+  const { base: baseFlicker } = flickerEffect({ isTyping: !!incoming && item.role !== roles.user && item.isLast, theme });
 
   const setOption = (val) => {
     dispatch(setOutgoing(val));

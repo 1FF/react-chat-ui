@@ -35,10 +35,11 @@ const configSlice = createSlice({
         ...state.incoming,
         content: state.incoming.content + payload.chunk,
         id: payload.id,
+        question_id: payload.question_id,
       };
     },
     setHistory(state, { payload }) {
-      state.history = payload.map((item) => ({ ...item, id: item.id, role: item.role, ...extractOptionSet(item.content) }));
+      state.history = payload.map((item) => ({ ...item, role: item.role, ...extractOptionSet(item.content) }));
     },
     appendHistory(state, { payload }) {
       let bubbleContent;
@@ -55,7 +56,15 @@ const configSlice = createSlice({
         bubbleContent = { content: payload.content, groupId: payload.groupId };
       }
 
-      state.history.push({ id: payload.id, ...bubbleContent, role: payload.role });
+      state.history.push({ ...bubbleContent, role: payload.role, id: payload.id });
+    },
+    setLastQuestionId(state, { payload }) {
+      state.history = state.history.map(item => {
+        if (!item.id) {
+          item.id = payload;
+        }
+        return item;
+      });
     },
     resetHistory(state) {
       state.history = initialState.history;
@@ -82,9 +91,6 @@ const configSlice = createSlice({
       state.closed = true;
     },
     updateMessageStatus(state, { payload }) {
-      //  payload =  {
-      //   id, groupId, resend, sent;
-      // }
       state.history = state.history.map(item => {
         if (payload.groupId === item.groupId) {
           item = { ...item, resend: payload.resend, sent: payload.sent };
@@ -112,7 +118,6 @@ const configSlice = createSlice({
 });
 
 export const getLastUserMessage = (state) => state.chat.history.findLast(item => item.role === roles.user);
-export const getCurrentPointer = (state) => state.chat.incoming?.id || state.chat.history[state.chat.history.length - 1]?.id;
 export const getChat = state => state.chat;
 
 export const { setOutgoing, setIncoming,
@@ -122,7 +127,7 @@ export const { setOutgoing, setIncoming,
   setIsLoading, resetIsLoading, setLastGroupPointer,
   setTypingTimeoutExpired, setError, resetError,
   setConnected, setClosed, updateMessageStatus,
-  resendMessage
+  resendMessage, setLastQuestionId
 } = configSlice.actions;
 
 export default configSlice.reducer;

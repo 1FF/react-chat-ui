@@ -81,5 +81,8 @@
     "vite-plugin-css-injected-by-js": "^3.3.0",
     "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-node-polyfills": "^0.14.1"
+  },
+  "dependencies": {
+    "uid": "^2.0.2"
   }
 }

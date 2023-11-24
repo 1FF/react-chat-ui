@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { uid } from 'uid';
 import { getResponseIntentions } from '@/store/slices/intentions';
 import { getConfig } from '@/store/slices/config';
 import { useAppDispatch, useAppSelector } from '@/hooks';
@@ -7,7 +8,6 @@ import { IconBtn } from '@/components/Button';
 
 import { appendHistory, getChat, setLastGroupPointer, setTypingTimeoutExpired } from '@/store/slices/chat';
 import { roles } from '@/config';
-import { bsonId } from '@/utils';
 import { layoutFoot as variant } from '../Layout/variants';
 
 export const ResponseForm = () => {
@@ -47,7 +47,7 @@ export const ResponseForm = () => {
     clearTimeout(timerId);
     const currentId = setTimeout(() => {
       dispatch(setTypingTimeoutExpired(true));
-      dispatch(setLastGroupPointer(bsonId()));
+      dispatch(setLastGroupPointer(uid()));
     }, 3000);
     setTimerId(currentId);
   };
