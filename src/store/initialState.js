@@ -26,6 +26,7 @@ export const config = {
 export const chat = {
   outgoing: null,
   incoming: null,
+  queue: [],
   textToParse: '',
   history: [],
   status: null,

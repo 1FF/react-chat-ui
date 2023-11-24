@@ -9,10 +9,13 @@ import {
   setTypingTimeoutExpired, setError,
   setOutgoing, setConnected,
   setClosed, setTextToParse,
-  getLastUserMessage,
-  updateMessageStatus,
+  updateResendStatus,
   resendMessage,
   setLastQuestionId,
+  showResendStatus,
+  pushQueue,
+  removeFromQueue,
+  setQueuedId,
 } from '@/store/slices/chat';
 import { checkForSpecialPhrases, getQueryParam, isExpired } from '@/utils';
 import { constructLink, extractOptionSet } from '@/utils/formatting';
@@ -31,12 +34,13 @@ const chatMiddleware = store => next => action => {
 
   const onError = () => {
     const { config } = store.getState();
-    const lastMessage = getLastUserMessage(store.getState());
-    if (lastMessage) {
-      store.dispatch(updateMessageStatus({ id: lastMessage.id, groupId: lastMessage.groupId, resend: true, sent: false }));
-      store.dispatch(resetIsLoading());
-      store.dispatch(setError(config.translations.error));
-    }
+    store.dispatch(resetIsLoading());
+    store.dispatch(setError(config.translations.error));
+  };
+
+  const dispatchRetry = () => {
+    store.dispatch(showResendStatus());
+    onError();
   };
 
   const handleMessageSending = (data) => {
@@ -45,35 +49,36 @@ const chatMiddleware = store => next => action => {
     }
 
     if (socket && socket.connected) {
-      // for the purpose of acknowledgement the ack part when accepting event must be executed
-      // so that the timeout does not fire this will mean that the server is okay;
-      socket.volatile.emit(events.chat, data, withTimeout(onError));
+      socket.volatile.emit(events.chat, data, withTimeout(dispatchRetry));
       return;
     }
 
-    onError();
+    dispatchRetry();
   };
 
   const handleMessageResending = (data) => {
-    store.dispatch(updateMessageStatus({ id: data.id, groupId: data.groupId, resend: false, sent: true }));
+    store.dispatch(updateResendStatus({ groupId: data.groupId, resend: false, sent: true }));
     store.dispatch(setIsLoading());
+    store.dispatch(pushQueue(data));
 
     const onResendError = () => {
       const { config } = store.getState();
-      store.dispatch(updateMessageStatus({ id: data.id, groupId: data.groupId, resend: true, sent: false }));
+      store.dispatch(removeFromQueue(data));
+      store.dispatch(updateResendStatus({ groupId: data.groupId, resend: true, sent: false }));
       store.dispatch(resetIsLoading());
       store.dispatch(setError(config.translations.error));
     };
 
     if (socket && socket.connected) {
-      // for the purpose of acknowledgement the ack part when accepting event must be executed
-      // so that the timeout does not fire this will mean that the server is okay;
-      socket.volatile.emit(events.chat, {
-        role: roles.user,
-        message: data.groupId ? chat.history.filter(item => item.groupId === data.groupId).map(item => item.content).join('\n') : data.content,
-        term: getQueryParam(window.location.search, 'utm_chat'),
-        user_id: meta.cid,
-      }, withTimeout(onResendError));
+      socket.volatile.emit(
+        events.chat,
+        { role: roles.user,
+          message: data.groupId ? chat.history.filter(item => item.groupId === data.groupId).map(item => item.content).join('\n') : data.content,
+          term: getQueryParam(window.location.search, 'utm_chat'),
+          user_id: meta.cid,
+        },
+        withTimeout(onResendError)
+      );
     } else {
       onResendError();
     }
@@ -144,22 +149,20 @@ const chatMiddleware = store => next => action => {
     });
   }
 
-  if (setIsPaymentButtonVisible.match(action)) {
-    if (action.payload === true) {
-      const data = {
-        eventType: null,
-        systemType: meta.systemType,
-        utmParams: meta.marketing.lastUtmParams,
-        customerUuid: meta.cid,
-        email: intentions.email.current
-      };
+  if (setIsPaymentButtonVisible.match(action) && action.payload === true) {
+    const data = {
+      eventType: null,
+      systemType: meta.systemType,
+      utmParams: meta.marketing.lastUtmParams,
+      customerUuid: meta.cid,
+      email: intentions.email.current
+    };
 
-      data.eventType = baseEvents.addToCart;
-      track(data);
+    data.eventType = baseEvents.addToCart;
+    track(data);
 
-      data.eventType = customEvents.priceSeen;
-      track(data);
-    }
+    data.eventType = customEvents.priceSeen;
+    track(data);
   }
 
   if (setIsEmailFormVisible.match(action) && action.payload) {
@@ -189,7 +192,7 @@ const chatMiddleware = store => next => action => {
 
   socket = io.connect(action.payload.chatUrl, { query: 'cid=' + meta.cid, ...socketConfig });
 
-  socket.on('connect', () => {
+  socket.on(events.connect, () => {
     const { meta } = store.getState();
     socket.sendBuffer = [];
     socket.emit(events.chatHistory, { user_id: meta.cid });
@@ -212,13 +215,13 @@ const chatMiddleware = store => next => action => {
       updateForAnySpecialMessage({ lastMessage, store });
       store.dispatch(setHistory(history));
     } else {
+      store.dispatch(setHistory([{ role: roles.assistant, content: config.aiProfile.initialMessage, time: new Date() }]));
       handleMessageSending({
         role: roles.assistant,
         term: getQueryParam(window.location.search, 'utm_chat'),
         user_id: meta.cid,
         message: config.aiProfile.initialMessage
       });
-      store.dispatch(setHistory([{ role: roles.assistant, content: config.aiProfile.initialMessage, time: new Date() }]));
     }
   });
 
@@ -227,18 +230,6 @@ const chatMiddleware = store => next => action => {
     store.dispatch(resetOutgoing());
     store.dispatch(setIncoming());
     store.dispatch(resetError());
-  });
-
-  socket.on(`${events.chat}-${meta.cid}`, (data) => {
-    const { options, content } = extractOptionSet(data.message);
-    const isSpecial = checkForSpecialPhrases(data.message, specialMessages);
-    updateForAnySpecialMessage({ lastMessage: { content: data.message }, store });
-    const { intentions } = store.getState();
-
-    store.dispatch(resetIsLoading());
-    store.dispatch(resetError());
-    store.dispatch(appendHistory({ content, options, role: roles.assistant, isSpecial }));
-    store.dispatch(setResponseFormVisibility({ intentions, options }));
   });
 
   socket.on(events.streamData, ({ chunk, errors, question_id, answer_id }) => {
@@ -276,13 +267,21 @@ const chatMiddleware = store => next => action => {
     const { chat, intentions } = store.getState();
     const { content, options } = extractOptionSet(chat.textToParse);
     const isSpecial = options.some(item => checkForSpecialPhrases(item.value, specialMessages));
+    const queued = chat.queue.length && chat.queue[chat.queue.length - 1];
     store.dispatch(appendHistory({
       ...chat.incoming,
       content: chat.incoming.content + content,
       options,
       isSpecial
     }));
-    store.dispatch(setLastQuestionId(chat.incoming.question_id));
+
+    if (queued) {
+      store.dispatch(setQueuedId({ ...queued, id: chat.incoming.question_id }));
+      store.dispatch(removeFromQueue(queued));
+    } else {
+      store.dispatch(setLastQuestionId(chat.incoming.question_id));
+    }
+
     store.dispatch(resetIncoming());
     store.dispatch(resetTextToParse());
     store.dispatch(setResponseFormVisibility({ intentions, options }));

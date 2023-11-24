@@ -19,6 +19,13 @@ const configSlice = createSlice({
     resetOutgoing(state) {
       state.outgoing = initialState.outgoing;
     },
+    pushQueue(state, { payload }) {
+      const notFound = !state.queue.find(it => it.groupId === payload.groupId || it.content === payload.content);
+      if (notFound) state.queue.push(payload);
+    },
+    removeFromQueue(state, { payload }) {
+      state.queue = state.queue.filter(it => it.groupId !== payload.groupId || it.content !== payload.content) || [];
+    },
     setIncoming(state, { payload }) {
       state.incoming = {
         term: getQueryParam(window.location.search, 'utm_chat'),
@@ -66,6 +73,17 @@ const configSlice = createSlice({
         return item;
       });
     },
+    setQueuedId(state, { payload }) {
+      state.history = state.history.map(item => {
+        if (!item.id && item.groupId === payload.groupId) {
+          item.id = payload.id;
+        }
+        if (!item.id && item.content === payload.content) {
+          item.id = payload.id;
+        }
+        return item;
+      });
+    },
     resetHistory(state) {
       state.history = initialState.history;
     },
@@ -90,14 +108,27 @@ const configSlice = createSlice({
     setClosed(state) {
       state.closed = true;
     },
-    updateMessageStatus(state, { payload }) {
+    updateResendStatus(state, { payload }) {
       state.history = state.history.map(item => {
-        if (payload.groupId === item.groupId) {
+        if (!item.id && payload.groupId === item.groupId) {
           item = { ...item, resend: payload.resend, sent: payload.sent };
         }
-        if (item.id === payload.id) {
+        if (!item.id && payload.content === item.content) {
           item = { ...item, resend: payload.resend, sent: payload.sent };
         }
+        return item;
+      });
+    },
+    showResendStatus(state) {
+      state.history = state.history.map((item, index, array) => {
+        if (index === array.length - 1) {
+          item = { ...item, resend: true, sent: false };
+        }
+
+        if (item.role === roles.user && !item.id) {
+          item = { ...item, resend: true, sent: false };
+        }
+
         return item;
       });
     },
@@ -105,7 +136,6 @@ const configSlice = createSlice({
       state.lastGroupId = payload;
     },
     resendMessage(state, { payload }) {
-      console.log('resend DISPATCH');
       state.history = state.history.map(item => item);
     },
     setError(state, { payload }) {
@@ -117,7 +147,6 @@ const configSlice = createSlice({
   },
 });
 
-export const getLastUserMessage = (state) => state.chat.history.findLast(item => item.role === roles.user);
 export const getChat = state => state.chat;
 
 export const { setOutgoing, setIncoming,
@@ -126,8 +155,9 @@ export const { setOutgoing, setIncoming,
   appendHistory, setTextToParse, resetTextToParse,
   setIsLoading, resetIsLoading, setLastGroupPointer,
   setTypingTimeoutExpired, setError, resetError,
-  setConnected, setClosed, updateMessageStatus,
-  resendMessage, setLastQuestionId
+  setConnected, setClosed, updateResendStatus,
+  resendMessage, setLastQuestionId, showResendStatus,
+  pushQueue, removeFromQueue, setQueuedId
 } = configSlice.actions;
 
 export default configSlice.reducer;
