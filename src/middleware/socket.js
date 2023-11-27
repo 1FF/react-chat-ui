@@ -201,6 +201,7 @@ const chatMiddleware = store => next => action => {
 
   socket.on(events.chatHistory, ({ history, errors }) => {
     store.dispatch(resetIsLoading());
+    store.dispatch(resetIncoming());
     const { config, meta, chat } = store.getState();
 
     if (chat.error) return;
