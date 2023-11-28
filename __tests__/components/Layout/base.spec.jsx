@@ -1,6 +1,6 @@
 /* eslint-env jest */
 import { render } from '@testing-library/react';
-import { useAppSelector, useWindowSize } from '@/hooks';
+import { useAppDispatch, useAppSelector, useWindowSize } from '@/hooks';
 import { LayoutBase } from '@/components/Layout';
 
 const original = console.error;
@@ -10,6 +10,7 @@ describe('LayoutBase Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     console.error = jest.fn();
+    useAppDispatch.mockReturnValue(() => jest.fn());
     useAppSelector.mockReturnValue({ themeId: 'light' });
     useWindowSize.mockReturnValue([150, 150]);
   });

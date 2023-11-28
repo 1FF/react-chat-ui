@@ -1,8 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { chat as initialState } from '@/store/initialState';
 import { extractOptionSet } from '@/utils/formatting';
-import { getQueryParam } from '@/utils';
+import { getQueryParam, hasExpired } from '@/utils';
 import { roles } from '@/config';
+import { CHAT_SEEN_KEY } from '@/config/env';
 
 const configSlice = createSlice({
   name: 'chat',
@@ -63,7 +64,7 @@ const configSlice = createSlice({
         bubbleContent = { content: payload.content, groupId: payload.groupId };
       }
 
-      state.history.push({ ...bubbleContent, role: payload.role, id: payload.id });
+      state.history.push({ ...bubbleContent, role: payload.role, id: payload.id, time: new Date().getTime() });
     },
     setLastQuestionId(state, { payload }) {
       state.history = state.history.map(item => {
@@ -148,6 +149,27 @@ const configSlice = createSlice({
 });
 
 export const getChat = state => state.chat;
+
+export const mustHideChat = (state) => {
+  const userMessages = state.chat.history.filter(it => it.role === roles.user);
+
+  if (userMessages.length === 0) return false;
+
+  const { time, role } = userMessages[userMessages.length - 1];
+  let hasToStayOpen;
+
+  if (role === roles.user && time) {
+    hasToStayOpen = hasExpired(time);
+  }
+
+  if (hasToStayOpen) {
+    localStorage.removeItem(CHAT_SEEN_KEY);
+  }
+
+  const chatSeen = localStorage.getItem(CHAT_SEEN_KEY);
+
+  return chatSeen;
+};
 
 export const { setOutgoing, setIncoming,
   resetIncoming, addIncomingChunk,

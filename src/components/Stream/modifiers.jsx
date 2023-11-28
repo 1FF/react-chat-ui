@@ -1,11 +1,32 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+import { customEvents } from '@/config/analytics';
+import { CHAT_SEEN_KEY } from '@/config/env';
 import { curlyBraces, link } from '@/config/patterns';
+import { useAppDispatch, useAppSelector } from '@/hooks';
+import { track } from '@/services/tracking';
+import { setClosed } from '@/store/slices/chat';
+import { getMeta } from '@/store/slices/meta';
 import { constructLink } from '@/utils/formatting';
 /**
 * Replaces all string links with anchor tags.
 * @example { replaceLinksWithAnchors('hello nice to see you here is a link to diet http://www.yourketo.diet') }
 */
 export const replaceLinksWithAnchors = (val) => {
+  const dispatch = useAppDispatch();
+  const { cid, systemType, marketing } = useAppSelector(getMeta);
+
   const parts = val.split(link);
+
+  const onClick = (e) => {
+    localStorage.setItem(CHAT_SEEN_KEY, e.currentTarget.href || true);
+    track({
+      eventType: customEvents.linkClicked,
+      systemType,
+      utmParams: marketing.lastUtmParams,
+      customerUuid: cid,
+    });
+    dispatch(setClosed());
+  };
 
   return parts.map((part) => {
     if (link.test(part)) {
@@ -15,6 +36,7 @@ export const replaceLinksWithAnchors = (val) => {
           key={ `link-idx-${Math.random()}` }
           className="tw--underline"
           href={ urlWithParams }
+          onClick={ onClick }
         >
           { part }
         </a>

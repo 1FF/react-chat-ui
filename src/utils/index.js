@@ -230,11 +230,11 @@ export const getQueryParam = (url, param) => {
 /**
  * Checks if 24 hours have passed since the given date.
  *
- * @function isExpired
+ * @function hasExpired
  * @param {string} date - The date to compare in ISO 8601 format (e.g., "2023-07-04T14:11:00.097Z").
  * @returns {boolean} Returns true if 24 hours have passed since the given date, or false otherwise.
  */
-export const isExpired = (date, maxHours = 24) => {
+export const hasExpired = (date, maxHours = 24) => {
   const currentDate = new Date();
   const givenDate = new Date(date);
   const elapsedMilliseconds = currentDate - givenDate;

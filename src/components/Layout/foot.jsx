@@ -62,7 +62,8 @@ export const LayoutFoot = () => {
     setDisabled(true);
   };
 
-  const onClickCtaPay = () => {
+  const onClickCta = (e) => {
+    localStorage.setItem(CHAT_SEEN_KEY, e.currentTarget.href || true);
     track({
       eventType: customEvents.linkClicked,
       systemType,
@@ -70,9 +71,7 @@ export const LayoutFoot = () => {
       customerUuid: cid,
       email: current
     });
-
     dispatch(setClosed());
-    localStorage.setItem(CHAT_SEEN_KEY, true);
   };
 
   return (
@@ -85,7 +84,7 @@ export const LayoutFoot = () => {
           <Link
             forwardedRef={ ctaAfterPayButton }
             text={ ctaText }
-            onClick={ onClickCtaPay }
+            onClick={ onClickCta }
             href={ ctaHref }
             e2e="quiz-trigger-btn"
           />
