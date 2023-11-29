@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { customEvents } from '@/config/analytics';
-import { CHAT_SEEN_KEY } from '@/config/env';
+import { LINK_CLICKED_KEY } from '@/config/env';
 import { curlyBraces, link } from '@/config/patterns';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { track } from '@/services/tracking';
@@ -18,7 +18,7 @@ export const replaceLinksWithAnchors = (val) => {
   const parts = val.split(link);
 
   const onClick = (e) => {
-    localStorage.setItem(CHAT_SEEN_KEY, e.currentTarget.href || true);
+    localStorage.setItem(LINK_CLICKED_KEY, e.currentTarget.href);
     track({
       eventType: customEvents.linkClicked,
       systemType,

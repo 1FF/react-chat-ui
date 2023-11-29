@@ -25,6 +25,7 @@ import { setConfig } from '@/store/slices/config';
 import { track } from '@/services/tracking';
 import { baseEvents, customEvents } from '@/config/analytics';
 import { setRegion } from '@/store/slices/meta';
+import { CHAT_FINISHED_TIMESTAMP } from '@/config/env';
 
 const specialMessages = [intent.type.email, intent.type.payment];
 let socket;
@@ -128,6 +129,7 @@ const chatMiddleware = store => next => action => {
   if (setClosed.match(action)) {
     document.querySelector('#chatbot-container')?.remove();
     document.body.classList?.remove('scroll-stop');
+    localStorage.setItem(CHAT_FINISHED_TIMESTAMP, new Date().getTime());
     socket.close();
   }
 

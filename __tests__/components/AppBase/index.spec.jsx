@@ -7,7 +7,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import mockio, { serverSocket, cleanup, io } from 'socket.io-client';
 import { initialConfig, history as defaultHistory, historyWithLink, historyWithEmailIntent, historyWithPaymentIntent, pd, streamedMessage, streamedMessageWithLink, streamedMessageWithEmailIntent, streamedMessageWithPaymentIntent } from '@/chatMocks';
-import { CHAT_SEEN_KEY, STORING_CHECKER_INTERVAL } from '@/config/env';
+import { CHAT_SEEN_KEY, LINK_CLICKED_KEY, STORING_CHECKER_INTERVAL } from '@/config/env';
 import { intent } from '@/main';
 import initialState from '@/store/initialState';
 
@@ -88,7 +88,7 @@ describe('AppBase, chat-history event and execute properly', () => {
 
     // Assert
     const { chat } = root.store.getState();
-    expect(localStorage.getItem(CHAT_SEEN_KEY)).toBeTruthy();
+    expect(localStorage.getItem(LINK_CLICKED_KEY)).toBeTruthy();
     expect(document.querySelector).toHaveBeenCalledWith('#chatbot-container');
     expect(nodeElem.remove).toHaveBeenCalled();
     expect(chat.closed).toBeTruthy();
