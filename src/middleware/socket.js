@@ -50,6 +50,7 @@ const chatMiddleware = store => next => action => {
 
     if (socket && socket.connected) {
       socket.volatile.emit(events.chat, data, withTimeout(dispatchRetry));
+      store.dispatch(resetError());
       return;
     }
 
@@ -79,6 +80,7 @@ const chatMiddleware = store => next => action => {
         },
         withTimeout(onResendError)
       );
+      store.dispatch(resetError());
     } else {
       onResendError();
     }
@@ -236,7 +238,7 @@ const chatMiddleware = store => next => action => {
   socket.on(events.streamData, ({ chunk, errors, question_id, answer_id }) => {
     const { chat, config } = store.getState();
     const { textToParse, incoming } = chat;
-    const link = constructLink(textToParse) || constructLink(incoming.content) || constructLink(chunk);
+    const link = constructLink(textToParse) || constructLink(incoming?.content) || constructLink(chunk);
 
     if (errors.length && !chat.error) {
       store.dispatch(setError(errors[0]));
