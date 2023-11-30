@@ -1,6 +1,6 @@
 {
   "name": "1ff-react-chat-ui",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "type": "module",
   "description": "UI to chat",
   "module": "dist/index.es.js",
