@@ -48,7 +48,7 @@ const chatMiddleware = store => next => action => {
       store.dispatch(setIsLoading());
     }
 
-    if (socket && socket.connected) {
+    if (socket && socket.connected && data.message.trim() !== '') {
       socket.volatile.emit(events.chat, data, withTimeout(dispatchRetry));
       store.dispatch(resetError());
       return;
@@ -70,11 +70,12 @@ const chatMiddleware = store => next => action => {
       store.dispatch(setError(config.translations.error));
     };
 
-    if (socket && socket.connected) {
+    const message = data.groupId ? chat.history.filter(item => item.groupId === data.groupId).map(item => item.content).join('\n') : data.content;
+    if (socket && socket.connected && message.trim() !== '') {
       socket.volatile.emit(
         events.chat,
         { role: roles.user,
-          message: data.groupId ? chat.history.filter(item => item.groupId === data.groupId).map(item => item.content).join('\n') : data.content,
+          message,
           term: getQueryParam(window.location.search, 'utm_chat'),
           user_id: meta.cid,
         },
@@ -129,14 +130,17 @@ const chatMiddleware = store => next => action => {
   }
 
   if (setTypingTimeoutExpired.match(action) && action.payload) {
-    handleMessageSending({
-      role: roles.user,
-      message: chat.history
-        .filter(message => message.role === roles.user && message.groupId === chat.lastGroupId)
-        .map(message => message.content).join('\n'),
-      term: getQueryParam(window.location.search, 'utm_chat'),
-      user_id: meta.cid
-    });
+    const lastMessage = chat.history
+      .filter(message => message.role === roles.user && message.groupId === chat.lastGroupId)
+      .map(message => message.content).join('\n');
+    if (lastMessage.trim() !== '') {
+      handleMessageSending({
+        role: roles.user,
+        message: lastMessage,
+        term: getQueryParam(window.location.search, 'utm_chat'),
+        user_id: meta.cid
+      });
+    }
   }
 
   const hasNoUserMessages = !chat.history.some(item => item.role === roles.user);
