@@ -2,7 +2,7 @@
 import { object } from 'prop-types';
 import { useAppSelector, useAppDispatch } from '@/hooks';
 import { getConfig } from '@/store/slices/config';
-import { appendHistory, getCurrentPointer, getStream, setOutgoing } from '@/store/slices/chat';
+import { appendHistory, getChat, resendMessage, setOutgoing } from '@/store/slices/chat';
 import { isNonEmptyArr } from '@/utils';
 
 import { Btn, IconBtn } from '@/components/Button';
@@ -14,19 +14,21 @@ import { textModifier } from './modifiers';
 export const StreamBubble = ({ item = {} }) => {
   const dispatch = useAppDispatch();
   const { themeId: theme } = useAppSelector(getConfig);
-  const currentPointer = useAppSelector(getCurrentPointer);
-  const { incoming } = useAppSelector(getStream);
-  const displayOptionList = isNonEmptyArr(item.options) && item.id === currentPointer && !item.isSpecial;
+  const { incoming } = useAppSelector(getChat);
+  const displayOptionList = isNonEmptyArr(item.options) && item.isLast && !item.isSpecial;
   const { base, action } = variant({ theme, type: item.role });
-  const { base: baseFlicker } = flickerEffect({ isTyping: !!incoming && !item.id, theme });
-  const displayActionButton = false; // DEV NOTE: get from store state
+  const { base: baseFlicker } = flickerEffect({ isTyping: !!incoming && item.role !== roles.user && item.isLast, theme });
 
   const setOption = (val) => {
     dispatch(setOutgoing(val));
   };
 
   const setMessage = (val) => {
-    dispatch(appendHistory({ role: 'user', content: val }));
+    dispatch(appendHistory({ role: roles.user, content: val }));
+  };
+
+  const onResend = (item) => {
+    dispatch(resendMessage(item));
   };
 
   const OptionList = ({ items = [] }) => (
@@ -48,9 +50,9 @@ export const StreamBubble = ({ item = {} }) => {
         { textModifier(item.content) }
       </span>
       { displayOptionList && <div className="tw--flex tw--flex-col tw--pt-[30px] tw--space-y-[10px]"><OptionList items={ item.options } /></div> }
-      { displayActionButton && (
+      { (item.role === roles.user && item.resend && !item.sent) && (
         <div className={ action() }>
-          <IconBtn outlined>
+          <IconBtn outlined onClick={ () => onResend(item) }>
             <svg
               fill="currentColor" viewBox="0 0 24 24"
               width="20px" height="20px"

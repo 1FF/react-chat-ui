@@ -1,3 +1,5 @@
+import { uid } from 'uid';
+
 export const meta = {
   pd: null,
   cid: null,
@@ -24,13 +26,14 @@ export const config = {
 export const chat = {
   outgoing: null,
   incoming: null,
+  queue: [],
   textToParse: '',
   history: [],
   status: null,
   error: null,
   isLoading: false,
-  shouldSendUnsent: false,
-  unsent: [],
+  typingTimeoutExpired: false,
+  lastGroupId: uid(),
   connected: false,
   closed: false,
 };

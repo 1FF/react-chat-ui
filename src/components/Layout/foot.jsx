@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks';
 import { ResponseForm, EmailForm } from '@/components/Form/';
 import { getEmailIntentions, getLinkIntentions, getPaymentIntentions, getResponseIntentions, setIsPaymentButtonVisible, setIsPaymentSuccessful, setLink, setPaymentFormVisibility, setPaymentIntentError } from '@/store/slices/intentions';
 import { PaymentButton, Link } from '@/components/Payment';
-import { appendHistory, getStream, setClosed } from '@/store/slices/chat';
+import { appendHistory, getChat, setClosed } from '@/store/slices/chat';
 import { roles } from '@/config/roles';
 import { PaymentScene } from '@/components/Scenes/payment';
 import { getConfig } from '@/store/slices/config';
@@ -20,7 +20,7 @@ export const LayoutFoot = () => {
   const { cid, systemType, marketing } = useAppSelector(getMeta);
   const { translations } = useAppSelector(getConfig);
   const { isVisible: isCtaVisible, text: ctaText, href: ctaHref } = useAppSelector(getLinkIntentions);
-  const { isLoading } = useAppSelector(getStream);
+  const { isLoading } = useAppSelector(getChat);
   const { error: streamError } = useAppSelector(store => store.chat);
   const { isFormVisible: isEmailFormVisible, current, error: emailError } = useAppSelector(getEmailIntentions);
   const { isButtonVisible: isPaymentButtonVisible, isFormVisible: isPaymentFormVisible, error: paymentIntentError } = useAppSelector(getPaymentIntentions);

@@ -14,7 +14,7 @@ disableReactDevTools();
 const persistConfig = {
   key: 'root',
   storage,
-  blacklist: ['chat', 'intentions'],
+  whitelist: ['chat', 'meta', 'config'],
 };
 
 export const store = configureStore({

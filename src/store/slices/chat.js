@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { uid } from 'uid';
 import { chat as initialState } from '@/store/initialState';
 import { extractOptionSet } from '@/utils/formatting';
 import { getQueryParam } from '@/utils';
@@ -20,19 +19,20 @@ const configSlice = createSlice({
     resetOutgoing(state) {
       state.outgoing = initialState.outgoing;
     },
+    pushQueue(state, { payload }) {
+      const notFound = !state.queue.find(it => it.groupId === payload.groupId || it.content === payload.content);
+      if (notFound) state.queue.push(payload);
+    },
+    removeFromQueue(state, { payload }) {
+      state.queue = state.queue.filter(it => it.groupId !== payload.groupId || it.content !== payload.content) || [];
+    },
     setIncoming(state, { payload }) {
       state.incoming = {
         term: getQueryParam(window.location.search, 'utm_chat'),
         user_id: localStorage.getItem('__cid'),
         role: roles.assistant,
-        content: payload,
+        content: payload || '',
       };
-    },
-    setError(state, { payload }) {
-      state.error = payload;
-    },
-    resetError(state) {
-      state.error = initialState.error;
     },
     resetIncoming(state) {
       state.incoming = initialState.incoming;
@@ -41,10 +41,12 @@ const configSlice = createSlice({
       state.incoming = {
         ...state.incoming,
         content: state.incoming.content + payload.chunk,
+        id: payload.id,
+        question_id: payload.question_id,
       };
     },
     setHistory(state, { payload }) {
-      state.history = payload.map((item) => ({ ...item, id: uid(), role: item.role, ...extractOptionSet(item.content) }));
+      state.history = payload.map((item) => ({ ...item, role: item.role, ...extractOptionSet(item.content) }));
     },
     appendHistory(state, { payload }) {
       let bubbleContent;
@@ -58,10 +60,29 @@ const configSlice = createSlice({
       }
 
       if (payload.role === roles.user) {
-        bubbleContent = { content: payload.content };
+        bubbleContent = { content: payload.content, groupId: payload.groupId };
       }
 
-      state.history.push({ id: uid(), ...bubbleContent, role: payload.role });
+      state.history.push({ ...bubbleContent, role: payload.role, id: payload.id });
+    },
+    setLastQuestionId(state, { payload }) {
+      state.history = state.history.map(item => {
+        if (!item.id) {
+          item.id = payload;
+        }
+        return item;
+      });
+    },
+    setQueuedId(state, { payload }) {
+      state.history = state.history.map(item => {
+        if (!item.id && item.groupId === payload.groupId) {
+          item.id = payload.id;
+        }
+        if (!item.id && item.content === payload.content) {
+          item.id = payload.id;
+        }
+        return item;
+      });
     },
     resetHistory(state) {
       state.history = initialState.history;
@@ -78,14 +99,8 @@ const configSlice = createSlice({
     resetIsLoading(state) {
       state.isLoading = initialState.isLoading;
     },
-    appendUnsent(state, { payload }) {
-      state.unsent = [...state.unsent, payload];
-    },
-    resetUnsent(state) {
-      state.unsent = initialState.unsent;
-    },
-    setShouldSendUnsent(state, { payload }) {
-      state.shouldSendUnsent = payload;
+    setTypingTimeoutExpired(state, { payload }) {
+      state.typingTimeoutExpired = payload;
     },
     setConnected(state, { payload }) {
       state.connected = payload;
@@ -93,19 +108,56 @@ const configSlice = createSlice({
     setClosed(state) {
       state.closed = true;
     },
+    updateResendStatus(state, { payload }) {
+      state.history = state.history.map(item => {
+        if (!item.id && payload.groupId === item.groupId) {
+          item = { ...item, resend: payload.resend, sent: payload.sent };
+        }
+        if (!item.id && payload.content === item.content) {
+          item = { ...item, resend: payload.resend, sent: payload.sent };
+        }
+        return item;
+      });
+    },
+    showResendStatus(state) {
+      state.history = state.history.map((item, index, array) => {
+        if (index === array.length - 1) {
+          item = { ...item, resend: true, sent: false };
+        }
+
+        if (item.role === roles.user && !item.id) {
+          item = { ...item, resend: true, sent: false };
+        }
+
+        return item;
+      });
+    },
+    setLastGroupPointer(state, { payload }) {
+      state.lastGroupId = payload;
+    },
+    resendMessage(state, { payload }) {
+      state.history = state.history.map(item => item);
+    },
+    setError(state, { payload }) {
+      state.error = payload;
+    },
+    resetError(state) {
+      state.error = initialState.error;
+    },
   },
 });
 
-export const getCurrentPointer = (state) => state.chat.history[state.chat.history.length - 1]?.id;
-export const getStream = state => state.chat;
+export const getChat = state => state.chat;
 
 export const { setOutgoing, setIncoming,
   resetIncoming, addIncomingChunk,
   resetOutgoing, setHistory, resetHistory,
   appendHistory, setTextToParse, resetTextToParse,
-  setIsLoading, resetIsLoading, appendUnsent, resetUnsent,
-  setShouldSendUnsent, setError, resetError,
-  setConnected, setClosed
+  setIsLoading, resetIsLoading, setLastGroupPointer,
+  setTypingTimeoutExpired, setError, resetError,
+  setConnected, setClosed, updateResendStatus,
+  resendMessage, setLastQuestionId, showResendStatus,
+  pushQueue, removeFromQueue, setQueuedId
 } = configSlice.actions;
 
 export default configSlice.reducer;

@@ -269,3 +269,23 @@ export const checkForSpecialPhrases = (string, specialMessages) => {
   const specialRegex = specialMessages.map(keyword => new RegExp(`\\[?${keyword}\\]?`));
   return specialRegex.some(regex => string.match(regex));
 };
+
+export const getNormalizedClientHistory = (clientHistory) => {
+  const groupedItems = {};
+  clientHistory.forEach((item) => {
+    if (item.groupId) {
+      if (!groupedItems[item.groupId]) {
+        groupedItems[item.groupId] = {
+          groupId: item.groupId,
+          role: item.role,
+          content: item.content,
+        };
+      } else {
+        groupedItems[item.groupId].content += ' ' + item.content;
+      }
+    } else {
+      groupedItems[`nonGroupId_${clientHistory.indexOf(item)}`] = item;
+    }
+  });
+  return Object.values(groupedItems);
+};

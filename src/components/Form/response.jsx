@@ -1,20 +1,31 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { uid } from 'uid';
 import { getResponseIntentions } from '@/store/slices/intentions';
 import { getConfig } from '@/store/slices/config';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { Input } from '@/components/Input';
 import { IconBtn } from '@/components/Button';
 
-import { appendUnsent, setShouldSendUnsent } from '@/store/slices/chat';
+import { appendHistory, getChat, setLastGroupPointer, setTypingTimeoutExpired } from '@/store/slices/chat';
+import { roles } from '@/config';
 import { layoutFoot as variant } from '../Layout/variants';
 
 export const ResponseForm = () => {
   const dispatch = useAppDispatch();
   const { themeId: theme } = useAppSelector(getConfig);
+  const { connected } = useAppSelector(getChat);
   const { isLoading } = useAppSelector(getResponseIntentions);
   const { base, input, button } = variant({ theme });
   const [response, setCurrentResponse] = useState('');
   const [timerId, setTimerId] = useState(null);
+  const groupId = useAppSelector(state => state.chat.lastGroupId);
+  const inputElement = useRef(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      inputElement.current.focus();
+    }, 500);
+  }, []);
 
   const handleInputChange = (e) => {
     setCurrentResponse(e.target.value);
@@ -25,7 +36,7 @@ export const ResponseForm = () => {
     e.preventDefault();
 
     if (response.trim()) {
-      dispatch(appendUnsent(response));
+      dispatch(appendHistory({ role: roles.user, content: response, groupId }));
     }
 
     setCurrentResponse('');
@@ -35,7 +46,8 @@ export const ResponseForm = () => {
   const setTimerToSendMessage = () => {
     clearTimeout(timerId);
     const currentId = setTimeout(() => {
-      dispatch(setShouldSendUnsent(true));
+      dispatch(setTypingTimeoutExpired(true));
+      dispatch(setLastGroupPointer(uid()));
     }, 3000);
     setTimerId(currentId);
   };
@@ -44,16 +56,18 @@ export const ResponseForm = () => {
     <form className={ base() } onSubmit={ handleFormSubmit }>
       <div className={ input() }>
         <Input
-          type="response"
-          name="response"
-          value={ response }
-          placeholder="Write your message here..."
-          onChange={ handleInputChange }
+          disabled={ !connected }
           isLoading={ isLoading }
+          name="response"
+          onChange={ handleInputChange }
+          placeholder="Write your message here..."
+          type="response"
+          value={ response }
+          passRef={ inputElement }
         />
       </div>
       <div className={ button() }>
-        <IconBtn onClick={ handleFormSubmit }>
+        <IconBtn onClick={ handleFormSubmit } disabled={ !connected }>
           <svg
             fill="currentColor" viewBox="0 0 24 24"
             width="20px" height="20px"

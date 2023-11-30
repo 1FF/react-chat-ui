@@ -1,23 +1,20 @@
 import ReactBotClient from '@/main';
 import { intent } from '@/services/intentions';
+import { chat as getChatConfig, paymentData } from '@/config';
 import { faker } from '@faker-js/faker';
 
 // example entry point for the plugin
 document.addEventListener('DOMContentLoaded', () => {
   // DEV NOTE: this is needed to simulate retarded loading of the data
   setTimeout(() => {
-    localStorage.setItem('__pd', JSON.stringify({ amount: '29.90',
-      amountInUSD: 29.9,
-      frequency: 1,
-      frequencyInMonths: 1,
-      billingOptionType: 'subscription',
-      isDisplayPricePlan: true,
-      displayPlanPrice: '$29.90', }));
+    localStorage.setItem('__pd', JSON.stringify(paymentData));
   }, 5000);
 
+  const id = faker.string.uuid();
   // eslint-disable-next-line no-unused-expressions
-  !localStorage.getItem('__cid') && localStorage.setItem('__cid', faker.datatype.uuid());
-  ReactBotClient({ root: document.querySelector('#root') });
+  !localStorage.getItem('__cid') && localStorage.setItem('__cid', id);
+
+  ReactBotClient({ root: document.querySelector('#root'), initialConfig: getChatConfig(id) });
   // example implementation from the plugin user side
   intent.core.on(intent.type.email, (data) => {
     // MOCKERIES FOR TESTING PURPOSES

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { intent } from '@/services/intentions';
 import { getEmailIntentions, setEmail, setIsEmailLoading } from '@/store/slices/intentions';
 import { getConfig } from '@/store/slices/config';
@@ -13,6 +13,13 @@ export const EmailForm = () => {
   const { isLoading } = useAppSelector(getEmailIntentions);
   const { base, input, button } = variant({ theme });
   const [email, setCurrentEmail] = useState('');
+  const inputElement = useRef(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      inputElement.current.focus();
+    }, 500);
+  }, []);
 
   const handleInputChange = (e) => {
     const currentValue = e.target.value.trim();
@@ -36,13 +43,14 @@ export const EmailForm = () => {
     <form className={ base() } onSubmit={ handleFormSubmit }>
       <div className={ input() }>
         <Input
-          type="email"
-          name="email"
           e2e="email-input"
-          value={ email }
-          placeholder={ translations.emailPlaceholder }
-          onChange={ handleInputChange }
           isLoading={ isLoading }
+          name="email"
+          onChange={ handleInputChange }
+          placeholder={ translations.emailPlaceholder }
+          type="email"
+          value={ email }
+          passRef={ inputElement }
         />
       </div>
       <div className={ button() }>
