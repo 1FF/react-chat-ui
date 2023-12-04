@@ -4,6 +4,7 @@ export const meta = {
   pd: null,
   cid: null,
   eid: null,
+  region: null,
   systemType: null,
   marketing: {},
 };

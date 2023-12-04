@@ -25,6 +25,7 @@ import { setConfig } from '@/store/slices/config';
 import { track } from '@/services/tracking';
 import { baseEvents, customEvents } from '@/config/analytics';
 import { CHAT_SEEN_KEY } from '@/config/env';
+import { setRegion } from '@/store/slices/meta';
 
 const specialMessages = [intent.type.email, intent.type.payment];
 let socket;
@@ -78,6 +79,7 @@ const chatMiddleware = store => next => action => {
           message,
           term: getQueryParam(window.location.search, 'utm_chat'),
           user_id: meta.cid,
+          region: meta.region,
         },
         withTimeout(onResendError)
       );
@@ -98,6 +100,7 @@ const chatMiddleware = store => next => action => {
       message: action.payload,
       term: getQueryParam(window.location.search, 'utm_chat'),
       user_id: meta.cid,
+      region: meta.region,
     });
 
     if (isFirstUserMessage(chat.history)) {
@@ -138,7 +141,8 @@ const chatMiddleware = store => next => action => {
         role: roles.user,
         message: lastMessage,
         term: getQueryParam(window.location.search, 'utm_chat'),
-        user_id: meta.cid
+        user_id: meta.cid,
+        region: meta.region,
       });
     }
   }
@@ -201,13 +205,15 @@ const chatMiddleware = store => next => action => {
   socket.on(events.connect, () => {
     const { meta } = store.getState();
     socket.sendBuffer = [];
-    socket.emit(events.chatHistory, { user_id: meta.cid });
+    socket.emit(events.chatHistory, { user_id: meta.cid, region: meta.region });
     store.dispatch(setConnected(true));
   });
 
-  socket.on(events.chatHistory, ({ history, errors }) => {
+  socket.on(events.chatHistory, ({ history, errors, region }) => {
     store.dispatch(resetIsLoading());
     store.dispatch(resetIncoming());
+    store.dispatch(setRegion(region));
+
     const { config, meta, chat } = store.getState();
 
     if (chat.error) return;
@@ -227,7 +233,8 @@ const chatMiddleware = store => next => action => {
         role: roles.assistant,
         term: getQueryParam(window.location.search, 'utm_chat'),
         user_id: meta.cid,
-        message: config.aiProfile.initialMessage
+        message: config.aiProfile.initialMessage,
+        region: meta.region,
       });
     }
   });
