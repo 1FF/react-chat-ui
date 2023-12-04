@@ -24,10 +24,13 @@ const configSlice = createSlice({
     },
     setPd(state, { payload }) {
       state.pd = { ...state.pd, ...payload };
+    },
+    setRegion(state, { payload }) {
+      state.region = payload;
     }
   }
 });
 
 export const getMeta = state => state.meta;
-export const { setMeta, resetMeta, setMarketing, setPd } = configSlice.actions;
+export const { setMeta, resetMeta, setMarketing, setPd, setRegion } = configSlice.actions;
 export default configSlice.reducer;
