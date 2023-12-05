@@ -32,6 +32,7 @@ export const customEvents = {
   emailExist: 'EmailExist',
   priceSeen: 'PriceSeen',
   buttonClick: 'ButtonClick',
+  closeClicked: 'CloseClicked',
 };
 
 export const baseEventsArr = getKeys(baseEvents);

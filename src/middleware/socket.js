@@ -75,7 +75,8 @@ const chatMiddleware = store => next => action => {
     if (socket && socket.connected && message.trim() !== '') {
       socket.volatile.emit(
         events.chat,
-        { role: roles.user,
+        {
+          role: roles.user,
           message,
           term: getQueryParam(window.location.search, 'utm_chat'),
           user_id: meta.cid,
@@ -129,8 +130,11 @@ const chatMiddleware = store => next => action => {
   if (setClosed.match(action)) {
     document.querySelector('#chatbot-container')?.remove();
     document.body.classList?.remove('scroll-stop');
+    const currentLocation = new URL(window.location.href);
+    currentLocation.search = '';
     localStorage.setItem(CHAT_FINISHED_TIMESTAMP, new Date().getTime());
-    socket.close();
+    window.location = currentLocation.toString();
+    if (socket) socket.close();
   }
 
   if (setTypingTimeoutExpired.match(action) && action.payload) {

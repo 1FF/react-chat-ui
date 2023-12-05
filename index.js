@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // eslint-disable-next-line no-unused-expressions
   !localStorage.getItem('__cid') && localStorage.setItem('__cid', id);
 
-  ReactBotClient({ root: document.querySelector('#root'), initialConfig: getChatConfig(id) });
+  ReactBotClient({ root: document.querySelector('#chatbot-container'), initialConfig: getChatConfig(id) });
   // example implementation from the plugin user side
   intent.core.on(intent.type.email, (data) => {
     // MOCKERIES FOR TESTING PURPOSES

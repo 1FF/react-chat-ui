@@ -25,7 +25,7 @@ export const layoutBase = /*tw*/ tv({
 
 export const layoutHead = /*tw*/ tv({
   slots: {
-    base: 'tw--flex tw--px-5 tw--py-[11px] tw--shadow-[-1px_2px_5px_0]',
+    base: 'tw--flex tw--px-5 tw--py-[11px] tw--shadow-[-1px_2px_5px_0] tw--justify-between',
   },
   variants: {
     theme: {
