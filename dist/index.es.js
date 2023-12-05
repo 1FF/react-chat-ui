@@ -1919,13 +1919,13 @@ const ct = {
   }
 }), ae = ({ config: e }) => e, {
   setConfig: Tn,
-  resetConfig: Ra,
+  resetConfig: ka,
   setTheme: Qi,
-  resetTheme: ka,
+  resetTheme: Ba,
   setDevToolsStatus: Ki,
-  resetDevToolsStatus: Ba,
+  resetDevToolsStatus: Pa,
   togglePluginMode: Zi,
-  setTranslations: Pa
+  setTranslations: ja
 } = En.actions, eo = En.reducer, In = Yt({
   name: "meta",
   initialState: ct,
@@ -1946,7 +1946,7 @@ const ct = {
       e.region = r;
     }
   }
-}), to = (e) => e.meta, { setMeta: ro, resetMeta: ja, setMarketing: no, setPd: io, setRegion: oo } = In.actions, so = In.reducer;
+}), to = (e) => e.meta, { setMeta: ro, resetMeta: Aa, setMarketing: no, setPd: io, setRegion: oo } = In.actions, so = In.reducer;
 var Hr = (e) => typeof e == "boolean" ? `${e}` : e === 0 ? "0" : e, me = (e) => !e || typeof e != "object" || Object.keys(e).length === 0, ao = (e, r) => JSON.stringify(e) === JSON.stringify(r);
 function _n(e, r) {
   e.forEach(function(i) {
@@ -4485,6 +4485,7 @@ const Do = (
   return /* @__PURE__ */ m.jsx(
     "div",
     {
+      "data-e2e": "base-container",
       style: { height: `${w}px` },
       className: d({ minimized: u }),
       children: /* @__PURE__ */ m.jsxs("div", { className: f(), children: [
@@ -4916,9 +4917,9 @@ const Ko = {
   setIsEmailFormVisible: Gt,
   setIsPaymentButtonVisible: qt,
   setLink: Qt,
-  setResponse: Aa,
+  setResponse: Fa,
   setResponseFormVisibility: ar,
-  setResponseLoadingStatus: Fa,
+  setResponseLoadingStatus: La,
   setPaymentIntentError: ss
 } = qn.actions, as = qn.reducer, ls = (
   /*tw*/
@@ -5011,21 +5012,23 @@ const cs = (
       }
     }
   })
-), Yn = ({ text: e = null, onClick: r = null }) => {
-  const { themeId: i } = z(ae), { base: s } = cs({ theme: i });
+), Yn = ({ text: e = null, onClick: r = null, e2e: i = null }) => {
+  const { themeId: s } = z(ae), { base: u } = cs({ theme: s });
   return /* @__PURE__ */ m.jsx(
     "button",
     {
       onClick: r,
-      className: s(),
+      className: u(),
       type: "button",
+      "data-e2e": i,
       children: e
     }
   );
 };
 Yn.propTypes = {
   text: ue.isRequired,
-  onClick: Ae
+  onClick: Ae,
+  e2e: ue
 };
 const Kt = ({ children: e, outlined: r = !1, onClick: i = null, e2e: s = null, disabled: u = !1 }) => {
   const { themeId: d } = z(ae), { base: f } = us({ theme: d, outlined: r });
@@ -5047,7 +5050,7 @@ Kt.propTypes = {
   outlined: pt,
   onClick: Ae
 };
-const Wt = "chatSeen", fs = "cid", Ht = (e) => {
+const Wt = "chatSeen", fs = "cid", ds = 1e3, Ht = (e) => {
   const r = /\[(.*?)\]/.exec(e);
   return !r || r.length <= 1 ? { content: e, options: [] } : {
     content: e.replace(r[0], ""),
@@ -5059,11 +5062,11 @@ const Wt = "chatSeen", fs = "cid", Ht = (e) => {
   window.location.search && (s = new URLSearchParams(window.location.search), s.append(Wt, "true"), s.append(fs, localStorage.getItem("__cid")), s = "/?" + s);
   const u = e.match(i), d = u ? u[0] : "";
   return d ? r(d) ? d : d + s : !1;
-}, ds = (e) => Array.isArray(e), ps = (e) => typeof e == "string", hs = (e) => ps(e) && e !== "", ms = (e) => ds(e) && e.length > 0, ut = (e, r) => new URLSearchParams(e).get(r), ws = (e, r = 24) => {
+}, ps = (e) => Array.isArray(e), hs = (e) => typeof e == "string", ms = (e) => hs(e) && e !== "", ws = (e) => ps(e) && e.length > 0, ut = (e, r) => new URLSearchParams(e).get(r), gs = (e, r = 24) => {
   const i = /* @__PURE__ */ new Date(), s = new Date(e);
   return (i - s) / (1e3 * 60 * 60) >= r;
 };
-function gs(e) {
+function ys(e) {
   const r = new Date(e), i = {
     day: "numeric",
     month: "long",
@@ -5173,16 +5176,16 @@ const Xn = (e, r) => r.map((s) => new RegExp(`\\[?${s}\\]?`)).some((s) => e.matc
   setOutgoing: Ar,
   setIncoming: rn,
   resetIncoming: nn,
-  addIncomingChunk: ys,
-  resetOutgoing: bs,
+  addIncomingChunk: bs,
+  resetOutgoing: xs,
   setHistory: lr,
-  resetHistory: La,
+  resetHistory: Oa,
   appendHistory: Xe,
   setTextToParse: cr,
-  resetTextToParse: xs,
+  resetTextToParse: vs,
   setIsLoading: ur,
   resetIsLoading: At,
-  setLastGroupPointer: vs,
+  setLastGroupPointer: Es,
   setTypingTimeoutExpired: Qn,
   setError: Ft,
   resetError: fr,
@@ -5190,16 +5193,17 @@ const Xn = (e, r) => r.map((s) => new RegExp(`\\[?${s}\\]?`)).some((s) => e.matc
   setClosed: Fr,
   updateResendStatus: sn,
   resendMessage: Kn,
-  setLastQuestionId: Es,
-  showResendStatus: Ts,
-  pushQueue: Is,
+  setLastQuestionId: Ts,
+  showResendStatus: Is,
+  pushQueue: _s,
   removeFromQueue: an,
-  setQueuedId: _s
-} = Jn.actions, Ss = Jn.reducer, Cs = () => {
+  setQueuedId: Ss
+} = Jn.actions, Cs = Jn.reducer, Rs = () => {
   const e = mt(), { themeId: r } = z(ae), { connected: i } = z(Zt), { isLoading: s } = z(Hn), { base: u, input: d, button: f } = Ln({ theme: r }), [l, w] = St(""), [v, x] = St(null), E = z((S) => S.chat.lastGroupId), y = Sr(null);
   hn(() => {
     setTimeout(() => {
-      y.current.focus();
+      var S;
+      (S = y.current) == null || S.focus();
     }, 500);
   }, []);
   const I = (S) => {
@@ -5209,45 +5213,54 @@ const Xn = (e, r) => r.map((s) => new RegExp(`\\[?${s}\\]?`)).some((s) => e.matc
   }, B = () => {
     clearTimeout(v);
     const S = setTimeout(() => {
-      e(Qn(!0)), e(vs(Rr()));
+      e(Qn(!0)), e(Es(Rr()));
     }, 3e3);
     x(S);
   };
-  return /* @__PURE__ */ m.jsxs("form", { className: u(), onSubmit: R, children: [
-    /* @__PURE__ */ m.jsx("div", { className: d(), children: /* @__PURE__ */ m.jsx(
-      jr,
-      {
-        disabled: !i,
-        isLoading: s,
-        name: "response",
-        onChange: I,
-        placeholder: "Write your message here...",
-        type: "response",
-        value: l,
-        passRef: y
-      }
-    ) }),
-    /* @__PURE__ */ m.jsx("div", { className: f(), children: /* @__PURE__ */ m.jsx(Kt, { onClick: R, disabled: !i, children: /* @__PURE__ */ m.jsx(
-      "svg",
-      {
-        fill: "currentColor",
-        viewBox: "0 0 24 24",
-        width: "20px",
-        height: "20px",
-        children: /* @__PURE__ */ m.jsx(
-          "path",
+  return /* @__PURE__ */ m.jsxs(
+    "form",
+    {
+      className: u(),
+      onSubmit: R,
+      "data-e2e": "user-form",
+      children: [
+        /* @__PURE__ */ m.jsx("div", { className: d(), children: /* @__PURE__ */ m.jsx(
+          jr,
           {
-            d: "M16.6915026,12.4744748 L3.50612381,13.2599618 C3.19218622,13.2599618 3.03521743,13.4170592 3.03521743,13.5741566 L1.15159189,20.0151496 C0.8376543,20.8006365 0.99,21.89 1.77946707,22.52 C2.41,22.99 3.50612381,23.1 4.13399899,22.8429026 L21.714504,14.0454487 C22.6563168,13.5741566 23.1272231,12.6315722 22.9702544,11.6889879 C22.8132856,11.0605983 22.3423792,10.4322088 21.714504,10.118014 L4.13399899,1.16346272 C3.34915502,0.9 2.40734225,1.00636533 1.77946707,1.4776575 C0.994623095,2.10604706 0.8376543,3.0486314 1.15159189,3.99121575 L3.03521743,10.4322088 C3.03521743,10.5893061 3.34915502,10.7464035 3.50612381,10.7464035 L16.6915026,11.5318905 C16.6915026,11.5318905 17.1624089,11.5318905 17.1624089,12.0031827 C17.1624089,12.4744748 16.6915026,12.4744748 16.6915026,12.4744748 Z"
+            disabled: !i,
+            isLoading: s,
+            name: "response",
+            onChange: I,
+            placeholder: "Write your message here...",
+            type: "response",
+            value: l,
+            passRef: y
           }
-        )
-      }
-    ) }) })
-  ] });
-}, Rs = () => {
+        ) }),
+        /* @__PURE__ */ m.jsx("div", { className: f(), children: /* @__PURE__ */ m.jsx(Kt, { onClick: R, disabled: !i, children: /* @__PURE__ */ m.jsx(
+          "svg",
+          {
+            fill: "currentColor",
+            viewBox: "0 0 24 24",
+            width: "20px",
+            height: "20px",
+            children: /* @__PURE__ */ m.jsx(
+              "path",
+              {
+                d: "M16.6915026,12.4744748 L3.50612381,13.2599618 C3.19218622,13.2599618 3.03521743,13.4170592 3.03521743,13.5741566 L1.15159189,20.0151496 C0.8376543,20.8006365 0.99,21.89 1.77946707,22.52 C2.41,22.99 3.50612381,23.1 4.13399899,22.8429026 L21.714504,14.0454487 C22.6563168,13.5741566 23.1272231,12.6315722 22.9702544,11.6889879 C22.8132856,11.0605983 22.3423792,10.4322088 21.714504,10.118014 L4.13399899,1.16346272 C3.34915502,0.9 2.40734225,1.00636533 1.77946707,1.4776575 C0.994623095,2.10604706 0.8376543,3.0486314 1.15159189,3.99121575 L3.03521743,10.4322088 C3.03521743,10.5893061 3.34915502,10.7464035 3.50612381,10.7464035 L16.6915026,11.5318905 C16.6915026,11.5318905 17.1624089,11.5318905 17.1624089,12.0031827 C17.1624089,12.4744748 16.6915026,12.4744748 16.6915026,12.4744748 Z"
+              }
+            )
+          }
+        ) }) })
+      ]
+    }
+  );
+}, ks = () => {
   const e = mt(), { themeId: r, translations: i } = z(ae), { isLoading: s } = z(Wn), { base: u, input: d, button: f } = Ln({ theme: r }), [l, w] = St(""), v = Sr(null);
   hn(() => {
     setTimeout(() => {
-      v.current.focus();
+      var y;
+      (y = v.current) == null || y.focus();
     }, 500);
   }, []);
   const x = (y) => {
@@ -5256,36 +5269,44 @@ const Xn = (e, r) => r.map((s) => new RegExp(`\\[?${s}\\]?`)).some((s) => e.matc
   }, E = (y) => {
     y.preventDefault(), l !== "" && (e(vr(!0)), e(rs(l)), fe.core.emit(fe.type.email, { email: l }), w(""));
   };
-  return /* @__PURE__ */ m.jsxs("form", { className: u(), onSubmit: E, children: [
-    /* @__PURE__ */ m.jsx("div", { className: d(), children: /* @__PURE__ */ m.jsx(
-      jr,
-      {
-        e2e: "email-input",
-        isLoading: s,
-        name: "email",
-        onChange: x,
-        placeholder: i.emailPlaceholder,
-        type: "email",
-        value: l,
-        passRef: v
-      }
-    ) }),
-    /* @__PURE__ */ m.jsx("div", { className: f(), children: /* @__PURE__ */ m.jsx(Kt, { onClick: E, e2e: "email-validate-btn", children: /* @__PURE__ */ m.jsx(
-      "svg",
-      {
-        fill: "currentColor",
-        viewBox: "0 0 24 24",
-        width: "20px",
-        height: "20px",
-        children: /* @__PURE__ */ m.jsx(
-          "path",
+  return /* @__PURE__ */ m.jsxs(
+    "form",
+    {
+      className: u(),
+      onSubmit: E,
+      "data-e2e": "email-form",
+      children: [
+        /* @__PURE__ */ m.jsx("div", { className: d(), children: /* @__PURE__ */ m.jsx(
+          jr,
           {
-            d: "M16.6915026,12.4744748 L3.50612381,13.2599618 C3.19218622,13.2599618 3.03521743,13.4170592 3.03521743,13.5741566 L1.15159189,20.0151496 C0.8376543,20.8006365 0.99,21.89 1.77946707,22.52 C2.41,22.99 3.50612381,23.1 4.13399899,22.8429026 L21.714504,14.0454487 C22.6563168,13.5741566 23.1272231,12.6315722 22.9702544,11.6889879 C22.8132856,11.0605983 22.3423792,10.4322088 21.714504,10.118014 L4.13399899,1.16346272 C3.34915502,0.9 2.40734225,1.00636533 1.77946707,1.4776575 C0.994623095,2.10604706 0.8376543,3.0486314 1.15159189,3.99121575 L3.03521743,10.4322088 C3.03521743,10.5893061 3.34915502,10.7464035 3.50612381,10.7464035 L16.6915026,11.5318905 C16.6915026,11.5318905 17.1624089,11.5318905 17.1624089,12.0031827 C17.1624089,12.4744748 16.6915026,12.4744748 16.6915026,12.4744748 Z"
+            e2e: "email-input",
+            isLoading: s,
+            name: "email",
+            onChange: x,
+            placeholder: i.emailPlaceholder,
+            type: "email",
+            value: l,
+            passRef: v
           }
-        )
-      }
-    ) }) })
-  ] });
+        ) }),
+        /* @__PURE__ */ m.jsx("div", { className: f(), children: /* @__PURE__ */ m.jsx(Kt, { onClick: E, e2e: "email-validate-btn", children: /* @__PURE__ */ m.jsx(
+          "svg",
+          {
+            fill: "currentColor",
+            viewBox: "0 0 24 24",
+            width: "20px",
+            height: "20px",
+            children: /* @__PURE__ */ m.jsx(
+              "path",
+              {
+                d: "M16.6915026,12.4744748 L3.50612381,13.2599618 C3.19218622,13.2599618 3.03521743,13.4170592 3.03521743,13.5741566 L1.15159189,20.0151496 C0.8376543,20.8006365 0.99,21.89 1.77946707,22.52 C2.41,22.99 3.50612381,23.1 4.13399899,22.8429026 L21.714504,14.0454487 C22.6563168,13.5741566 23.1272231,12.6315722 22.9702544,11.6889879 C22.8132856,11.0605983 22.3423792,10.4322088 21.714504,10.118014 L4.13399899,1.16346272 C3.34915502,0.9 2.40734225,1.00636533 1.77946707,1.4776575 C0.994623095,2.10604706 0.8376543,3.0486314 1.15159189,3.99121575 L3.03521743,10.4322088 C3.03521743,10.5893061 3.34915502,10.7464035 3.50612381,10.7464035 L16.6915026,11.5318905 C16.6915026,11.5318905 17.1624089,11.5318905 17.1624089,12.0031827 C17.1624089,12.4744748 16.6915026,12.4744748 16.6915026,12.4744748 Z"
+              }
+            )
+          }
+        ) }) })
+      ]
+    }
+  );
 }, Zn = (
   /*tw*/
   Z({
@@ -5294,7 +5315,7 @@ const Xn = (e, r) => r.map((s) => new RegExp(`\\[?${s}\\]?`)).some((s) => e.matc
       link: "tw--flex-1 tw--space-x-2 tw--text-white tw--text-center tw--bg-dark-neon tw--max-w-[280px] tw--mx-auto tw--px-4 tw--py-3 tw--font-extrabold tw--rounded-[20px] tw--shadow-[0px_12px_24px_-4px_rgba(1,154,255,0.2)] tw--flex tw--justify-center tw--items-center tw--cursor-pointer tw--relative tw--w-full tw--mb-[11px] spaced-letters max-h-[46px] customXs:max-h-[52px] customXs:tw--max-w-xs customXs:te--text-[20px] customXs:tw--text-xl"
     }
   })
-), ks = (
+), Bs = (
   /*tw*/
   Z({
     slots: {
@@ -5307,7 +5328,7 @@ const Xn = (e, r) => r.map((s) => new RegExp(`\\[?${s}\\]?`)).some((s) => e.matc
       }
     }
   })
-), Bs = (
+), Ps = (
   /*tw*/
   Z({
     slots: {
@@ -5322,19 +5343,19 @@ const Xn = (e, r) => r.map((s) => new RegExp(`\\[?${s}\\]?`)).some((s) => e.matc
       info: "tw--leading-[2] tw--text-[10px] tw--text-muted-blue"
     }
   })
-), Ps = (
+), js = (
   /*tw*/
   Z({
     slots: {
       base: "tw--absolute tw--top-[-30px] tw--right-[-10px] tw--w-6 tw--h-6 tw--p-1 tw--bg-white tw--rounded-full tw--cursor-pointer tw--text-muted-blue"
     }
   })
-), js = Z({
+), As = Z({
   slots: {
     base: "tw--mt-[30px] tw--flex tw--items-center tw--justify-center tw--text-[12.8px] tw--leading-[1.56] tw--text-light-seraph tw--font-bold",
     icon: "tw--mr-[5px]"
   }
-}), As = Z({
+}), Fs = Z({
   slots: {
     wrapper: "loader js-payment-loader tw--max-w-[335px] tw--overflow-hidden tw--relative tw--flex tw--w-full tw--flex-col tw--items-center tw--justify-center tw--rounded-xl tw--p-5",
     inner: "tw--absolute tw--left-0 tw--top-8 tw--flex tw--h-8 tw--w-full tw--items-center tw--justify-center",
@@ -5364,7 +5385,7 @@ const Xn = (e, r) => r.map((s) => new RegExp(`\\[?${s}\\]?`)).some((s) => e.matc
     }
   }
 }), ei = ({ config: e = { price: "", period: "" } }) => {
-  const { translations: r } = z((E) => E.config), { wrapper: i, left: s, leftTop: u, icon: d, text: f, bottom: l, right: w, price: v, info: x } = Bs();
+  const { translations: r } = z((E) => E.config), { wrapper: i, left: s, leftTop: u, icon: d, text: f, bottom: l, right: w, price: v, info: x } = Ps();
   return /* @__PURE__ */ m.jsx("header", { children: /* @__PURE__ */ m.jsxs("div", { className: i(), children: [
     /* @__PURE__ */ m.jsxs("span", { className: s(), children: [
       /* @__PURE__ */ m.jsxs("div", { className: u(), children: [
@@ -5425,7 +5446,7 @@ ti.propTypes = {
   e2e: ue
 };
 const ri = ({ onClick: e }) => {
-  const { base: r } = Ps();
+  const { base: r } = js();
   return /* @__PURE__ */ m.jsx(
     "button",
     {
@@ -5452,8 +5473,8 @@ const ri = ({ onClick: e }) => {
 ri.propTypes = {
   onClick: Ae.isRequired
 };
-const Fs = () => {
-  const { base: e, icon: r } = js();
+const Ls = () => {
+  const { base: e, icon: r } = As();
   return /* @__PURE__ */ m.jsxs("footer", { className: e(), children: [
     /* @__PURE__ */ m.jsx(
       "svg",
@@ -5476,7 +5497,7 @@ const Fs = () => {
     /* @__PURE__ */ m.jsx("span", { children: "SSL Secure Connection" })
   ] });
 }, ni = ({ texts: e = [], title: r = "" }) => {
-  const { themeId: i } = z(ae), { wrapper: s, inner: u, dots: d, dotsIn: f, icon: l, progressCheckmark: w, panelTitle: v, spinningTexts: x, filmContainer: E, film: y } = As({ theme: i });
+  const { themeId: i } = z(ae), { wrapper: s, inner: u, dots: d, dotsIn: f, icon: l, progressCheckmark: w, panelTitle: v, spinningTexts: x, filmContainer: E, film: y } = Fs({ theme: i });
   return /* @__PURE__ */ m.jsxs(
     "div",
     {
@@ -5548,7 +5569,7 @@ ii.propTypes = {
   forwardedRef: ht.isRequired,
   href: ue.isRequired
 };
-const Ls = (
+const Os = (
   /*tw*/
   Z({
     slots: {
@@ -5566,12 +5587,12 @@ const Ls = (
     }
   })
 ), oi = ({ children: e }) => {
-  const { themeId: r } = z(ae), { base: i } = Ls({ theme: r });
+  const { themeId: r } = z(ae), { base: i } = Os({ theme: r });
   return /* @__PURE__ */ m.jsx("div", { className: i(), children: e });
 };
 oi.propTypes = { children: Lt.isRequired };
 const si = ({ onClose: e }) => {
-  const { displayPlanPrice: r, billingFrequencyTmsg: i } = z((f) => f.meta.pd), { translations: s, themeId: u } = z((f) => f.config), { base: d } = ks({ theme: u });
+  const { displayPlanPrice: r, billingFrequencyTmsg: i } = z((f) => f.meta.pd), { translations: s, themeId: u } = z((f) => f.config), { base: d } = Bs({ theme: u });
   return /* @__PURE__ */ m.jsx("div", { className: d(), children: /* @__PURE__ */ m.jsxs(
     "div",
     {
@@ -5581,7 +5602,7 @@ const si = ({ onClose: e }) => {
         /* @__PURE__ */ m.jsx(oi, { children: /* @__PURE__ */ m.jsx(ni, { texts: s.loaderTexts, title: s.tm1224 }) }),
         /* @__PURE__ */ m.jsx(ri, { onClick: e }),
         /* @__PURE__ */ m.jsx("div", { id: "primer-form-container", className: "tw--w-full h-full", children: /* @__PURE__ */ m.jsx(ei, { config: { price: r, period: i } }) }),
-        /* @__PURE__ */ m.jsx(Fs, {})
+        /* @__PURE__ */ m.jsx(Ls, {})
       ]
     }
   ) });
@@ -5604,7 +5625,7 @@ const je = ({ eventType: e, systemType: r, utmParams: i, customerUuid: s, email:
     });
     window.tracking.trackClient(f), window.trackEventInGTM && window.trackEventInGTM(f);
   }
-}, Os = {
+}, Ns = {
   addToCart: "AddToCart",
   contact: "Contact",
   initiateCheckout: "InitiateCheckout",
@@ -5632,7 +5653,7 @@ const je = ({ eventType: e, systemType: r, utmParams: i, customerUuid: s, email:
   emailExist: "EmailExist",
   priceSeen: "PriceSeen",
   buttonClick: "ButtonClick"
-}, Ns = (
+}, Ms = (
   /*tw*/
   Z({
     slots: {
@@ -5651,7 +5672,7 @@ const je = ({ eventType: e, systemType: r, utmParams: i, customerUuid: s, email:
       }
     }
   })
-), Ms = (
+), Us = (
   /*tw*/
   Z({
     slots: {
@@ -5664,14 +5685,14 @@ const je = ({ eventType: e, systemType: r, utmParams: i, customerUuid: s, email:
       }
     }
   })
-), Us = (
+), zs = (
   /*tw*/
   Z({
     slots: {
       base: "tw--grid"
     }
   })
-), zs = (
+), Ds = (
   /* tw */
   Z({
     slots: {
@@ -5688,7 +5709,7 @@ const je = ({ eventType: e, systemType: r, utmParams: i, customerUuid: s, email:
       }
     }
   })
-), Ds = (
+), Vs = (
   /*tw*/
   Z({
     slots: {
@@ -5741,7 +5762,7 @@ const je = ({ eventType: e, systemType: r, utmParams: i, customerUuid: s, email:
       }
     ]
   })
-), Vs = Z({
+), $s = Z({
   slots: {
     dotFirst: "tw--inline-block tw--h-[12px] tw--w-[12px] tw--rounded-full tw--opacity-40 tw--animate-wave",
     dotSecond: "tw--inline-block tw--h-[12px] tw--w-[12px] tw--rounded-full tw--opacity-40 tw--animate-wave-delay",
@@ -5759,14 +5780,14 @@ const je = ({ eventType: e, systemType: r, utmParams: i, customerUuid: s, email:
       class: "tw--bg-dark-zephyr-100"
     }
   ]
-}), $s = () => {
-  const { themeId: e } = z(ae), { dotFirst: r, dotSecond: i, dotThird: s } = Vs({ theme: e });
+}), Gs = () => {
+  const { themeId: e } = z(ae), { dotFirst: r, dotSecond: i, dotThird: s } = $s({ theme: e });
   return /* @__PURE__ */ m.jsxs("div", { className: "tw--ml-7 tw--space-x-[6px]", "data-e2e": "stream-response-loader", children: [
     /* @__PURE__ */ m.jsx("span", { className: r() }),
     /* @__PURE__ */ m.jsx("span", { className: i() }),
     /* @__PURE__ */ m.jsx("span", { className: s() })
   ] });
-}, Gs = () => {
+}, qs = () => {
   const e = mt(), { isFormVisible: r } = z(Hn), { cid: i, systemType: s, marketing: u } = z(to), { translations: d } = z(ae), { isVisible: f, text: l, href: w } = z(ts), { isLoading: v } = z(Zt), { error: x } = z((C) => C.chat), { isFormVisible: E, current: y, error: I } = z(Wn), { isButtonVisible: R, isFormVisible: B, error: S } = z(es), D = x || I || S, F = Sr(null), [de, pe] = St(!1), le = (C) => {
     e(os(C));
   }, ye = (C) => {
@@ -5791,7 +5812,7 @@ const je = ({ eventType: e, systemType: r, utmParams: i, customerUuid: s, email:
   return /* @__PURE__ */ m.jsxs("div", { className: "tw--space-y-[11px] tw--pb-[11px]", children: [
     D && /* @__PURE__ */ m.jsx("div", { className: "tw--pl-[35px] tw--text-[#ff0043] tw--font-medium", children: D }),
     B && /* @__PURE__ */ m.jsx(si, { onClose: ye }),
-    v && /* @__PURE__ */ m.jsx($s, {}),
+    v && /* @__PURE__ */ m.jsx(Gs, {}),
     f && /* @__PURE__ */ m.jsx(
       ii,
       {
@@ -5802,8 +5823,8 @@ const je = ({ eventType: e, systemType: r, utmParams: i, customerUuid: s, email:
         e2e: "quiz-trigger-btn"
       }
     ),
-    E && /* @__PURE__ */ m.jsx(Rs, {}),
-    r && /* @__PURE__ */ m.jsx(Cs, {}),
+    E && /* @__PURE__ */ m.jsx(ks, {}),
+    r && /* @__PURE__ */ m.jsx(Rs, {}),
     R && /* @__PURE__ */ m.jsx(
       ti,
       {
@@ -5815,7 +5836,7 @@ const je = ({ eventType: e, systemType: r, utmParams: i, customerUuid: s, email:
     )
   ] });
 }, ai = ({ titleTxt: e = "" }) => {
-  const { themeId: r } = z(ae), { base: i, title: s } = Ms({ theme: r }), u = hs(e);
+  const { themeId: r } = z(ae), { base: i, title: s } = Us({ theme: r }), u = ms(e);
   return /* @__PURE__ */ m.jsxs("div", { className: i(), children: [
     u && /* @__PURE__ */ m.jsx("div", { className: s(), children: e }),
     /* @__PURE__ */ m.jsx(Br, { orientation: "vertical" })
@@ -5824,7 +5845,7 @@ const je = ({ eventType: e, systemType: r, utmParams: i, customerUuid: s, email:
 ai.propTypes = {
   titleTxt: ue
 };
-const qs = (
+const Ws = (
   /*tw*/
   Z({
     slots: {
@@ -5848,7 +5869,7 @@ Z({
   }
 });
 const li = ({ text: e = null, href: r = null, onClick: i = null }) => {
-  const { themeId: s } = z(ae), { base: u } = qs({ theme: s });
+  const { themeId: s } = z(ae), { base: u } = Ws({ theme: s });
   return /* @__PURE__ */ m.jsx(
     "a",
     {
@@ -5864,7 +5885,7 @@ li.propTypes = {
   text: ue.isRequired,
   onClick: Ae
 };
-const ln = /((?:https?:\/\/|www\.)[^\s/$.?#].[^\s{}[\]()<>]*)/gi, Ws = /\{([^}]+)\}/g, cn = (e) => e.split(ln).map((i) => {
+const ln = /((?:https?:\/\/|www\.)[^\s/$.?#].[^\s{}[\]()<>]*)/gi, Hs = /\{([^}]+)\}/g, cn = (e) => e.split(ln).map((i) => {
   if (ln.test(i)) {
     const s = _t(i);
     return /* @__PURE__ */ m.jsx(
@@ -5878,21 +5899,21 @@ const ln = /((?:https?:\/\/|www\.)[^\s/$.?#].[^\s{}[\]()<>]*)/gi, Ws = /\{([^}]+
     );
   }
   return i;
-}), Hs = (e) => e.split(Ws).map((i, s) => s % 2 === 0 ? cn(i) : /* @__PURE__ */ m.jsx("strong", { children: cn(i) }, `strong-${Math.random()}`)), ci = ({ item: e = {} }) => {
-  const r = mt(), { themeId: i } = z(ae), { incoming: s } = z(Zt), u = ms(e.options) && e.isLast && !e.isSpecial, { base: d, action: f } = Ds({ theme: i, type: e.role }), { base: l } = zs({ isTyping: !!s && e.role !== ne.user && e.isLast, theme: i }), w = (y) => {
+}), Ys = (e) => e.split(Hs).map((i, s) => s % 2 === 0 ? cn(i) : /* @__PURE__ */ m.jsx("strong", { children: cn(i) }, `strong-${Math.random()}`)), ci = ({ item: e = {} }) => {
+  const r = mt(), { themeId: i } = z(ae), { incoming: s } = z(Zt), u = ws(e.options) && e.isLast && !e.isSpecial, { base: d, action: f } = Vs({ theme: i, type: e.role }), { base: l } = Ds({ isTyping: !!s && e.role !== ne.user && e.isLast, theme: i }), w = (y) => {
     r(Ar(y));
   }, v = (y) => {
     r(Xe({ role: ne.user, content: y }));
   }, x = (y) => {
     r(Kn(y));
-  }, E = ({ items: y = [] }) => y.map(({ id: I, label: R, value: B, link: S, noStream: D }) => /* @__PURE__ */ m.jsx("span", { children: S ? /* @__PURE__ */ m.jsx(li, { text: R, href: S }) : /* @__PURE__ */ m.jsx(Yn, { text: R, onClick: D ? () => v(B) : () => w(B) }) }, I));
+  }, E = ({ items: y = [] }) => y.map(({ id: I, label: R, value: B, link: S, noStream: D }) => /* @__PURE__ */ m.jsx("span", { children: S ? /* @__PURE__ */ m.jsx(li, { text: R, href: S }) : /* @__PURE__ */ m.jsx(Yn, { text: R, e2e: "option-button", onClick: D ? () => v(B) : () => w(B) }) }, I));
   return /* @__PURE__ */ m.jsxs("div", { className: d(), children: [
     /* @__PURE__ */ m.jsx(
       "span",
       {
         className: l(),
         ...e.role === ne.assistant ? { "data-e2e": "stream-assistant-msg" } : "",
-        children: Hs(e.content)
+        children: Ys(e.content)
       }
     ),
     u && /* @__PURE__ */ m.jsx("div", { className: "tw--flex tw--flex-col tw--pt-[30px] tw--space-y-[10px]", children: /* @__PURE__ */ m.jsx(E, { items: e.options }) }),
@@ -5915,23 +5936,23 @@ ci.propTypes = {
   item: ht.isRequired
 };
 const Er = ({ item: e = {} }) => {
-  const { themeId: r } = z(ae), { base: i } = Us({ theme: r });
-  return /* @__PURE__ */ m.jsx("div", { className: i(), children: /* @__PURE__ */ m.jsx(ci, { item: e }) });
+  const { themeId: r } = z(ae), { base: i } = zs({ theme: r });
+  return /* @__PURE__ */ m.jsx("div", { className: i(), "data-e2e": "history-item", children: /* @__PURE__ */ m.jsx(ci, { item: e }) });
 };
 Er.propTypes = {
   item: ht.isRequired
 };
-const Ys = () => {
-  const { themeId: e } = z(ae), { aiProfile: r } = z(ae), { history: i, incoming: s } = z(Zt), { base: u, second: d, date: f } = Ns({ theme: e }), l = i && i.length > 0 && i[0];
-  return /* @__PURE__ */ m.jsx("div", { className: u(), children: /* @__PURE__ */ m.jsxs("div", { className: d(), children: [
+const Xs = () => {
+  const { themeId: e } = z(ae), { aiProfile: r } = z(ae), { history: i, incoming: s } = z(Zt), { base: u, second: d, date: f } = Ms({ theme: e }), l = i && i.length > 0 && i[0];
+  return /* @__PURE__ */ m.jsx("div", { className: u(), children: /* @__PURE__ */ m.jsxs("div", { className: d(), "data-e2e": "history-container", children: [
     /* @__PURE__ */ m.jsx(ai, { titleTxt: r.welcome }),
-    l && /* @__PURE__ */ m.jsx("div", { className: f(), "data-e2e": "stream-assistant-msg-date", children: gs(l.time) }),
+    l && /* @__PURE__ */ m.jsx("div", { className: f(), "data-e2e": "stream-assistant-msg-date", children: ys(l.time) }),
     i.map(
       (w, v) => /* @__PURE__ */ m.jsx(Er, { item: { ...w, isLast: v === i.length - 1 } }, Rr())
     ),
     s && /* @__PURE__ */ m.jsx(Er, { item: s })
   ] }) });
-}, Xs = (
+}, Js = (
   /*tw*/
   Z({
     slots: {
@@ -5944,7 +5965,7 @@ const Ys = () => {
       }
     }
   })
-), Js = (
+), Qs = (
   /*tw*/
   Z({
     slots: {
@@ -5958,7 +5979,7 @@ const Ys = () => {
     }
   })
 ), Tr = ({ onToggle: e, on: r = !1, title: i = "" }) => {
-  const { base: s } = Xs({ color: r ? "enabled" : "disabled" }), { base: u } = Js({ position: r ? "enabled" : "disabled" });
+  const { base: s } = Js({ color: r ? "enabled" : "disabled" }), { base: u } = Qs({ position: r ? "enabled" : "disabled" });
   return /* @__PURE__ */ m.jsxs("div", { className: "tw--flex tw--flex-col tw--text-white", children: [
     /* @__PURE__ */ m.jsx("span", { className: "tw--pb-1", children: i }),
     /* @__PURE__ */ m.jsx(
@@ -5977,7 +5998,7 @@ Tr.propTypes = {
   title: ue.isRequired,
   on: pt
 };
-const Qs = (
+const Ks = (
   /* tw */
   Z({
     slots: {
@@ -5989,8 +6010,8 @@ const Qs = (
       }
     }
   })
-), Ks = () => {
-  const e = mt(), { enableDevTools: r, themeId: i, isPluginMode: s } = z(ae), u = () => e(Qi(i === "light" ? "dark" : "light")), { base: d } = Qs({ hidden: !r });
+), Zs = () => {
+  const e = mt(), { enableDevTools: r, themeId: i, isPluginMode: s } = z(ae), u = () => e(Qi(i === "light" ? "dark" : "light")), { base: d } = Ks({ hidden: !r });
   return /* @__PURE__ */ m.jsxs("div", { className: d(), children: [
     /* @__PURE__ */ m.jsx(
       Tr,
@@ -6012,13 +6033,13 @@ const Qs = (
 }, ui = ({ config: e = {} }) => {
   const r = mt();
   return r(ro(e.meta)), r(Tn(e.app)), r(Ki(!1)), /* @__PURE__ */ m.jsxs(m.Fragment, { children: [
-    /* @__PURE__ */ m.jsx(Ks, {}),
+    /* @__PURE__ */ m.jsx(Zs, {}),
     /* @__PURE__ */ m.jsx(
       On,
       {
         head: /* @__PURE__ */ m.jsx(Go, {}),
-        stream: /* @__PURE__ */ m.jsx(Ys, {}),
-        foot: /* @__PURE__ */ m.jsx(Gs, {})
+        stream: /* @__PURE__ */ m.jsx(Xs, {}),
+        foot: /* @__PURE__ */ m.jsx(qs, {})
       }
     )
   ] });
@@ -6033,7 +6054,7 @@ function Mt(e) {
     return i && typeof Symbol == "function" && i.constructor === Symbol && i !== Symbol.prototype ? "symbol" : typeof i;
   }, Mt(e);
 }
-function Zs(e, r) {
+function ea(e, r) {
   if (!(e instanceof r))
     throw new TypeError("Cannot call a class as a function");
 }
@@ -6043,10 +6064,10 @@ function un(e, r) {
     s.enumerable = s.enumerable || !1, s.configurable = !0, "value" in s && (s.writable = !0), Object.defineProperty(e, s.key, s);
   }
 }
-function ea(e, r, i) {
+function ta(e, r, i) {
   return r && un(e.prototype, r), i && un(e, i), e;
 }
-function ta(e, r) {
+function ra(e, r) {
   return r && (Mt(r) === "object" || typeof r == "function") ? r : Ut(e);
 }
 function Ir(e) {
@@ -6059,7 +6080,7 @@ function Ut(e) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
   return e;
 }
-function ra(e, r) {
+function na(e, r) {
   if (typeof r != "function" && r !== null)
     throw new TypeError("Super expression must either be null or a function");
   e.prototype = Object.create(r && r.prototype, { constructor: { value: e, writable: !0, configurable: !0 } }), r && _r(e, r);
@@ -6073,13 +6094,13 @@ function zt(e, r, i) {
   return r in e ? Object.defineProperty(e, r, { value: i, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = i, e;
 }
 var fi = /* @__PURE__ */ function(e) {
-  ra(r, e);
+  na(r, e);
   function r() {
     var i, s;
-    Zs(this, r);
+    ea(this, r);
     for (var u = arguments.length, d = new Array(u), f = 0; f < u; f++)
       d[f] = arguments[f];
-    return s = ta(this, (i = Ir(r)).call.apply(i, [this].concat(d))), zt(Ut(s), "state", {
+    return s = ra(this, (i = Ir(r)).call.apply(i, [this].concat(d))), zt(Ut(s), "state", {
       bootstrapped: !1
     }), zt(Ut(s), "_unsubscribe", void 0), zt(Ut(s), "handlePersistorState", function() {
       var l = s.props.persistor, w = l.getState(), v = w.bootstrapped;
@@ -6092,7 +6113,7 @@ var fi = /* @__PURE__ */ function(e) {
       }), s._unsubscribe && s._unsubscribe());
     }), s;
   }
-  return ea(r, [{
+  return ta(r, [{
     key: "componentDidMount",
     value: function() {
       this._unsubscribe = this.props.persistor.subscribe(this.handlePersistorState), this.handlePersistorState();
@@ -6115,12 +6136,12 @@ zt(fi, "defaultProps", {
 });
 const di = [fe.type.email, fe.type.payment];
 let ce;
-const na = (e) => (r) => (i) => {
+const ia = (e) => (r) => (i) => {
   const { meta: s, chat: u, intentions: d } = e.getState(), f = () => {
     const { config: y } = e.getState();
     e.dispatch(At()), e.dispatch(Ft(y.translations.error));
   }, l = () => {
-    e.dispatch(Ts()), f();
+    e.dispatch(Is()), f();
   }, w = (y) => {
     if (y.role === ne.user && e.dispatch(ur()), ce && ce.connected && y.message.trim() !== "") {
       ce.volatile.emit(Re.chat, y, fn(l)), e.dispatch(fr());
@@ -6128,7 +6149,7 @@ const na = (e) => (r) => (i) => {
     }
     l();
   }, v = (y) => {
-    e.dispatch(sn({ groupId: y.groupId, resend: !1, sent: !0 })), e.dispatch(ur()), e.dispatch(Is(y));
+    e.dispatch(sn({ groupId: y.groupId, resend: !1, sent: !0 })), e.dispatch(ur()), e.dispatch(_s(y));
     const I = () => {
       const { config: B } = e.getState();
       e.dispatch(an(y)), e.dispatch(sn({ groupId: y.groupId, resend: !0, sent: !1 })), e.dispatch(At()), e.dispatch(Ft(B.translations.error));
@@ -6155,7 +6176,7 @@ const na = (e) => (r) => (i) => {
     term: ut(window.location.search, "utm_chat"),
     user_id: s.cid,
     region: s.region
-  }), oa(u.history) && je({
+  }), sa(u.history) && je({
     eventType: Ne.firstMessage,
     systemType: s.systemType,
     utmParams: s.marketing.lastUtmParams,
@@ -6193,7 +6214,7 @@ const na = (e) => (r) => (i) => {
       customerUuid: s.cid,
       email: d.email.current
     };
-    y.eventType = Os.addToCart, je(y), y.eventType = Ne.priceSeen, je(y);
+    y.eventType = Ns.addToCart, je(y), y.eventType = Ne.priceSeen, je(y);
   }
   if (Gt.match(i) && i.payload && je({
     eventType: Ne.emailField,
@@ -6220,7 +6241,7 @@ const na = (e) => (r) => (i) => {
       }
       if (y.length) {
         const F = y[y.length - 1];
-        sa({ lastMessage: F, store: e }), e.dispatch(lr(y));
+        aa({ lastMessage: F, store: e }), e.dispatch(lr(y));
       } else
         e.dispatch(lr([{ role: ne.assistant, content: B.aiProfile.initialMessage, time: /* @__PURE__ */ new Date() }])), w({
           role: ne.assistant,
@@ -6231,7 +6252,7 @@ const na = (e) => (r) => (i) => {
         });
     }
   }), ce.on(Re.streamStart, () => {
-    e.dispatch(At()), e.dispatch(bs()), e.dispatch(rn()), e.dispatch(fr());
+    e.dispatch(At()), e.dispatch(xs()), e.dispatch(rn()), e.dispatch(fr());
   }), ce.on(Re.streamData, ({ chunk: y, errors: I, question_id: R, answer_id: B }) => {
     const { chat: S, config: D } = e.getState(), { textToParse: F, incoming: de } = S, pe = _t(F) || _t(de == null ? void 0 : de.content) || _t(y);
     if (I.length && !S.error && e.dispatch(Ft(I[0])), pe && (e.dispatch(Qt({
@@ -6246,7 +6267,7 @@ const na = (e) => (r) => (i) => {
       e.dispatch(cr(y));
       return;
     }
-    e.dispatch(ys({ chunk: y, id: B, question_id: R }));
+    e.dispatch(bs({ chunk: y, id: B, question_id: R }));
   }), ce.on(Re.streamEnd, () => {
     const { chat: y, intentions: I } = e.getState(), { content: R, options: B } = Ht(y.textToParse), S = B.some((F) => Xn(F.value, di)), D = y.queue.length && y.queue[y.queue.length - 1];
     e.dispatch(Xe({
@@ -6254,16 +6275,16 @@ const na = (e) => (r) => (i) => {
       content: y.incoming.content + R,
       options: B,
       isSpecial: S
-    })), D ? (e.dispatch(_s({ ...D, id: y.incoming.question_id })), e.dispatch(an(D))) : e.dispatch(Es(y.incoming.question_id)), e.dispatch(nn()), e.dispatch(xs()), e.dispatch(ar({ intentions: I, options: B }));
+    })), D ? (e.dispatch(Ss({ ...D, id: y.incoming.question_id })), e.dispatch(an(D))) : e.dispatch(Ts(y.incoming.question_id)), e.dispatch(nn()), e.dispatch(vs()), e.dispatch(ar({ intentions: I, options: B }));
   }), ce.on(Re.streamError, f), ce.on(Re.error, f), ce.on(Re.disconnect, () => {
     e.dispatch(on(!1));
   }), r(i);
-}, ia = ({ time: e, role: r }) => {
+}, oa = ({ time: e, role: r }) => {
   let i;
-  return r === ne.user && e && (i = ws(e)), i && localStorage.removeItem(Wt), localStorage.getItem(Wt) === "true";
-}, oa = (e) => e.filter((r) => r.role === ne.user).length === 1, sa = ({ lastMessage: e, store: r }) => {
+  return r === ne.user && e && (i = gs(e)), i && localStorage.removeItem(Wt), localStorage.getItem(Wt) === "true";
+}, sa = (e) => e.filter((r) => r.role === ne.user).length === 1, aa = ({ lastMessage: e, store: r }) => {
   const { meta: i, config: s } = r.getState(), u = _t(e.content);
-  ia(e) && r.dispatch(Fr(!0)), u && r.dispatch(Qt({
+  oa(e) && r.dispatch(Fr(!0)), u && r.dispatch(Qt({
     isVisible: !0,
     href: u,
     text: s.translations.mealButton
@@ -6276,7 +6297,7 @@ const na = (e) => (r) => (i) => {
   return () => {
     i || (i = !0, clearTimeout(s));
   };
-}, aa = (e) => (r) => {
+}, la = (e) => (r) => {
   const i = (s) => {
     const { meta: u } = e.getState();
     if (u.pd)
@@ -6339,11 +6360,11 @@ const na = (e) => (r) => (i) => {
       d = localStorage.getItem(e);
     }
     s && d && (d = s(d)), d && (r.dispatch(i(d)), clearInterval(u));
-  }, 1e3);
+  }, ds);
 };
 var Lr = {}, Or = {};
 Or.__esModule = !0;
-Or.default = ua;
+Or.default = fa;
 function Dt(e) {
   return typeof Symbol == "function" && typeof Symbol.iterator == "symbol" ? Dt = function(i) {
     return typeof i;
@@ -6353,12 +6374,12 @@ function Dt(e) {
 }
 function dr() {
 }
-var la = {
+var ca = {
   getItem: dr,
   setItem: dr,
   removeItem: dr
 };
-function ca(e) {
+function ua(e) {
   if ((typeof self > "u" ? "undefined" : Dt(self)) !== "object" || !(e in self))
     return !1;
   try {
@@ -6369,18 +6390,18 @@ function ca(e) {
   }
   return !0;
 }
-function ua(e) {
+function fa(e) {
   var r = "".concat(e, "Storage");
-  return ca(r) ? self[r] : (Je.process.env.NODE_ENV !== "production" && console.error("redux-persist failed to create sync storage. falling back to noop storage."), la);
+  return ua(r) ? self[r] : (Je.process.env.NODE_ENV !== "production" && console.error("redux-persist failed to create sync storage. falling back to noop storage."), ca);
 }
 Lr.__esModule = !0;
-Lr.default = pa;
-var fa = da(Or);
-function da(e) {
+Lr.default = ha;
+var da = pa(Or);
+function pa(e) {
   return e && e.__esModule ? e : { default: e };
 }
-function pa(e) {
-  var r = (0, fa.default)(e);
+function ha(e) {
+  var r = (0, da.default)(e);
   return {
     getItem: function(s) {
       return new Promise(function(u, d) {
@@ -6399,39 +6420,39 @@ function pa(e) {
     }
   };
 }
-var pi = void 0, ha = ma(Lr);
-function ma(e) {
+var pi = void 0, ma = wa(Lr);
+function wa(e) {
   return e && e.__esModule ? e : { default: e };
 }
-var wa = (0, ha.default)("local");
-pi = wa;
-function ga() {
+var ga = (0, ma.default)("local");
+pi = ga;
+function ya() {
   if (typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__ == "object")
     for (const e in window.__REACT_DEVTOOLS_GLOBAL_HOOK__)
       e === "renderers" ? window.__REACT_DEVTOOLS_GLOBAL_HOOK__[e] = /* @__PURE__ */ new Map() : window.__REACT_DEVTOOLS_GLOBAL_HOOK__[e] = typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__[e] == "function" ? () => {
       } : null;
 }
-ga();
-const ya = {
+ya();
+const ba = {
   key: "root",
   storage: pi,
   whitelist: ["chat", "meta", "config"]
 }, hi = Pi({
-  reducer: Fi(ya, ji({
+  reducer: Fi(ba, ji({
     meta: so,
     config: eo,
-    chat: Ss,
+    chat: Cs,
     intentions: as
   })),
-  middleware: (e) => e({ serializableCheck: !1 }).concat(na, aa)
-}), ba = Li(hi), Oa = (e) => {
+  middleware: (e) => e({ serializableCheck: !1 }).concat(ia, la)
+}), xa = Li(hi), Na = (e) => {
   It.createRoot(e.root).render(
-    /* @__PURE__ */ m.jsx(Ri, { store: hi, children: /* @__PURE__ */ m.jsx(fi, { persistor: ba, children: /* @__PURE__ */ m.jsx(ui, { config: e.initialConfig }) }) })
+    /* @__PURE__ */ m.jsx(Ri, { store: hi, children: /* @__PURE__ */ m.jsx(fi, { persistor: xa, children: /* @__PURE__ */ m.jsx(ui, { config: e.initialConfig }) }) })
   );
 };
 export {
-  Oa as ReactBotClient,
-  Oa as default,
+  Na as ReactBotClient,
+  Na as default,
   fe as intent
 };
 //# sourceMappingURL=index.es.js.map
