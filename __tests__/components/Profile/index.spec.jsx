@@ -2,8 +2,8 @@
 import { render } from '@testing-library/react';
 import { useAppSelector } from '@/hooks';
 import Profile from '@/components/Profile/index';
-import { assistant } from '@/mocks/ai';
 import profile from '@/components/Profile/variants';
+import { roles } from '@/config';
 
 jest.mock('@/hooks');
 jest.mock('@/components/Profile/variants');
@@ -11,7 +11,7 @@ jest.mock('@/components/Profile/variants');
 describe('Profile Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    useAppSelector.mockReturnValue({ themeId: 'light', aiProfile: assistant });
+    useAppSelector.mockReturnValue({ themeId: 'light', aiProfile: roles.assistant });
     profile.mockReturnValue({ base: jest.fn(),
       avatar: jest.fn(),
       info: jest.fn(),

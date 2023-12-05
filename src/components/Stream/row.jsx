@@ -10,7 +10,7 @@ export const StreamRow = ({ item = {} }) => {
   const { base } = variant({ theme });
 
   return (
-    <div className={ base() }>
+    <div className={ base() } data-e2e="history-item">
       <StreamBubble item={ item } />
     </div>
   );

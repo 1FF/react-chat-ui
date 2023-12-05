@@ -17,7 +17,7 @@ export const StreamBase = () => {
 
   return (
     <div className={ base() }>
-      <div className={ second() }>
+      <div className={ second() } data-e2e="history-container">
         <StreamHead titleTxt={ aiProfile.welcome } />
         { firstMessage && <div className={ date() } data-e2e="stream-assistant-msg-date">{ formatDateByLocale(firstMessage.time) }</div> }
         { history.map((message, index) => (

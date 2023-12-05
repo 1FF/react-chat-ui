@@ -36,7 +36,7 @@ export const StreamBubble = ({ item = {} }) => {
       <span key={ id }>
         { link
           ? (<Link text={ label } href={ link } />)
-          : (<Btn text={ label } onClick={ noStream ? () => setMessage(value) : () => setOption(value) } />) }
+          : (<Btn text={ label } e2e="option-button" onClick={ noStream ? () => setMessage(value) : () => setOption(value) } />) }
       </span>
     ))
   );

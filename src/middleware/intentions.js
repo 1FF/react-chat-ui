@@ -4,6 +4,7 @@ import intent from '@/services/intentions';
 import { setIsEmailLoading, setEmailSuccess, setIsEmailFormVisible, setEmailError, setLink } from '@/store/slices/intentions';
 import { setPd, setMarketing } from '@/store/slices/meta';
 import { appendHistory, setOutgoing } from '@/store/slices/chat';
+import { STORING_CHECKER_INTERVAL } from '@/config/env';
 
 export const intentionsMiddleware = store => next => {
   const setPaymentDataTranslationAccordingly = (data) => {
@@ -114,7 +115,7 @@ const dataIntervalChecker = (key, store, setValue, transformData = null) => {
       store.dispatch(setValue(storedItem));
       clearInterval(intervalId);
     }
-  }, 1000);
+  }, STORING_CHECKER_INTERVAL);
 };
 
 export default intentionsMiddleware;

@@ -11,6 +11,7 @@ export const LayoutBase = ({ head, stream, foot }) => {
 
   return (
     <div
+      data-e2e="base-container"
       style={ { height: `${height}px` } }
       className={ base({ minimized: isPluginMode }) }
     >
