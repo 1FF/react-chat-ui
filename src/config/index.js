@@ -1,5 +1,3 @@
-import { colors as baseThemeColors } from './themes/base';
-
 export { config, events } from './socket';
 export { roles } from './roles';
 export { intentions } from './intentions';
@@ -10,13 +8,6 @@ export const dateFormattingOptions = {
   year: 'numeric',
   hour: 'numeric',
   minute: 'numeric',
-};
-
-export const colors = {
-  white: '#ffffff',
-  black: '#000000',
-  'muted-blue': 'rgba(15, 14, 30, 0.6)',
-  ...baseThemeColors,
 };
 
 export const chat = (id) => ({
@@ -86,5 +77,3 @@ export const paymentData = { amount: '29.90',
   isDisplayPricePlan: true,
   displayPlanPrice: '$29.90'
 };
-
-export default { colors };

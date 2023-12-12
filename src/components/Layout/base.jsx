@@ -13,7 +13,7 @@ export const LayoutBase = ({ head, stream, foot }) => {
     <div
       data-e2e="base-container"
       style={ { height: `${height}px` } }
-      className={ base({ minimized: isPluginMode }) }
+      className={ base({ minimized: isPluginMode }) + ' ' + theme }
     >
       <div className={ wrapper() }>
         { head }
