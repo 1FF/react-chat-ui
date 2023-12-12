@@ -10,7 +10,7 @@ import { setClosed } from '@/store/slices/chat';
 import { layoutHead as variant } from './variants';
 
 export const LayoutHead = () => {
-  const { themeId: theme } = useAppSelector(getConfig);
+  const { themeId: theme, closeVisible } = useAppSelector(getConfig);
   const dispatch = useAppDispatch();
   const { cid, systemType, marketing } = useAppSelector(getMeta);
   const { base } = variant({ theme });
@@ -23,32 +23,36 @@ export const LayoutHead = () => {
       utmParams: marketing.lastUtmParams,
       customerUuid: cid,
     });
-    dispatch(setClosed());
+    setTimeout(() => {
+      dispatch(setClosed());
+    }, 500);
   };
 
   return (
     <div className={ base() }>
       <Profile />
-      <IconBtn e2e="chat-close-btn" onClick={ onClick }>
-        <svg
-          height="24px" viewBox="0 0 24 24"
-          width="24px"
-        >
-          <g
-            stroke="currentColor" strokeLinecap="round"
-            strokeWidth="2"
+      { closeVisible && (
+        <IconBtn e2e="chat-close-btn" onClick={ onClick }>
+          <svg
+            height="24px" viewBox="0 0 24 24"
+            width="24px"
           >
-            <line
-              x1="6" x2="18"
-              y1="6" y2="18"
-            />
-            <line
-              x1="6" x2="18"
-              y1="18" y2="6"
-            />
-          </g>
-        </svg>
-      </IconBtn>
+            <g
+              stroke="currentColor" strokeLinecap="round"
+              strokeWidth="2"
+            >
+              <line
+                x1="6" x2="18"
+                y1="6" y2="18"
+              />
+              <line
+                x1="6" x2="18"
+                y1="18" y2="6"
+              />
+            </g>
+          </svg>
+        </IconBtn>
+      ) }
     </div>
   );
 };

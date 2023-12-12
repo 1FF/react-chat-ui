@@ -128,8 +128,11 @@ const chatMiddleware = store => next => action => {
   }
 
   if (setClosed.match(action)) {
-    document.querySelector('#chatbot-container')?.remove();
-    document.body.classList?.remove('scroll-stop');
+    const chatBotContainer = document.querySelector('#chatbot-container');
+    if (document.body && chatBotContainer) {
+      chatBotContainer.innerHTML = '';
+      document.body.classList.remove('scroll-stop');
+    }
     const currentLocation = new URL(window.location.href);
     currentLocation.search = '';
     localStorage.setItem(CHAT_FINISHED_TIMESTAMP, new Date().getTime());

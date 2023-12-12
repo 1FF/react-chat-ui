@@ -10,6 +10,7 @@ const configSlice = createSlice({
       state.translations = { ...initialState.translations, ...payload.translations };
       state.themeId = payload.themeId;
       state.chatUrl = payload.chatUrl;
+      state.closeVisible = payload.closeVisible;
     },
     resetConfig(state) {
       state.aiProfile = initialState.aiProfile;

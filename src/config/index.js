@@ -74,11 +74,13 @@ export const chat = (id) => ({
       mealButton: 'Create your meal plan',
       error: 'Oops something went wrong.',
       tm505: 'Please enter valid email address',
-    }
+    },
+    closeVisible: true
   },
 });
 
-export const paymentData = { amount: '29.90',
+export const paymentData = {
+  amount: '29.90',
   amountInUSD: 29.9,
   frequency: 1,
   frequencyInMonths: 1,

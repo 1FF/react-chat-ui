@@ -56,7 +56,8 @@ export const initialConfig = {
       mealButton: 'Create your meal plan',
       error: 'Oops something went wrong.',
       tm505: 'Please enter valid email address',
-    }
+    },
+    closeVisible: true,
   },
 };
 
