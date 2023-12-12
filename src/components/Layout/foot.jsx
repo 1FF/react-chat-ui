@@ -12,7 +12,7 @@ import { track } from '@/services/tracking';
 import { customEvents } from '@/config/analytics';
 import { getMeta } from '@/store/slices/meta';
 import { Ellipsis } from '@/components/Stream/ellipsis';
-import { CHAT_SEEN_KEY } from '@/config/env';
+import { LINK_CLICKED_KEY } from '@/config/env';
 
 export const LayoutFoot = () => {
   const dispatch = useAppDispatch();
@@ -62,7 +62,8 @@ export const LayoutFoot = () => {
     setDisabled(true);
   };
 
-  const onClickCtaPay = () => {
+  const onClickCta = (e) => {
+    localStorage.setItem(LINK_CLICKED_KEY, e.currentTarget.href);
     track({
       eventType: customEvents.linkClicked,
       systemType,
@@ -70,9 +71,7 @@ export const LayoutFoot = () => {
       customerUuid: cid,
       email: current
     });
-
     dispatch(setClosed());
-    localStorage.setItem(CHAT_SEEN_KEY, true);
   };
 
   return (
@@ -85,7 +84,7 @@ export const LayoutFoot = () => {
           <Link
             forwardedRef={ ctaAfterPayButton }
             text={ ctaText }
-            onClick={ onClickCtaPay }
+            onClick={ onClickCta }
             href={ ctaHref }
             e2e="quiz-trigger-btn"
           />

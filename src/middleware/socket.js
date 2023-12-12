@@ -17,15 +17,15 @@ import {
   removeFromQueue,
   setQueuedId,
 } from '@/store/slices/chat';
-import { checkForSpecialPhrases, getQueryParam, isExpired } from '@/utils';
+import { checkForSpecialPhrases, getQueryParam } from '@/utils';
 import { constructLink, extractOptionSet } from '@/utils/formatting';
 import intent from '@/services/intentions';
 import { setIsEmailFormVisible, setIsPaymentButtonVisible, setLink, setResponseFormVisibility } from '@/store/slices/intentions';
 import { setConfig } from '@/store/slices/config';
 import { track } from '@/services/tracking';
 import { baseEvents, customEvents } from '@/config/analytics';
-import { CHAT_SEEN_KEY } from '@/config/env';
 import { setRegion } from '@/store/slices/meta';
+import { CHAT_FINISHED_TIMESTAMP } from '@/config/env';
 
 const specialMessages = [intent.type.email, intent.type.payment];
 let socket;
@@ -127,8 +127,9 @@ const chatMiddleware = store => next => action => {
   }
 
   if (setClosed.match(action)) {
-    document.querySelector('#chatbot-container').remove();
-    document.body.classList.remove('scroll-stop');
+    document.querySelector('#chatbot-container')?.remove();
+    document.body.classList?.remove('scroll-stop');
+    localStorage.setItem(CHAT_FINISHED_TIMESTAMP, new Date().getTime());
     socket.close();
   }
 
@@ -311,31 +312,11 @@ const chatMiddleware = store => next => action => {
   next(action);
 };
 
-const mustHideChat = ({ time, role }) => {
-  let hasExpired;
-
-  if (role === roles.user && time) {
-    hasExpired = isExpired(time);
-  }
-
-  if (hasExpired) {
-    localStorage.removeItem(CHAT_SEEN_KEY);
-  }
-
-  const chatSeen = localStorage.getItem(CHAT_SEEN_KEY);
-
-  return chatSeen === 'true';
-};
-
 const isFirstUserMessage = (messages) => messages.filter(obj => obj.role === roles.user).length === 1;
 
 const updateForAnySpecialMessage = ({ lastMessage, store }) => {
   const { meta, config } = store.getState();
   const link = constructLink(lastMessage.content);
-
-  if (mustHideChat(lastMessage)) {
-    store.dispatch(setClosed(true));
-  }
 
   if (link) {
     store.dispatch(setLink({

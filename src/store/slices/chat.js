@@ -63,7 +63,7 @@ const configSlice = createSlice({
         bubbleContent = { content: payload.content, groupId: payload.groupId };
       }
 
-      state.history.push({ ...bubbleContent, role: payload.role, id: payload.id });
+      state.history.push({ ...bubbleContent, role: payload.role, id: payload.id, time: new Date().getTime() });
     },
     setLastQuestionId(state, { payload }) {
       state.history = state.history.map(item => {
