@@ -1,8 +1,6 @@
 import { forwardRef } from 'react';
 
-import { useAppSelector } from '../../hooks';
 import { BasicInputProps } from '../../interfaces/component';
-import { getConfig } from '../../store/slices/config';
 import { basic as variant } from './variants';
 
 export const Input = forwardRef<HTMLInputElement, BasicInputProps>((props, ref) => {
@@ -17,8 +15,7 @@ export const Input = forwardRef<HTMLInputElement, BasicInputProps>((props, ref) 
     value,
   } = props;
 
-  const { themeId: theme } = useAppSelector(getConfig);
-  const { base, input, loader, spin } = variant({ theme });
+  const { base, input, loader, spin } = variant();
 
   return (
     <div className={base()}>

@@ -1,11 +1,8 @@
-import { useAppSelector } from '../../hooks';
 import { IconProps } from '../../interfaces/component';
-import { getConfig } from '../../store/slices/config';
 import { icon as variant } from './variants';
 
 export const IconBtn = ({ children, outlined = false, onClick, e2e = null, disabled = false }: IconProps) => {
-  const { themeId: theme } = useAppSelector(getConfig);
-  const { base } = variant({ theme, outlined });
+  const { base } = variant({ outlined });
 
   return (
     <button

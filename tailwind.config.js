@@ -1,6 +1,3 @@
-import { boxShadow } from './src/config/themes/base';
-import { colors } from './src/config/index';
-
 export default {
   prefix: 'tw--',
   content: [
@@ -11,8 +8,37 @@ export default {
     fontFamily: {
       sans: ['Plus Jakarta Sans', 'Roboto', 'Mulish', 'Exo', 'Helvetica', 'Arial', 'sans-serif'],
     },
-    colors,
-    boxShadow,
+    colors: {
+      white: '#ffffff',
+      black: '#000000',
+      'muted-blue': 'rgba(15, 14, 30, 0.6)',
+      lumina: 'var(--lumina)',
+      whisper: 'var(--whisper)',
+      seraph: 'var(--seraph)',
+      ember: 'var(--ember)',
+      enigma: 'var(--enigma)',
+      glaze: 'var(--glaze)',
+      glazeText: 'var(--glazeText)',
+      glazeBg: 'var(--glazeBg)',
+      sigma: 'var(--sigma)',
+      zeta: 'var(--zeta)',
+      status: 'var(--status)',
+      loader: 'var(--loader)',
+      dots: 'var(--dots)',
+      neon: 'var(--neon)',
+      'pale-dots': 'var(--pale-dots)',
+      'iota-dots': 'var(--iota-dots)',
+      overlay: 'var(--overlay)',
+      beta: 'var(--beta)',
+      'zephyr-100': 'var(--zephyr-100)',
+      'zephyr-200': 'var(--zephyr-200)',
+      'zephyr-600': 'var(--zephyr-600)',
+      'zephyr-800': 'var(--zephyr-800)',
+    },
+    boxShadow: {
+      card: '0 12px 24px 0 rgba(43, 49, 57, 0.06), 0 4px 8px 0 rgba(43, 55, 70, 0.04)',
+      'loading-dots': '-24px 0 rgba(201, 201, 201, 0.5), 24px 0 rgba(201, 201, 201, 0.5)',
+    },
     keyframes: {
       blink: {
         '0%': {
@@ -121,6 +147,9 @@ export default {
     extend: {
       screens: {
         customXs: '350px',
+      },
+      fontWeight: {
+        'density-different': 'var(--density-different)',
       },
     },
   },

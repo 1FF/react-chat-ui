@@ -2,16 +2,8 @@ import { AssistantRecord } from '../interfaces/index';
 import { getQueryParam, uuidV4 } from '../utils';
 import { Definition, QueryParams, Roles } from './enums';
 import { SPECIAL_MERCHANT, SPECIAL_SUPPORT_TICKET } from './env';
-import { colors as baseThemeColors } from './themes/base';
 export { Events, Roles } from './enums';
 export { config } from './socket';
-
-export const colors = {
-  white: '#ffffff',
-  black: '#000000',
-  'muted-blue': 'rgba(15, 14, 30, 0.6)',
-  ...baseThemeColors,
-};
 
 export const initialMessage = [
   {
@@ -78,7 +70,7 @@ export const chat = ({ id, purpose, close }: InitiationConfig) => ({
     aiProfile: {
       name: 'Meal Mentor',
       role: 'AI-powered nutritionist',
-      imgSrc: 'https://storage.1forfit.com/4oZrkOwbOQcSIGJopBG5qsf0CmBbVDKDqflzEkXq.jpg',
+      imgSrc: 'https://storage.1forfit.com/lGbeX4lzNpWGyywHuJxMdegZ6My040jsvtVwZqBv.png',
       welcome: 'Welcome to our live support. We\'re here to understand your requirements and suggest the best Keto diet suited for you.',
       initialMessage
     },
@@ -149,5 +141,3 @@ export const getUnifiedSequence = (current: Array<AssistantRecord>, incoming: As
     return record;
   })
 };
-
-export default { colors };

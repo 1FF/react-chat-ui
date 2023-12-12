@@ -8,10 +8,9 @@ import { getConfig } from '../../store/slices/config';
 import { payment as variant } from './variants';
 
 export const PaymentButton = ({ text, onClick, e2e, disabled = false }: PaymentButtonProps) => {
-  const { themeId: theme } = useAppSelector(getConfig);
   const meta = useAppSelector((state) => state.meta);
   const currentEmail = useAppSelector((state) => state.intentions.email.current);
-  const { btn } = variant({ theme });
+  const { btn } = variant();
 
   useEffect(() => {
     const data = {

@@ -14,7 +14,14 @@ export const OptionList = ({ options = [] }: OptionsListProps) => {
   const isFirstUserMessage = !useAppSelector(userMessageFindOne);
 
   const setOption = (val: string, sequence: number) => {
-    dispatch(fillUserHistoryData({ id: uuidV4(), sequence: 1, role: Roles.user, content: { sequence: 1, message: val, resend: false, sent: true, groupId: '' } }));
+    dispatch(fillUserHistoryData({
+      id: uuidV4(),
+      sequence: 1,
+      role: Roles.user,
+      content: {
+        sequence: 1, message: val, resend: false, sent: true, groupId: ''
+      }
+    }));
     dispatch(setOutgoing(val));
     if (isFirstUserMessage) {
       track({

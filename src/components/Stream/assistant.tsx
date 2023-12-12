@@ -5,7 +5,6 @@ import { Definition } from '../../config/enums';
 import { useAppSelector } from '../../hooks';
 import { AssistantProps } from '../../interfaces/component';
 import { getChat, sortBySequence } from '../../store/slices/chat';
-import { getConfig } from '../../store/slices/config';
 import { getMeta } from '../../store/slices/meta';
 import { uuidV4 } from '../../utils';
 import MarkdownLink from '../Markdown/link';
@@ -14,11 +13,10 @@ import OptionList from './options';
 import { flickerEffect } from './variants';
 
 const Assistant = ({ message, itemId }: AssistantProps) => {
-  const { themeId: theme } = useAppSelector(getConfig);
   const { isStreaming } = useAppSelector(getChat);
   const { pd } = useAppSelector(getMeta);
   const isLast = useAppSelector((state) => state.chat.historyIds.length - 1 === state.chat.historyIds.indexOf(itemId));
-  const { base: baseFlicker } = flickerEffect({ isTyping: isStreaming && isLast, theme });
+  const { base: baseFlicker } = flickerEffect({ isTyping: isStreaming && isLast });
   const sortedContent = [...message.content].sort(sortBySequence);
 
   return (
@@ -77,7 +75,6 @@ const Assistant = ({ message, itemId }: AssistantProps) => {
         if (it.type === Definition.email) {
           return it[it.type];
         }
-
 
       })}
     </>

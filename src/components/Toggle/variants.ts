@@ -7,8 +7,8 @@ export const wrapper = /*tw*/ tv({
   },
   variants: {
     color: {
-      enabled: 'tw--bg-light-seraph',
-      disabled: 'tw--bg-light-zephyr-100'
+      enabled: 'tw--bg-seraph',
+      disabled: 'tw--bg-zephyr-100'
     }
   }
 });

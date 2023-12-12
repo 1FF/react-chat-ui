@@ -13,9 +13,9 @@ import { layoutFoot as variant } from '../Layout/variants';
 export const EmailForm = () => {
   const dispatch = useAppDispatch();
   const meta = useAppSelector((state) => state.meta);
-  const { themeId: theme, translations } = useAppSelector(getConfig);
+  const { translations } = useAppSelector(getConfig);
   const { isLoading } = useAppSelector(getEmailIntentions);
-  const { base, input, button } = variant({ theme });
+  const { base, input, button } = variant();
   const [email, setCurrentEmail] = useState<string | ''>('');
   const inputElement = useRef<HTMLInputElement>(null);
 
