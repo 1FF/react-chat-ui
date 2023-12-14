@@ -90,7 +90,6 @@ describe('AppBase, chat-history event and execute properly', () => {
     const { chat } = root.store.getState();
     expect(localStorage.getItem(LINK_CLICKED_KEY)).toBeTruthy();
     expect(document.querySelector).toHaveBeenCalledWith('#chatbot-container');
-    expect(nodeElem.remove).toHaveBeenCalled();
     expect(chat.closed).toBeTruthy();
   });
 
@@ -221,6 +220,53 @@ describe('AppBase, streaming events execute properly', () => {
   });
 });
 
+describe('Close button closes chat', () => {
+  const href = 'https://example.com/?utm_chat=default';
+  const search = '?utm_chat=default';
+
+  beforeEach(async () => {
+    const mockLocation = {
+      href,
+      search,
+    };
+
+    Object.defineProperty(window, 'location', {
+      value: mockLocation,
+      writable: true,
+      enumerable: true,
+    });
+    await localSetup();
+  });
+
+  afterEach(localTearDown);
+
+  test('chat.closed is true after close button is clicked', async () => {
+    // Arrange
+    expect(window.location.search).toContain('?utm_chat=default');
+
+    const nodeElem = { remove: jest.fn() };
+    const querySelectorSpy = jest.spyOn(document, 'querySelector');
+    const ioCloseSpy = jest.spyOn(io.connect(), 'close');
+    spies.push(querySelectorSpy, ioCloseSpy);
+    querySelectorSpy.mockImplementation(() => nodeElem);
+
+    // Act
+    act(dispatchSocketChange);
+    const closeButton = root.container.querySelector('[data-e2e="chat-close-btn"]');
+    fireEvent.click(closeButton);
+
+    // Assert
+    setTimeout(() => {
+      const { chat } = root.store.getState();
+      expect(chat.closed).toBeTruthy();
+      expect(querySelectorSpy).toHaveBeenCalledWith('#chatbot-container');
+      expect(nodeElem.remove).toHaveBeenCalled();
+      expect(window.location.search).not.toContain(search);
+      expect(ioCloseSpy).toHaveBeenCalled();
+    }, 501);
+  });
+});
+
 function dispatchSocketChange(history = defaultHistory) {
   serverSocket.emit('connect');
   serverSocket.emit(events.chatHistory, { history, errors: [], region: 'frankfurt' });
@@ -236,12 +282,11 @@ function dispatchStreaming(chunks) {
 async function localSetup() {
   localStorage.setItem('__pd', JSON.stringify(pd));
   spies.push(jest.spyOn(intent.core, 'emit'));
-
   const intentOnSpy = jest.spyOn(intent.core, 'on');
   spies.push(intentOnSpy);
   intentOnSpy.mockReturnValue(() => true);
   await waitFor(() => {
-    root = renderWithProviders(<AppBase config={ initialConfig } />);
+    root = renderWithProviders(<div id="chatbot-container"><AppBase config={ initialConfig } /></div>);
   });
 }
 
