@@ -10,6 +10,7 @@ import { getChat } from '@/store/slices/chat';
 import { getMeta } from '@/store/slices/meta';
 import { flickerEffect } from './variants';
 import OptionList from './options';
+import MarkdownLink from '../Markdown/link';
 
 export const Assistant = ({ message = [], isLast = false }) => {
   const { themeId: theme } = useAppSelector(getConfig);
@@ -31,10 +32,7 @@ export const Assistant = ({ message = [], isLast = false }) => {
                 data-e2e="stream-assistant-msg"
               >
                 <Markdown components={ {
-                  a(props) {
-                    console.log(props);
-                    return <a href="text" style={ { color: 'red' } }>text</a>;
-                  } } }
+                  a(props) { return <MarkdownLink properties={ props } />; } } }
                 >{ it[it.type] }
                 </Markdown>
               </span>
