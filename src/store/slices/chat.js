@@ -1,6 +1,7 @@
+import { uid } from 'uid';
+import produce from 'immer';
 import { createSlice } from '@reduxjs/toolkit';
 import { chat as initialState } from '@/store/initialState';
-import { extractOptionSet } from '@/utils/formatting';
 import { getQueryParam } from '@/utils';
 import { roles } from '@/config';
 
@@ -26,44 +27,66 @@ const configSlice = createSlice({
     removeFromQueue(state, { payload }) {
       state.queue = state.queue.filter(it => it.groupId !== payload.groupId || it.content !== payload.content) || [];
     },
-    setIncoming(state, { payload }) {
-      state.incoming = {
-        term: getQueryParam(window.location.search, 'utm_chat'),
-        user_id: localStorage.getItem('__cid'),
-        role: roles.assistant,
-        content: payload || '',
-      };
+    setExistingHistory(state, { payload }) {
+      // TODO: Must see how it will be received from the server
+      state.history = [];
     },
-    resetIncoming(state) {
-      state.incoming = initialState.incoming;
+    addPredefinedAssistantMessage(state, { payload }) {
+      const id = uid();
+      return produce(state, (draft) => {
+        draft.historyIds.push(id);
+        draft.historyData[id] = [
+          { type: 'text', text: payload.content, role: roles.assistant },
+          { type: 'buttons', buttons: payload.buttons, role: roles.assistant }
+        ];
+      });
     },
-    addIncomingChunk(state, { payload }) {
-      state.incoming = {
-        ...state.incoming,
-        content: state.incoming.content + payload.chunk,
-        id: payload.id,
-        question_id: payload.question_id,
-      };
-    },
-    setHistory(state, { payload }) {
-      state.history = payload.map((item) => ({ ...item, role: item.role, ...extractOptionSet(item.content) }));
-    },
-    appendHistory(state, { payload }) {
-      let bubbleContent;
-
-      if (payload.role === roles.assistant) {
-        if (payload.options && payload.options.length > 0) {
-          bubbleContent = { content: payload.content, options: payload.options, isSpecial: payload.isSpecial };
+    fillAssistantHistoryData(state, { payload }) {
+      const data = { role: roles.assistant, ...payload.content };
+      return produce(state, (draft) => {
+        if (!draft.historyData[payload.id]) {
+          draft.historyData[payload.id] = [data];
+          draft.historyIds.push(payload.id);
         } else {
-          bubbleContent = { ...extractOptionSet(payload.content), isSpecial: payload.isSpecial };
+          // here we order items by sequence and accumulate the text into one object
+          draft.historyData[payload.id].push(data);
+          const reducedText = draft.historyData[payload.id]
+            .filter((obj) => obj.type === 'text')
+            .reduce((initial, current) => ({
+              ...initial,
+              ...current,
+              text: initial.text + current.text
+            }), { type: 'text', text: '' });
+
+          draft.historyData[payload.id] = [...draft.historyData[payload.id].filter(it => it.type !== 'text'), reducedText];
+          draft.historyData[payload.id].sort((a, b) => a.sequence - b.sequence);
         }
-      }
+      });
+    },
+    fillUserHistoryData(state, { payload }) {
+      const id = uid();
+      const content = { role: roles.user, content: payload.content, groupId: payload.groupId, resend: false, sent: true, };
+      return produce(state, (draft) => {
+        let belongsTo;
 
-      if (payload.role === roles.user) {
-        bubbleContent = { content: payload.content, groupId: payload.groupId };
-      }
+        if (payload.groupId) {
+          Object.entries(draft.historyData).forEach(([key, value]) => {
+            if (value.find(el => el.groupId === payload.groupId)) {
+              belongsTo = key;
+            }
+          });
+        }
 
-      state.history.push({ ...bubbleContent, role: payload.role, id: payload.id, time: new Date().getTime() });
+        if (belongsTo) {
+          draft.historyData[belongsTo].push(content);
+          return;
+        }
+
+        if (!draft.historyData[id]) {
+          draft.historyData[id] = [content];
+          draft.historyIds.push(id);
+        }
+      });
     },
     setLastQuestionId(state, { payload }) {
       state.history = state.history.map(item => {
@@ -83,15 +106,6 @@ const configSlice = createSlice({
         }
         return item;
       });
-    },
-    resetHistory(state) {
-      state.history = initialState.history;
-    },
-    setTextToParse(state, { payload }) {
-      state.textToParse += payload;
-    },
-    resetTextToParse(state) {
-      state.textToParse = initialState.textToParse;
     },
     setIsLoading(state) {
       state.isLoading = true;
@@ -144,20 +158,23 @@ const configSlice = createSlice({
     resetError(state) {
       state.error = initialState.error;
     },
+    setIsStreaming(state, { payload }) {
+      state.isStreaming = payload;
+    }
   },
 });
 
 export const getChat = state => state.chat;
 
-export const { setOutgoing, setIncoming,
-  resetIncoming, addIncomingChunk,
-  resetOutgoing, setHistory, resetHistory,
-  appendHistory, setTextToParse, resetTextToParse,
+export const {
+  setOutgoing, resetOutgoing, setExistingHistory,
+  addPredefinedAssistantMessage,
   setIsLoading, resetIsLoading, setLastGroupPointer,
   setTypingTimeoutExpired, setError, resetError,
   setConnected, setClosed, updateResendStatus,
   resendMessage, setLastQuestionId, showResendStatus,
-  pushQueue, removeFromQueue, setQueuedId
+  pushQueue, removeFromQueue, setQueuedId, setIsStreaming,
+  fillAssistantHistoryData, fillUserHistoryData
 } = configSlice.actions;
 
 export default configSlice.reducer;

@@ -83,6 +83,7 @@
     "vite-plugin-node-polyfills": "^0.14.1"
   },
   "dependencies": {
+    "react-markdown": "^9.0.1",
     "uid": "^2.0.2"
   }
 }

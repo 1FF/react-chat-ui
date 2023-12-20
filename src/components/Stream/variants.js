@@ -33,7 +33,7 @@ export const streamHead = /*tw*/ tv({
 
 export const streamRow = /*tw*/ tv({
   slots: {
-    base: 'tw--grid',
+    base: 'tw--grid tw--break-words',
   },
 });
 
@@ -55,8 +55,9 @@ export const flickerEffect = /* tw */ tv({
 
 export const streamBubble = /*tw*/ tv({
   slots: {
-    base: 'tw--relative tw--max-w-[375px] tw--px-[15px] tw--py-[11px] tw--whitespace-pre-wrap tw--rounded-[20px] tw--mb-5',
-    action: 'tw--absolute tw--bottom-[-16px] tw--right-[-10px]'
+    base: 'tw--relative tw--max-w-[375px] tw--whitespace-pre-wrap tw--rounded-[20px] tw--mb-5 tw--space-y-5',
+    action: 'tw--absolute tw--bottom-[-16px] tw--right-[-10px]',
+    separator: 'tw--px-[15px] tw--py-[11px] tw--rounded-[20px] tw--w-fit tw--ml-auto tw--mr-0'
   },
   variants: {
     theme: {
@@ -82,25 +83,25 @@ export const streamBubble = /*tw*/ tv({
       slots: ['base'],
       theme: 'light',
       type: 'assistant',
-      class: 'tw--bg-light-lumina',
-    },
-    {
-      slots: ['base'],
-      theme: 'light',
-      type: 'user',
-      class: 'tw--bg-light-seraph tw--text-white',
+      class: 'tw--bg-light-lumina tw--px-[15px] tw--py-[11px]',
     },
     {
       slots: ['base'],
       theme: 'dark',
       type: 'assistant',
-      class: 'tw--bg-dark-lumina',
+      class: 'tw--bg-dark-lumina tw--px-[15px] tw--py-[11px]',
     },
     {
-      slots: ['base'],
+      slots: ['separator'],
       theme: 'dark',
       type: 'user',
-      class: 'tw--bg-dark-seraph',
+      class: 'tw--bg-dark-seraph'
+    },
+    {
+      slots: ['separator'],
+      theme: 'light',
+      type: 'user',
+      class: 'tw--bg-light-seraph tw--text-white'
     },
   ],
 });

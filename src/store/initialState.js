@@ -30,6 +30,8 @@ export const chat = {
   queue: [],
   textToParse: '',
   history: [],
+  historyData: {},
+  historyIds: [],
   status: null,
   error: null,
   isLoading: false,
@@ -37,6 +39,7 @@ export const chat = {
   lastGroupId: uid(),
   connected: false,
   closed: false,
+  isStreaming: false,
 };
 
 export const intentions = {

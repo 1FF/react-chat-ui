@@ -4,8 +4,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks';
 import { ResponseForm, EmailForm } from '@/components/Form/';
 import { getEmailIntentions, getLinkIntentions, getPaymentIntentions, getResponseIntentions, setIsPaymentButtonVisible, setIsPaymentSuccessful, setLink, setPaymentFormVisibility, setPaymentIntentError } from '@/store/slices/intentions';
 import { PaymentButton, Link } from '@/components/Payment';
-import { appendHistory, getChat, setClosed } from '@/store/slices/chat';
-import { roles } from '@/config/roles';
+import { addPredefinedAssistantMessage, getChat, setClosed } from '@/store/slices/chat';
 import { PaymentScene } from '@/components/Scenes/payment';
 import { getConfig } from '@/store/slices/config';
 import { track } from '@/services/tracking';
@@ -20,10 +19,17 @@ export const LayoutFoot = () => {
   const { cid, systemType, marketing } = useAppSelector(getMeta);
   const { translations } = useAppSelector(getConfig);
   const { isVisible: isCtaVisible, text: ctaText, href: ctaHref } = useAppSelector(getLinkIntentions);
-  const { isLoading } = useAppSelector(getChat);
-  const { error: streamError } = useAppSelector(store => store.chat);
-  const { isFormVisible: isEmailFormVisible, current, error: emailError } = useAppSelector(getEmailIntentions);
-  const { isButtonVisible: isPaymentButtonVisible, isFormVisible: isPaymentFormVisible, error: paymentIntentError } = useAppSelector(getPaymentIntentions);
+  const { isStreaming, error: streamError, isLoading } = useAppSelector(getChat);
+  const {
+    isFormVisible: isEmailFormVisible,
+    current,
+    error: emailError
+  } = useAppSelector(getEmailIntentions);
+  const {
+    isButtonVisible: isPaymentButtonVisible,
+    isFormVisible: isPaymentFormVisible,
+    error: paymentIntentError
+  } = useAppSelector(getPaymentIntentions);
   const error = streamError || emailError || paymentIntentError;
 
   const ctaAfterPayButton = useRef(null);
@@ -42,7 +48,7 @@ export const LayoutFoot = () => {
 
   const onPaymentSuccess = () => {
     // TODO: set in store to be persisted the GO THROUGH QUIZ button
-    dispatch(appendHistory({ role: roles.assistant, content: translations.tm1226 }));
+    dispatch(addPredefinedAssistantMessage({ content: translations.tm1226 }));
     dispatch(setIsPaymentSuccessful(true));
     dispatch(setIsPaymentButtonVisible(false));
     dispatch(setLink({ href: '/', isVisible: true, text: translations.ctaTextContent }));
@@ -90,8 +96,8 @@ export const LayoutFoot = () => {
           />
         ) }
 
-      { isEmailFormVisible && <EmailForm /> }
-      { isResponseFormVisible && <ResponseForm /> }
+      { !isStreaming && isEmailFormVisible && <EmailForm /> }
+      { !isStreaming && isResponseFormVisible && <ResponseForm /> }
 
       { isPaymentButtonVisible && (
         <PaymentButton

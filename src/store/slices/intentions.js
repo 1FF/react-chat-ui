@@ -35,16 +35,11 @@ const intentionsSlice = createSlice({
     setLink(state, { payload }) {
       state.link = { ...state.link, ...payload };
     },
-    // Response Form reducers
     setResponse(state, { payload }) {
       state.response.value = payload;
     },
     setResponseFormVisibility(state, { payload }) {
-      if (payload.isFormVisible !== undefined) {
-        state.response.isFormVisible = payload.isFormVisible;
-        return;
-      }
-      state.response.isFormVisible = !payload.intentions.link.isVisible && !payload.intentions.email.isFormVisible && !payload.intentions.payment.isFormVisible && !payload.intentions.payment.isButtonVisible && payload.options.length === 0;
+      state.response.isFormVisible = !payload.some(el => el.type === 'buttons' || el.type === 'payment' || el.type === 'email');
     },
     setResponseLoadingStatus(state, { payload }) {
       state.response.isLoading = payload;

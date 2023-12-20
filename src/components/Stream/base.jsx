@@ -1,29 +1,33 @@
 import { useAppSelector } from '@/hooks';
 import { getConfig } from '@/store/slices/config';
-
-import { getChat } from '@/store/slices/chat';
 import { formatDateByLocale } from '@/utils';
 import { uid } from 'uid';
 import { StreamHead } from './head';
-import { StreamRow } from './row';
-import { streamBase as variant } from './variants';
+import { StreamBubble } from './bubble';
+import { streamBase, streamRow } from './variants';
 
 export const StreamBase = () => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { aiProfile } = useAppSelector(getConfig);
-  const { history, incoming } = useAppSelector(getChat);
-  const { base, second, date } = variant({ theme });
-  const firstMessage = history && history.length > 0 && history[0];
+  const historyIds = useAppSelector(state => state.chat.historyIds);
+  const historyData = useAppSelector(state => state.chat.historyData);
+  const { base, second, date } = streamBase({ theme });
+  const { base: baseRow } = streamRow({ theme });
+  const time = historyIds.length > 0 && (historyData[historyIds[0]][0].time || new Date().getTime());
 
   return (
     <div className={ base() }>
       <div className={ second() } data-e2e="history-container">
         <StreamHead titleTxt={ aiProfile.welcome } />
-        { firstMessage && <div className={ date() } data-e2e="stream-assistant-msg-date">{ formatDateByLocale(firstMessage.time) }</div> }
-        { history.map((message, index) => (
-          <StreamRow key={ uid() } item={ { ...message, isLast: index === history.length - 1 } } />)
-        ) }
-        { incoming && <StreamRow item={ incoming } /> }
+        { time && <div className={ date() } data-e2e="stream-assistant-msg-date">{ formatDateByLocale(time) }</div> }
+        { historyIds.map((id) => (
+          <div
+            key={ uid() } className={ baseRow() }
+            data-e2e="history-item"
+          >
+            <StreamBubble itemId={ id } />
+          </div>
+        )) }
       </div>
     </div>
   );

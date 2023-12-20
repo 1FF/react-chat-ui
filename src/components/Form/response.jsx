@@ -5,9 +5,7 @@ import { getConfig } from '@/store/slices/config';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { Input } from '@/components/Input';
 import { IconBtn } from '@/components/Button';
-
-import { appendHistory, getChat, setLastGroupPointer, setTypingTimeoutExpired } from '@/store/slices/chat';
-import { roles } from '@/config';
+import { fillUserHistoryData, getChat, setLastGroupPointer, setTypingTimeoutExpired } from '@/store/slices/chat';
 import { layoutFoot as variant } from '../Layout/variants';
 
 export const ResponseForm = () => {
@@ -36,7 +34,7 @@ export const ResponseForm = () => {
     e.preventDefault();
 
     if (response.trim()) {
-      dispatch(appendHistory({ role: roles.user, content: response, groupId }));
+      dispatch(fillUserHistoryData({ content: response, groupId }));
     }
 
     setCurrentResponse('');
