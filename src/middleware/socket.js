@@ -1,33 +1,25 @@
 import { io } from 'socket.io-client';
-import { config as socketConfig, events, roles } from '@/config';
+import { config as socketConfig, events, roles, streamMock } from '@/config';
 import {
-  appendHistory,
-  resetIncoming, resetIsLoading,
-  resetError, resetTextToParse,
-  resetOutgoing, setIncoming, addIncomingChunk,
-  setHistory, setIsLoading,
+  setExistingHistory, setIsLoading,
   setTypingTimeoutExpired, setError,
   setOutgoing, setConnected,
-  setClosed, setTextToParse,
-  updateResendStatus,
-  resendMessage,
-  setLastQuestionId,
-  showResendStatus,
-  pushQueue,
-  removeFromQueue,
-  setQueuedId,
+  resetIsLoading, setClosed, resetError, resetOutgoing,
+  updateResendStatus, resendMessage,
+  setLastQuestionId, showResendStatus, pushQueue,
+  removeFromQueue, setQueuedId,
+  setIsStreaming, fillAssistantHistoryData,
 } from '@/store/slices/chat';
-import { checkForSpecialPhrases, getQueryParam } from '@/utils';
-import { constructLink, extractOptionSet } from '@/utils/formatting';
-import intent from '@/services/intentions';
-import { setIsEmailFormVisible, setIsPaymentButtonVisible, setLink, setResponseFormVisibility } from '@/store/slices/intentions';
+import { getQueryParam } from '@/utils';
+import { setIsEmailFormVisible, setIsPaymentButtonVisible, setResponseFormVisibility } from '@/store/slices/intentions';
 import { setConfig } from '@/store/slices/config';
 import { track } from '@/services/tracking';
 import { baseEvents, customEvents } from '@/config/analytics';
 import { setRegion } from '@/store/slices/meta';
 import { CHAT_FINISHED_TIMESTAMP } from '@/config/env';
+import { faker } from '@faker-js/faker';
+import { uid } from 'uid';
 
-const specialMessages = [intent.type.email, intent.type.payment];
 let socket;
 
 const chatMiddleware = store => next => action => {
@@ -91,40 +83,14 @@ const chatMiddleware = store => next => action => {
   };
 
   if (setOutgoing.match(action)) {
-    store.dispatch(appendHistory({
-      role: roles.user,
-      content: action.payload,
-    }));
-
     handleMessageSending({
       role: roles.user,
       message: action.payload,
       term: getQueryParam(window.location.search, 'utm_chat'),
       user_id: meta.cid,
       region: meta.region,
+      messageId: [...chat.historyIds].pop(),
     });
-
-    if (isFirstUserMessage(chat.history)) {
-      track({
-        eventType: customEvents.firstMessage,
-        systemType: meta.systemType,
-        utmParams: meta.marketing.lastUtmParams,
-        customerUuid: meta.cid
-      });
-    }
-  }
-
-  if (setTextToParse.match(action)) {
-    const { textToParse, incoming } = chat;
-    const currentText = textToParse + action.payload;
-    if (currentText.includes(intent.type.email)) {
-      store.dispatch(setIsEmailFormVisible(true));
-    }
-
-    if (currentText.includes(intent.type.payment)) {
-      store.dispatch(setIsPaymentButtonVisible(true));
-      store.dispatch(setIncoming(incoming.content + meta.pd.displayPlanPrice + ' ' + meta.pd.billingFrequencyTmsg));
-    }
   }
 
   if (setClosed.match(action)) {
@@ -141,9 +107,9 @@ const chatMiddleware = store => next => action => {
   }
 
   if (setTypingTimeoutExpired.match(action) && action.payload) {
-    const lastMessage = chat.history
-      .filter(message => message.role === roles.user && message.groupId === chat.lastGroupId)
-      .map(message => message.content).join('\n');
+    const messageId = [...chat.historyIds].pop();
+    const lastMessage = chat.historyData[messageId].map(({ content }) => content).join('\n');
+
     if (lastMessage.trim() !== '') {
       handleMessageSending({
         role: roles.user,
@@ -151,20 +117,9 @@ const chatMiddleware = store => next => action => {
         term: getQueryParam(window.location.search, 'utm_chat'),
         user_id: meta.cid,
         region: meta.region,
+        messageId
       });
     }
-  }
-
-  const hasNoUserMessages = !chat.history.some(item => item.role === roles.user);
-  const lastMessage = chat.history[chat.history.length - 1];
-  if (hasNoUserMessages && appendHistory.match(action) && action.payload.role === roles.user && lastMessage.options.length) {
-    const buttonSequence = lastMessage.options.findIndex((item) => item.value === action.payload.content) + 1;
-    track({
-      eventType: customEvents.buttonClick + buttonSequence,
-      systemType: meta.systemType,
-      utmParams: meta.marketing.lastUtmParams,
-      customerUuid: meta.cid,
-    });
   }
 
   if (setIsPaymentButtonVisible.match(action) && action.payload === true) {
@@ -189,13 +144,7 @@ const chatMiddleware = store => next => action => {
       systemType: meta.systemType,
       utmParams: meta.marketing.lastUtmParams,
       customerUuid: meta.cid,
-      email: intentions.email.current
     });
-  }
-
-  if (setHistory.match(action)) {
-    const { intentions } = store.getState();
-    store.dispatch(setResponseFormVisibility({ intentions, options: extractOptionSet(action.payload[action.payload.length - 1].content).options }));
   }
 
   if (resendMessage.match(action)) {
@@ -219,7 +168,6 @@ const chatMiddleware = store => next => action => {
 
   socket.on(events.chatHistory, ({ history, errors, region }) => {
     store.dispatch(resetIsLoading());
-    store.dispatch(resetIncoming());
     store.dispatch(setRegion(region));
 
     const { config, meta, chat } = store.getState();
@@ -232,81 +180,86 @@ const chatMiddleware = store => next => action => {
     }
 
     if (history.length) {
-      const lastMessage = history[history.length - 1];
-      updateForAnySpecialMessage({ lastMessage, store });
-      store.dispatch(setHistory(history));
-    } else {
-      store.dispatch(setHistory([{ role: roles.assistant, content: config.aiProfile.initialMessage, time: new Date() }]));
-      handleMessageSending({
-        role: roles.assistant,
-        term: getQueryParam(window.location.search, 'utm_chat'),
-        user_id: meta.cid,
-        message: config.aiProfile.initialMessage,
-        region: meta.region,
-      });
+      store.dispatch(setExistingHistory(history));
+      return;
     }
+
+    const id = uid();
+    config.aiProfile.initialMessage.map(content => store.dispatch(fillAssistantHistoryData({ id, content })));
+    store.dispatch(setResponseFormVisibility(config.aiProfile.initialMessage));
+    handleMessageSending({
+      role: roles.assistant,
+      term: getQueryParam(window.location.search, 'utm_chat'),
+      user_id: meta.cid,
+      message: 'initial message',
+      initialMessageContent: config.aiProfile.initialMessage,
+      initialMessageId: id,
+      region: meta.region,
+    });
   });
 
-  socket.on(events.streamStart, () => {
+  // remove => meant to be for socket mock
+  let idx = 0;
+  let messageUuid = faker.string.uuid();
+
+  let mockedDataForEachStream = streamMock;
+
+  const resetUUID = () => {
+    messageUuid = faker.string.uuid();
+    mockedDataForEachStream = mockedDataForEachStream.map(i => ({ ...i, id: messageUuid }));
+  };
+
+  socket.on(events.streamStart, (data) => {
+    // remove => meant to be for socket mock
+    resetUUID();
+
+    store.dispatch(setIsStreaming(true));
     store.dispatch(resetIsLoading());
     store.dispatch(resetOutgoing());
-    store.dispatch(setIncoming());
     store.dispatch(resetError());
+
+    store.dispatch(fillAssistantHistoryData({ id: mockedDataForEachStream[idx].id, content: mockedDataForEachStream[idx] }));
+
+    // remove => meant to be for socket mock
+    idx += 1;
   });
 
-  socket.on(events.streamData, ({ chunk, errors, question_id, answer_id }) => {
-    const { chat, config } = store.getState();
-    const { textToParse, incoming } = chat;
-    const link = constructLink(textToParse) || constructLink(incoming?.content) || constructLink(chunk);
+  socket.on(events.streamData, (data) => {
+    const { chat } = store.getState();
 
-    if (errors.length && !chat.error) {
-      store.dispatch(setError(errors[0]));
+    const current = mockedDataForEachStream[idx];
+    if (current) {
+      if (current.type === 'email') store.dispatch(setIsEmailFormVisible(true));
+      store.dispatch(fillAssistantHistoryData({ id: current.id, content: current }));
+      store.dispatch(setResponseFormVisibility(chat.historyData[[...chat.historyIds].pop()]));
     }
 
-    if (link) {
-      store.dispatch(setLink({
-        isVisible: true,
-        href: link,
-        text: config.translations.mealButton
-      }));
-      store.dispatch(setResponseFormVisibility({ isFormVisible: false }));
+    if (data.errors.length && !chat.error) {
+      store.dispatch(setError(data.errors[0]));
     }
 
-    if (chunk.includes('[')) {
-      store.dispatch(setTextToParse(chunk));
-      return;
+    // remove => meant to be for socket mock
+    if (mockedDataForEachStream[idx + 1]) {
+      idx += 1;
     }
-
-    if (chunk.includes(']') || textToParse) {
-      store.dispatch(setTextToParse(chunk));
-      return;
-    }
-
-    store.dispatch(addIncomingChunk({ chunk, id: answer_id, question_id }));
   });
 
-  socket.on(events.streamEnd, () => {
-    const { chat, intentions } = store.getState();
-    const { content, options } = extractOptionSet(chat.textToParse);
-    const isSpecial = options.some(item => checkForSpecialPhrases(item.value, specialMessages));
+  socket.on(events.streamEnd, (data) => {
+    const { chat } = store.getState();
     const queued = chat.queue.length && chat.queue[chat.queue.length - 1];
-    store.dispatch(appendHistory({
-      ...chat.incoming,
-      content: chat.incoming.content + content,
-      options,
-      isSpecial
-    }));
 
     if (queued) {
-      store.dispatch(setQueuedId({ ...queued, id: chat.incoming.question_id }));
+      store.dispatch(setQueuedId({ ...queued, id: data.question_id }));
       store.dispatch(removeFromQueue(queued));
     } else {
-      store.dispatch(setLastQuestionId(chat.incoming.question_id));
+      store.dispatch(setLastQuestionId(data.question_id));
     }
 
-    store.dispatch(resetIncoming());
-    store.dispatch(resetTextToParse());
-    store.dispatch(setResponseFormVisibility({ intentions, options }));
+    store.dispatch(setIsStreaming(false));
+
+    // remove => meant to be for socket mock
+    idx = 0;
+    resetUUID();
   });
 
   socket.on(events.streamError, onError);
@@ -319,29 +272,27 @@ const chatMiddleware = store => next => action => {
   next(action);
 };
 
-const isFirstUserMessage = (messages) => messages.filter(obj => obj.role === roles.user).length === 1;
+// const updateForAnySpecialMessage = ({ lastMessage, store }) => {
+//   const { meta, config } = store.getState();
+//   const link = constructLink(lastMessage.content);
 
-const updateForAnySpecialMessage = ({ lastMessage, store }) => {
-  const { meta, config } = store.getState();
-  const link = constructLink(lastMessage.content);
+//   if (link) {
+//     store.dispatch(setLink({
+//       isVisible: true,
+//       href: link,
+//       text: config.translations.mealButton
+//     }));
+//   }
 
-  if (link) {
-    store.dispatch(setLink({
-      isVisible: true,
-      href: link,
-      text: config.translations.mealButton
-    }));
-  }
+//   lastMessage.isSpecial = checkForSpecialPhrases(lastMessage.content, specialMessages);
 
-  lastMessage.isSpecial = checkForSpecialPhrases(lastMessage.content, specialMessages);
+//   if (lastMessage.content.includes(intent.type.email)) store.dispatch(setIsEmailFormVisible(true));
 
-  if (lastMessage.content.includes(intent.type.email)) store.dispatch(setIsEmailFormVisible(true));
-
-  if (lastMessage.content.includes(intent.type.payment)) {
-    store.dispatch(setIsPaymentButtonVisible(true));
-    lastMessage.content += meta.pd.displayPlanPrice + ' ' + meta.pd.billingFrequencyTmsg;
-  }
-};
+//   if (lastMessage.content.includes(intent.type.payment)) {
+//     store.dispatch(setIsPaymentButtonVisible(true));
+//     lastMessage.content += meta.pd.displayPlanPrice + ' ' + meta.pd.billingFrequencyTmsg;
+//   }
+// };
 
 const withTimeout = (onTimeout, timeout = 5000) => {
   let called = false;

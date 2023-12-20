@@ -3,7 +3,7 @@ import { track } from '@/services/tracking';
 import intent from '@/services/intentions';
 import { setIsEmailLoading, setEmailSuccess, setIsEmailFormVisible, setEmailError, setLink } from '@/store/slices/intentions';
 import { setPd, setMarketing } from '@/store/slices/meta';
-import { appendHistory, setOutgoing } from '@/store/slices/chat';
+import { addPredefinedAssistantMessage, fillUserHistoryData, setOutgoing } from '@/store/slices/chat';
 import { STORING_CHECKER_INTERVAL } from '@/config/env';
 
 export const intentionsMiddleware = store => next => {
@@ -22,6 +22,7 @@ export const intentionsMiddleware = store => next => {
 
     store.dispatch(setIsEmailLoading(false));
     store.dispatch(setEmailError(''));
+    store.dispatch(fillUserHistoryData({ content: intentions.email.current }));
     store.dispatch(setOutgoing(intentions.email.current));
 
     // DEV: setEmailSuccess this status is for us to know if mail is validated in the endpoint
@@ -43,12 +44,11 @@ export const intentionsMiddleware = store => next => {
     store.dispatch(setIsEmailLoading(false));
 
     if (response.status === 409) {
-      store.dispatch(appendHistory({
-        role: 'assistant',
+      store.dispatch(addPredefinedAssistantMessage({
         content: tm716,
-        options: [
-          { id: 'opt-1', label: tm526, value: 'link', link: response.data.buttonLink },
-          { id: 'opt-2', label: tm715, value: 'button', noStream: true }
+        buttons: [
+          { id: 'opt-1', text: tm526, value: 'link', link: response.data.buttonLink },
+          { id: 'opt-2', text: tm715, value: 'button', noStream: true }
         ]
       }));
 
