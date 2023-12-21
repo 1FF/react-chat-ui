@@ -31,7 +31,6 @@ export const LayoutFoot = () => {
     error: paymentIntentError
   } = useAppSelector(getPaymentIntentions);
   const error = streamError || emailError || paymentIntentError;
-
   const ctaAfterPayButton = useRef(null);
   const [disabled, setDisabled] = useState(false);
 
@@ -97,7 +96,7 @@ export const LayoutFoot = () => {
         ) }
 
       { !isStreaming && isEmailFormVisible && <EmailForm /> }
-      { !isStreaming && isResponseFormVisible && <ResponseForm /> }
+      { !isStreaming && isResponseFormVisible && !isCtaVisible && <ResponseForm /> }
 
       { isPaymentButtonVisible && (
         <PaymentButton

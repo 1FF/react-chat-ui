@@ -28,8 +28,13 @@ const configSlice = createSlice({
       state.queue = state.queue.filter(it => it.groupId !== payload.groupId || it.content !== payload.content) || [];
     },
     setExistingHistory(state, { payload }) {
-      // TODO: Must see how it will be received from the server
-      state.history = [];
+      return produce(state, (draft) => {
+        draft.historyIds = payload.map(item => item.id);
+        draft.historyData = payload.reduce((prev, current) => ({
+          ...prev,
+          [current.id]: current.role === 'user' ? [{ ...current, resend: false, sent: true }] : current.content
+        }), {});
+      });
     },
     addPredefinedAssistantMessage(state, { payload }) {
       const id = uid();

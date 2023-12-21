@@ -1,5 +1,5 @@
 import { io } from 'socket.io-client';
-import { config as socketConfig, events, roles, streamMock } from '@/config';
+import { config as socketConfig, events, roles, streamMock, serverHistoryMock } from '@/config';
 import {
   setExistingHistory, setIsLoading,
   setTypingTimeoutExpired, setError,
@@ -17,7 +17,7 @@ import { track } from '@/services/tracking';
 import { baseEvents, customEvents } from '@/config/analytics';
 import { setRegion } from '@/store/slices/meta';
 import { CHAT_FINISHED_TIMESTAMP } from '@/config/env';
-import { faker } from '@faker-js/faker';
+// import { faker } from '@faker-js/faker';
 import { uid } from 'uid';
 
 let socket;
@@ -124,7 +124,6 @@ const chatMiddleware = store => next => action => {
 
   if (setIsPaymentButtonVisible.match(action) && action.payload === true) {
     const data = {
-      eventType: null,
       systemType: meta.systemType,
       utmParams: meta.marketing.lastUtmParams,
       customerUuid: meta.cid,
@@ -169,7 +168,6 @@ const chatMiddleware = store => next => action => {
   socket.on(events.chatHistory, ({ history, errors, region }) => {
     store.dispatch(resetIsLoading());
     store.dispatch(setRegion(region));
-
     const { config, meta, chat } = store.getState();
 
     if (chat.error) return;
@@ -181,6 +179,10 @@ const chatMiddleware = store => next => action => {
 
     if (history.length) {
       store.dispatch(setExistingHistory(history));
+      const last = [...history].pop();
+      store.dispatch(setResponseFormVisibility(last.content));
+      store.dispatch(setIsEmailFormVisible(last.content.some(el => el.type === 'email')));
+      store.dispatch(setIsPaymentButtonVisible(last.content.some(el => el.type === 'payment')));
       return;
     }
 
@@ -199,49 +201,46 @@ const chatMiddleware = store => next => action => {
   });
 
   // remove => meant to be for socket mock
-  let idx = 0;
-  let messageUuid = faker.string.uuid();
+  // let idx = 0;
+  // let messageUuid = faker.string.uuid();
 
-  let mockedDataForEachStream = streamMock;
+  // let mockedDataForEachStream = streamMock;
 
-  const resetUUID = () => {
-    messageUuid = faker.string.uuid();
-    mockedDataForEachStream = mockedDataForEachStream.map(i => ({ ...i, id: messageUuid }));
-  };
+  // const resetUUID = () => {
+  //   messageUuid = faker.string.uuid();
+  //   mockedDataForEachStream = mockedDataForEachStream.map(i => ({ ...i, id: messageUuid }));
+  // };
 
   socket.on(events.streamStart, (data) => {
     // remove => meant to be for socket mock
-    resetUUID();
+    // resetUUID();
 
     store.dispatch(setIsStreaming(true));
     store.dispatch(resetIsLoading());
     store.dispatch(resetOutgoing());
     store.dispatch(resetError());
 
-    store.dispatch(fillAssistantHistoryData({ id: mockedDataForEachStream[idx].id, content: mockedDataForEachStream[idx] }));
+    store.dispatch(fillAssistantHistoryData({ id: data.id, content: data }));
 
     // remove => meant to be for socket mock
-    idx += 1;
+    // idx += 1;
   });
 
   socket.on(events.streamData, (data) => {
     const { chat } = store.getState();
 
-    const current = mockedDataForEachStream[idx];
-    if (current) {
-      if (current.type === 'email') store.dispatch(setIsEmailFormVisible(true));
-      store.dispatch(fillAssistantHistoryData({ id: current.id, content: current }));
-      store.dispatch(setResponseFormVisibility(chat.historyData[[...chat.historyIds].pop()]));
-    }
+    if (data.type === 'email') store.dispatch(setIsEmailFormVisible(true));
+    store.dispatch(fillAssistantHistoryData({ id: data.id, content: data }));
+    store.dispatch(setResponseFormVisibility(chat.historyData[[...chat.historyIds].pop()]));
 
     if (data.errors.length && !chat.error) {
       store.dispatch(setError(data.errors[0]));
     }
 
     // remove => meant to be for socket mock
-    if (mockedDataForEachStream[idx + 1]) {
-      idx += 1;
-    }
+    // if (mockedDataForEachStream[idx + 1]) {
+    //   idx += 1;
+    // }
   });
 
   socket.on(events.streamEnd, (data) => {
@@ -258,8 +257,8 @@ const chatMiddleware = store => next => action => {
     store.dispatch(setIsStreaming(false));
 
     // remove => meant to be for socket mock
-    idx = 0;
-    resetUUID();
+    // idx = 0;
+    // resetUUID();
   });
 
   socket.on(events.streamError, onError);
@@ -271,28 +270,6 @@ const chatMiddleware = store => next => action => {
 
   next(action);
 };
-
-// const updateForAnySpecialMessage = ({ lastMessage, store }) => {
-//   const { meta, config } = store.getState();
-//   const link = constructLink(lastMessage.content);
-
-//   if (link) {
-//     store.dispatch(setLink({
-//       isVisible: true,
-//       href: link,
-//       text: config.translations.mealButton
-//     }));
-//   }
-
-//   lastMessage.isSpecial = checkForSpecialPhrases(lastMessage.content, specialMessages);
-
-//   if (lastMessage.content.includes(intent.type.email)) store.dispatch(setIsEmailFormVisible(true));
-
-//   if (lastMessage.content.includes(intent.type.payment)) {
-//     store.dispatch(setIsPaymentButtonVisible(true));
-//     lastMessage.content += meta.pd.displayPlanPrice + ' ' + meta.pd.billingFrequencyTmsg;
-//   }
-// };
 
 const withTimeout = (onTimeout, timeout = 5000) => {
   let called = false;

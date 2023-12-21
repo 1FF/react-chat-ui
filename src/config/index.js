@@ -1,4 +1,6 @@
+import { faker } from '@faker-js/faker';
 import { colors as baseThemeColors } from './themes/base';
+import roles from './roles';
 
 export { config, events } from './socket';
 export { roles } from './roles';
@@ -142,6 +144,42 @@ export const streamMock = [
   //   sequence: 2,
   //   id: ''
   // },
+];
+
+const contentMock = [
+  { type: 'text', text: 'hello', role: roles.assistant, sequence: 1, time: 1700119723000 },
+  { type: 'buttons',
+    role: roles.assistant,
+    buttons: [
+      { sequence: 1, value: 'Okay', text: 'option 1' },
+      { sequence: 2, value: 'Goodbye', text: 'option 2' }],
+    sequence: 2,
+    time: 1700119723000
+  }];
+
+export const serverHistoryMock = [
+  { id: faker.string.uuid(), role: 'assistant', content: contentMock },
+  { id: faker.string.uuid(), role: 'user', content: 'user test' },
+  { id: faker.string.uuid(), role: 'assistant', content: contentMock },
+  { id: faker.string.uuid(), role: 'user', content: 'user test' },
+  { id: faker.string.uuid(), role: 'assistant', content: contentMock },
+  { id: faker.string.uuid(), role: 'user', content: 'user test' },
+  { id: faker.string.uuid(), role: 'assistant', content: contentMock },
+];
+
+export const serverHistoryMockWithLink = [
+  ...serverHistoryMock,
+  { id: faker.string.uuid(), role: 'assistant', content: [{ type: 'text', text: 'hello [test](https://test.com).', role: roles.assistant, sequence: 1, time: 1700119723000 }] }
+];
+
+export const serverHistoryMockWithEmailIntent = [
+  ...serverHistoryMock,
+  { id: faker.string.uuid(), role: 'assistant', content: [{ type: 'email', email: 'Give us email', role: roles.assistant, sequence: 1, time: 1700119723000 }] }
+];
+
+export const serverHistoryMockWithPaymentIntent = [
+  ...serverHistoryMock,
+  { id: faker.string.uuid(), role: 'assistant', content: [{ type: 'payment', payment: 'Give us email', role: roles.assistant, sequence: 1, time: 1700119723000 }] }
 ];
 
 export default { colors };
