@@ -17,7 +17,6 @@ import { track } from '@/services/tracking';
 import { baseEvents, customEvents } from '@/config/analytics';
 import { setRegion } from '@/store/slices/meta';
 import { CHAT_FINISHED_TIMESTAMP } from '@/config/env';
-// import { faker } from '@faker-js/faker';
 import { uid } from 'uid';
 
 let socket;
@@ -42,7 +41,7 @@ const chatMiddleware = store => next => action => {
     }
 
     if (socket && socket.connected && data.message.trim() !== '') {
-      socket.volatile.emit(events.chat, data, withTimeout(dispatchRetry));
+      socket.volatile.emit(events.chat, { time: new Date().getTime(), ...data }, withTimeout(dispatchRetry));
       store.dispatch(resetError());
       return;
     }
@@ -187,15 +186,14 @@ const chatMiddleware = store => next => action => {
     }
 
     const id = uid();
-    config.aiProfile.initialMessage.map(content => store.dispatch(fillAssistantHistoryData({ id, content })));
+    config.aiProfile.initialMessage.map(content => store.dispatch(fillAssistantHistoryData({ id, ...content })));
     store.dispatch(setResponseFormVisibility(config.aiProfile.initialMessage));
     handleMessageSending({
       role: roles.assistant,
       term: getQueryParam(window.location.search, 'utm_chat'),
       user_id: meta.cid,
-      message: 'initial message',
-      initialMessageContent: config.aiProfile.initialMessage,
-      initialMessageId: id,
+      message: JSON.stringify(config.aiProfile.initialMessage),
+      messageId: id,
       region: meta.region,
     });
   });
@@ -214,23 +212,23 @@ const chatMiddleware = store => next => action => {
   socket.on(events.streamStart, (data) => {
     // remove => meant to be for socket mock
     // resetUUID();
-
+    // idx = 0;
     store.dispatch(setIsStreaming(true));
     store.dispatch(resetIsLoading());
     store.dispatch(resetOutgoing());
     store.dispatch(resetError());
 
-    store.dispatch(fillAssistantHistoryData({ id: data.id, content: data }));
-
-    // remove => meant to be for socket mock
-    // idx += 1;
+    store.dispatch(fillAssistantHistoryData(data));
+    // store.dispatch(fillAssistantHistoryData(mockedDataForEachStream[idx]));
   });
 
   socket.on(events.streamData, (data) => {
     const { chat } = store.getState();
 
     if (data.type === 'email') store.dispatch(setIsEmailFormVisible(true));
-    store.dispatch(fillAssistantHistoryData({ id: data.id, content: data }));
+    if (data.type === 'payment') store.dispatch(setIsPaymentButtonVisible(true));
+    store.dispatch(fillAssistantHistoryData(data));
+    // store.dispatch(fillAssistantHistoryData(mockedDataForEachStream[idx]));
     store.dispatch(setResponseFormVisibility(chat.historyData[[...chat.historyIds].pop()]));
 
     if (data.errors.length && !chat.error) {
@@ -239,7 +237,7 @@ const chatMiddleware = store => next => action => {
 
     // remove => meant to be for socket mock
     // if (mockedDataForEachStream[idx + 1]) {
-    //   idx += 1;
+    // idx += 1;
     // }
   });
 

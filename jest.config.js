@@ -1,6 +1,10 @@
 export default {
   testEnvironment: 'jsdom',
   testMatch: ['**/__tests__/**/*.js', '**/?(*.)+(spec|test).(js|jsx)'],
+  clearMocks: true,
+  resetMocks: true,
+  resetModules: true,
+  restoreMocks: true,
   moduleFileExtensions: ['js', 'jsx', 'json', 'node'],
   transform: {
     '^.+\\.(js|jsx)$': 'babel-jest',
@@ -11,4 +15,6 @@ export default {
     '\\.(css|less)$': '<rootDir>/__mocks__/styleMock.js',
     '^@/(.*)$': '<rootDir>/src/$1',
   },
+  workerIdleMemoryLimit: '512MB',
+  coverageProvider: 'v8',
 };

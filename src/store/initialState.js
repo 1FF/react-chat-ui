@@ -26,13 +26,10 @@ export const config = {
 
 export const chat = {
   outgoing: null,
-  incoming: null,
   queue: [],
-  textToParse: '',
   history: [],
   historyData: {},
   historyIds: [],
-  status: null,
   error: null,
   isLoading: false,
   typingTimeoutExpired: false,

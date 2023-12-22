@@ -126,7 +126,7 @@ export const streamMock = [
   { type: 'text', text: 'you', sequence: 12, id: '' },
   { type: 'text', text: 'you', sequence: 13, id: '' },
   { type: 'text', text: 'you', sequence: 14, id: '' },
-  // {
+  //  {
   //   type: 'payment',
   //   payment: 'Continue by getting the best plan that suits you with customizing it for:',
   //   sequence: 1,
@@ -145,6 +145,60 @@ export const streamMock = [
   //   id: ''
   // },
 ];
+
+export const streamMocks = {
+  text: [
+    { type: 'text', text: '', id: 'test', time: new Date().getTime(), errors: [] },
+    { type: 'text', text: 'Hello ', sequence: 6, id: 'test', time: new Date().getTime(), errors: [] },
+    { type: 'text', text: 'Hello ', sequence: 6, id: 'test', time: new Date().getTime(), errors: [] },
+    { type: 'text', text: 'Hello ', sequence: 6, id: 'test', time: new Date().getTime(), errors: [] },
+    { type: 'text', text: 'Hello ', sequence: 6, id: 'test', time: new Date().getTime(), errors: [] },
+    { type: 'text', text: 'Hello ', sequence: 6, id: 'test', time: new Date().getTime(), errors: [] },
+    { type: 'text', text: 'My favorite search engine is [Duck Duck Go](https://duckduckgo.com). [Google](https://google.com).', sequence: 2, id: 'test', errors: [] },
+    { type: 'text', text: '', id: 'test', time: new Date().getTime(), errors: [] },
+  ],
+  buttons: [
+    { type: 'buttons', buttons: [], id: 'test', time: new Date().getTime(), errors: [] },
+    {
+      type: 'buttons',
+      buttons: [{ sequence: 1, value: 'Okay', text: 'option 1' }, { sequence: 2, value: 'Goodbye', text: 'option 2' }],
+      sequence: 1,
+      id: 'test',
+      errors: [],
+    },
+    {
+      type: 'buttons',
+      buttons: [{ sequence: 1, value: 'Okay', text: 'option 1' }, { sequence: 2, value: 'Goodbye', text: 'option 2' }, { sequence: 3, value: 'Goodbye', text: 'option 3' }],
+      sequence: 2,
+      id: 'test',
+      errors: [],
+    },
+    { type: 'buttons', buttons: [], id: 'test', time: new Date().getTime(), errors: [] },
+  ],
+  video: [
+    {
+      type: 'video',
+      video: { url: 'https://www.youtube.com/embed/edAHDU8n1dQ?si=0y4khjCKGaprRrYQ' },
+      sequence: 2,
+      id: 'test'
+    },],
+  email: [
+    { type: 'email', email: 'Email', sequence: 1, id: 'test', errors: [] },
+    { type: 'email', email: 'Email', sequence: 1, id: 'test', errors: [] },
+    { type: 'email', email: 'Email', sequence: 1, id: 'test', errors: [] },
+  ],
+  payment: [
+    { type: 'payment', payment: 'payment', sequence: 1, id: 'test', errors: [] },
+    { type: 'payment', payment: 'Continue by getting the best plan that suits you with customizing it for:', sequence: 2, id: 'test', errors: [] },
+    { type: 'payment', payment: 'payment', sequence: 3, id: 'test', errors: [] },
+  ],
+  image: [{
+    type: 'image',
+    image: { url: 'https://static.boredpanda.com/blog/wp-content/uploads/2016/08/wet-dogs-before-after-bath-fb6__700-png.jpg' },
+    sequence: 38,
+    id: 'test'
+  }],
+};
 
 const contentMock = [
   { type: 'text', text: 'hello', role: roles.assistant, sequence: 1, time: 1700119723000 },
@@ -181,5 +235,47 @@ export const serverHistoryMockWithPaymentIntent = [
   ...serverHistoryMock,
   { id: faker.string.uuid(), role: 'assistant', content: [{ type: 'payment', payment: 'Give us email', role: roles.assistant, sequence: 1, time: 1700119723000 }] }
 ];
+
+export const typeReducer = {
+  text: (initial, current) => ({
+    ...initial,
+    ...current,
+    text: initial.text + current.text
+  }),
+  buttons: (initial, current) => ({
+    ...initial,
+    ...current,
+    buttons: [...initial.buttons, ...current.buttons]
+  }),
+  image: (initial, current) => ({
+    ...initial,
+    ...current,
+    image: { ...initial.image, ...current.image }
+  }),
+  video: (initial, current) => ({
+    ...initial,
+    ...current,
+    video: { ...initial.video, ...current.video }
+  }),
+  email: (initial, current) => ({
+    ...initial,
+    ...current,
+    email: initial.email + current.email
+  }),
+  payment: (initial, current) => ({
+    ...initial,
+    ...current,
+    payment: initial.payment + current.payment
+  }),
+};
+
+export const initialStructure = {
+  text: { type: 'text', text: '' },
+  buttons: { type: 'buttons', buttons: [] },
+  image: { type: 'image', image: {} },
+  video: { type: 'video', video: {} },
+  payment: { type: 'payment', payment: '' },
+  email: { type: 'email', email: '' },
+};
 
 export default { colors };
