@@ -3,7 +3,7 @@ import produce from 'immer';
 import { createSlice } from '@reduxjs/toolkit';
 import { chat as initialState } from '@/store/initialState';
 import { getQueryParam } from '@/utils';
-import { roles } from '@/config';
+import { initialStructure, roles, typeReducer } from '@/config';
 
 const configSlice = createSlice({
   name: 'chat',
@@ -47,23 +47,19 @@ const configSlice = createSlice({
       });
     },
     fillAssistantHistoryData(state, { payload }) {
-      const data = { role: roles.assistant, ...payload.content };
+      const data = { role: roles.assistant, ...payload };
       return produce(state, (draft) => {
         if (!draft.historyData[payload.id]) {
           draft.historyData[payload.id] = [data];
           draft.historyIds.push(payload.id);
         } else {
-          // here we order items by sequence and accumulate the text into one object
+          // here we order items by sequence and accumulate the types into one object
           draft.historyData[payload.id].push(data);
           const reducedText = draft.historyData[payload.id]
-            .filter((obj) => obj.type === 'text')
-            .reduce((initial, current) => ({
-              ...initial,
-              ...current,
-              text: initial.text + current.text
-            }), { type: 'text', text: '' });
+            .filter((obj) => obj.type === payload.type)
+            .reduce(typeReducer[payload.type], initialStructure[payload.type]);
 
-          draft.historyData[payload.id] = [...draft.historyData[payload.id].filter(it => it.type !== 'text'), reducedText];
+          draft.historyData[payload.id] = [...draft.historyData[payload.id].filter(it => it.type !== payload.type), reducedText];
           draft.historyData[payload.id].sort((a, b) => a.sequence - b.sequence);
         }
       });
