@@ -1,21 +1,19 @@
 /* eslint-env jest */
-import { render } from '@testing-library/react';
-import { useAppSelector } from '@/hooks';
+import { waitFor } from '@testing-library/react';
 import { LayoutFoot } from '@/components/Layout';
-
-jest.mock('@/hooks');
+import renderWithProviders from '@/utils/storeMockWrapper';
 
 describe('LayoutFoot Component', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    useAppSelector.mockReturnValue({ themeId: 'light' });
+  let root;
+  beforeEach(async () => {
+    await waitFor(() => {
+      root = renderWithProviders(<div id="chatbot-container"><LayoutFoot /></div>);
+    });
   });
 
-  it('renders without errors', () => {
-    // Act
-    const { container } = render(<LayoutFoot />);
+  afterEach(() => { root = null; });
 
-    // Assert
-    expect(container).toBeInTheDocument();
+  it('renders without errors', () => {
+    expect(root.container.querySelector('[data-e2e="chat-foot"]')).toBeInTheDocument();
   });
 });

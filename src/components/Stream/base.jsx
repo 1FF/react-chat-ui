@@ -9,11 +9,10 @@ import { streamBase, streamRow } from './variants';
 export const StreamBase = () => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { aiProfile } = useAppSelector(getConfig);
-  const historyIds = useAppSelector(state => state.chat.historyIds);
-  const historyData = useAppSelector(state => state.chat.historyData);
-  const { base, second, date } = streamBase({ theme });
-  const { base: baseRow } = streamRow({ theme });
-  const time = historyIds.length > 0 && (historyData[historyIds[0]][0].time || new Date().getTime());
+  const incoming = useAppSelector(state => state.chat.incoming);
+  const history = useAppSelector(state => state.chat.history);
+  const { base, second, date } = variant({ theme });
+  const firstMessage = history && history.length > 0 && history[0];
 
   return (
     <div className={ base() }>

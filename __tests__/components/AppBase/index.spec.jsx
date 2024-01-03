@@ -10,12 +10,14 @@ import { LINK_CLICKED_KEY, STORING_CHECKER_INTERVAL } from '@/config/env';
 import { intent } from '@/main';
 import initialState from '@/store/initialState';
 import { initialConfig } from '@/chatMocks';
+import { faker } from '@faker-js/faker';
 
 const actualWindow = window.location;
 
 let root;
-const region = 'test';
 const spies = [];
+const region = faker.location.country();
+
 describe('AppBase, chat-history event and execute properly', () => {
   beforeEach(async () => { await localSetup(); });
   afterEach(localTearDown);
@@ -51,6 +53,7 @@ describe('AppBase, chat-history event and execute properly', () => {
   });
 
   test('on chat-history event state is shown and link is visualized', async () => {
+    const extractedLink = 'https://test123.com';
     // Act
     act(() => mockServerHistoryEmit(serverHistoryMockWithLink));
 

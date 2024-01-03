@@ -1,40 +1,26 @@
 /* eslint-env jest */
-import { render } from '@testing-library/react';
-import { useAppDispatch, useAppSelector, useWindowSize } from '@/hooks';
+import { render, waitFor } from '@testing-library/react';
 import { LayoutBase } from '@/components/Layout';
+import renderWithProviders from '@/utils/storeMockWrapper';
 
 const original = console.error;
-jest.mock('@/hooks');
 
 describe('LayoutBase Component', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
+  let root;
+  beforeEach(async () => {
     console.error = jest.fn();
-    useAppDispatch.mockReturnValue(() => jest.fn());
-    useAppSelector.mockReturnValue({ themeId: 'light' });
-    useWindowSize.mockReturnValue([150, 150]);
+    await waitFor(() => {
+      root = renderWithProviders(<div id="chatbot-container"><LayoutBase /></div>);
+    });
   });
 
   afterEach(() => {
+    root = null;
     console.error = original;
+    jest.clearAllMocks();
   });
 
   it('renders without errors', () => {
-    // Act
-    const { container } = render(<LayoutBase
-      head={ <div>Head</div> } stream={ <div>Stream</div> }
-      foot={ <div>Foot</div> }
-    />);
-
-    // Assert
-    expect(container).toBeInTheDocument();
-  });
-
-  it('renders with console error when prop is missing', () => {
-    // Act
-    render(<LayoutBase stream={ <div>Stream</div> } foot={ <div>Foot</div> } />);
-
-    // Assert
-    expect(console.error).toHaveBeenCalled();
+    expect(root.container.querySelector('[data-e2e="base-container"]')).toBeInTheDocument();
   });
 });
