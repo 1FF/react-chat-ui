@@ -1,27 +1,24 @@
-import { useAppDispatch, useAppSelector } from '@/hooks';
+import { useAppDispatch, useHeadControls } from '@/hooks';
 
 import { Profile } from '@/components/Profile';
-import { getConfig } from '@/store/slices/config';
 import { IconBtn } from '@/components/Button';
 import { customEvents } from '@/config/analytics';
 import { track } from '@/services/tracking';
-import { getMeta } from '@/store/slices/meta';
 import { setClosed } from '@/store/slices/chat';
 import { layoutHead as variant } from './variants';
 
 export const LayoutHead = () => {
-  const { themeId: theme, closeVisible } = useAppSelector(getConfig);
   const dispatch = useAppDispatch();
-  const { cid, systemType, marketing } = useAppSelector(getMeta);
-  const { base } = variant({ theme });
+  const headState = useHeadControls();
+  const { base } = variant({ theme: headState.theme });
 
   const onClick = (e) => {
     e.currentTarget.disabled = true;
     track({
       eventType: customEvents.closeClicked,
-      systemType,
-      utmParams: marketing.lastUtmParams,
-      customerUuid: cid,
+      systemType: headState.systemType,
+      utmParams: headState.marketing.lastUtmParams,
+      customerUuid: headState.cid,
     });
     setTimeout(() => {
       dispatch(setClosed());
@@ -29,9 +26,9 @@ export const LayoutHead = () => {
   };
 
   return (
-    <div className={ base() }>
+    <div className={ base() } data-e2e="chat-heading">
       <Profile />
-      { closeVisible && (
+      { headState.closeVisible && (
         <IconBtn e2e="chat-close-btn" onClick={ onClick }>
           <svg
             height="24px" viewBox="0 0 24 24"

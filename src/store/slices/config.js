@@ -11,6 +11,7 @@ const configSlice = createSlice({
       state.themeId = payload.themeId;
       state.chatUrl = payload.chatUrl;
       state.closeVisible = payload.closeVisible;
+      state.purpose = payload.purpose;
     },
     resetConfig(state) {
       state.aiProfile = initialState.aiProfile;

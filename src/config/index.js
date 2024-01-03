@@ -22,6 +22,7 @@ export const colors = {
 export const chat = (id) => ({
   meta: {
     cid: localStorage.getItem('__cid') || id,
+    region: null,
     pd: {
       subscriberBillingFrequency: 'Billed every {1} month(s)',
       oneTimer: 'Total price to be charged',
@@ -43,11 +44,11 @@ export const chat = (id) => ({
       name: 'Meal Mentor',
       role: 'AI-powered nutritionist',
       imgSrc: 'https://storage.1forfit.com/4oZrkOwbOQcSIGJopBG5qsf0CmBbVDKDqflzEkXq.jpg',
-      displayInStream: true,
       welcome: 'Welcome to our live support. We\'re here to understand your requirements and suggest the best Keto diet suited for you.',
       // initialMessage: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you. [yes|no|continue]',
       initialMessage: 'Do you want to lose weight? [Yes|No]',
     },
+    purpose: 'default',
     chatUrl: 'https://yourketo.ngrok.io',
     themeId: 'dark',
     translations: {

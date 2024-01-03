@@ -10,11 +10,14 @@ import { initialConfig, history as defaultHistory, historyWithLink, historyWithE
 import { CHAT_SEEN_KEY, LINK_CLICKED_KEY, STORING_CHECKER_INTERVAL } from '@/config/env';
 import { intent } from '@/main';
 import initialState from '@/store/initialState';
+import { faker } from '@faker-js/faker';
 
 jest.useFakeTimers();
 
 let root;
 const spies = [];
+const region = faker.location.country();
+
 describe('AppBase, chat-history event and execute properly', () => {
   beforeEach(localSetup);
   afterEach(localTearDown);
@@ -42,7 +45,7 @@ describe('AppBase, chat-history event and execute properly', () => {
     expect(name).toHaveLength(2);
 
     const { meta, config, chat } = root.store.getState();
-    expect(meta).toStrictEqual(initialConfig.meta);
+    expect(meta).toStrictEqual({ ...initialConfig.meta, region });
     expect(config.aiProfile).toStrictEqual(initialConfig.app.aiProfile);
     expect(config.translations).toStrictEqual(initialConfig.app.translations);
     expect(chat.history.length).toStrictEqual(defaultHistory.length);
@@ -50,6 +53,7 @@ describe('AppBase, chat-history event and execute properly', () => {
   });
 
   test('on chat-history event state is shown and link is visualized', async () => {
+    const extractedLink = 'https://test123.com';
     // Act
     act(() => dispatchSocketChange(historyWithLink));
 
@@ -60,7 +64,7 @@ describe('AppBase, chat-history event and execute properly', () => {
 
     // Assert
     expect(historyElements.length).toEqual(historyWithLink.length);
-    expect(lastMessageElement.textContent).toEqual('https://test123.com');
+    expect(lastMessageElement.textContent).toEqual(extractedLink);
     expect(userFormElement).toBeNull();
     expect(emailFormElement).toBeNull();
 
@@ -69,7 +73,7 @@ describe('AppBase, chat-history event and execute properly', () => {
     expect(chat.history[0].options.length).toEqual(2);
     expect(chat.connected).toBeTruthy();
     expect(intentions.link.isVisible).toBeTruthy();
-    expect(intentions.link.href).toBe('https://test123.com');
+    expect(intentions.link.href).toBe(extractedLink);
     expect(intentions.link.text).toBe(config.translations.mealButton);
   });
 
@@ -269,7 +273,7 @@ describe('Close button closes chat', () => {
 
 function dispatchSocketChange(history = defaultHistory) {
   serverSocket.emit('connect');
-  serverSocket.emit(events.chatHistory, { history, errors: [], region: 'frankfurt' });
+  serverSocket.emit(events.chatHistory, { history, errors: [], region });
 }
 
 function dispatchStreaming(chunks) {

@@ -1,7 +1,6 @@
 import { useAppSelector } from '@/hooks';
 import { getConfig } from '@/store/slices/config';
 
-import { getChat } from '@/store/slices/chat';
 import { formatDateByLocale } from '@/utils';
 import { uid } from 'uid';
 import { StreamHead } from './head';
@@ -11,7 +10,8 @@ import { streamBase as variant } from './variants';
 export const StreamBase = () => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { aiProfile } = useAppSelector(getConfig);
-  const { history, incoming } = useAppSelector(getChat);
+  const incoming = useAppSelector(state => state.chat.incoming);
+  const history = useAppSelector(state => state.chat.history);
   const { base, second, date } = variant({ theme });
   const firstMessage = history && history.length > 0 && history[0];
 
