@@ -1,15 +1,15 @@
 import { useRef, useState } from 'react';
 import intent from '@/services/intentions';
-import { useAppDispatch, useAppSelector } from '@/hooks';
+import { useAppDispatch, useFootControls } from '@/hooks';
 import { ResponseForm, EmailForm } from '@/components/Form/';
-import { getEmailIntentions, getLinkIntentions, getPaymentIntentions, getResponseIntentions, setIsPaymentButtonVisible, setIsPaymentSuccessful, setLink, setPaymentFormVisibility, setPaymentIntentError } from '@/store/slices/intentions';
+import { setIsPaymentButtonVisible, setIsPaymentSuccessful, setLink, setPaymentFormVisibility, setPaymentIntentError } from '@/store/slices/intentions';
 import { PaymentButton, Link } from '@/components/Payment';
 import { addPredefinedAssistantMessage, getChat, setClosed } from '@/store/slices/chat';
+import { appendHistory, setClosed } from '@/store/slices/chat';
+import { roles } from '@/config/roles';
 import { PaymentScene } from '@/components/Scenes/payment';
-import { getConfig } from '@/store/slices/config';
 import { track } from '@/services/tracking';
 import { customEvents } from '@/config/analytics';
-import { getMeta } from '@/store/slices/meta';
 import { Ellipsis } from '@/components/Stream/ellipsis';
 import { LINK_CLICKED_KEY } from '@/config/env';
 
@@ -50,7 +50,7 @@ export const LayoutFoot = () => {
     dispatch(addPredefinedAssistantMessage({ content: translations.tm1226 }));
     dispatch(setIsPaymentSuccessful(true));
     dispatch(setIsPaymentButtonVisible(false));
-    dispatch(setLink({ href: '/', isVisible: true, text: translations.ctaTextContent }));
+    dispatch(setLink({ href: '/', isVisible: true, text: footState.translations.ctaTextContent }));
     setIsPaymentContainerVisible(false);
 
     setTimeout(() => {
@@ -71,26 +71,26 @@ export const LayoutFoot = () => {
     localStorage.setItem(LINK_CLICKED_KEY, e.currentTarget.href);
     track({
       eventType: customEvents.linkClicked,
-      systemType,
-      utmParams: marketing.lastUtmParams,
-      customerUuid: cid,
-      email: current
+      systemType: footState.systemType,
+      utmParams: footState.marketing.lastUtmParams,
+      customerUuid: footState.cid,
+      email: footState.current
     });
     dispatch(setClosed());
   };
 
   return (
-    <div className="tw--space-y-[11px] tw--pb-[11px]">
+    <div className="tw--space-y-[11px] tw--pb-[11px]" data-e2e="chat-foot">
       { error && <div className="tw--pl-[35px] tw--text-[#ff0043] tw--font-medium">{ error }</div> }
-      { isPaymentFormVisible && <PaymentScene onClose={ onClosePaymentForm } /> }
-      { isLoading && <Ellipsis /> }
-      { isCtaVisible
+      { footState.isPaymentFormVisible && <PaymentScene onClose={ onClosePaymentForm } /> }
+      { footState.isLoading && <Ellipsis /> }
+      { footState.isCtaVisible
         && (
           <Link
             forwardedRef={ ctaAfterPayButton }
-            text={ ctaText }
+            text={ footState.ctaText }
             onClick={ onClickCta }
-            href={ ctaHref }
+            href={ footState.ctaHref }
             e2e="quiz-trigger-btn"
           />
         ) }
@@ -98,9 +98,9 @@ export const LayoutFoot = () => {
       { !isStreaming && isEmailFormVisible && <EmailForm /> }
       { !isStreaming && isResponseFormVisible && !isCtaVisible && <ResponseForm /> }
 
-      { isPaymentButtonVisible && (
+      { footState.isPaymentButtonVisible && (
         <PaymentButton
-          text={ translations.payButton }
+          text={ footState.translations.payButton }
           onClick={ initializePaymentForm }
           disabled={ disabled }
           e2e="payment-form-trigger-btn"

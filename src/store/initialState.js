@@ -15,13 +15,13 @@ export const config = {
     role: null,
     imgSrc: null,
     initialMessage: '',
-    displayInStream: false,
   },
   translations: {},
   themeId: null,
   chatUrl: null,
   enableDevTools: false,
   isPluginMode: false,
+  purpose: 'default'
 };
 
 export const chat = {
