@@ -1,12 +1,17 @@
-import { func } from 'prop-types';
 import { close as variants } from './variants';
+import { MouseEvent } from 'react';
 
-export const CloseButton = ({ onClick }) => {
+export type CloseButtonProps = {
+  onClick: (e: MouseEvent<HTMLButtonElement>) => void;
+}
+
+export const CloseButton = ({ onClick }: CloseButtonProps) => {
   const { base } = variants();
   return (
     <button
-      type="button" className={ base() }
-      onClick={ onClick }
+      type="button"
+      className={base()}
+      onClick={onClick}
     >
       <svg
         fill="none"
@@ -19,10 +24,6 @@ export const CloseButton = ({ onClick }) => {
       </svg>
     </button>
   );
-};
-
-CloseButton.propTypes = {
-  onClick: func.isRequired
 };
 
 export default CloseButton;

@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { uid } from 'uid';
-import { getResponseIntentions } from '@/store/slices/intentions';
-import { getConfig } from '@/store/slices/config';
-import { useAppDispatch, useAppSelector } from '@/hooks';
-import { Input } from '@/components/Input';
-import { IconBtn } from '@/components/Button';
-import { fillUserHistoryData, getChat, setLastGroupPointer, setTypingTimeoutExpired } from '@/store/slices/chat';
+import { getChat, setLastGroupPointer, setTypingTimeoutExpired, fillUserHistoryData, getChat, setLastGroupPointer, setTypingTimeoutExpired } from '../../store/slices/chat';
+import { getResponseIntentions } from '../../store/slices/intentions';
+import { getConfig } from '../../store/slices/config';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { Input } from '../../components/Input';
+import { IconBtn } from '../../components/Button';
+
+import { roles } from '../../config';
 import { layoutFoot as variant } from '../Layout/variants';
 
 export const ResponseForm = () => {
@@ -14,10 +16,10 @@ export const ResponseForm = () => {
   const { connected } = useAppSelector(getChat);
   const { isLoading } = useAppSelector(getResponseIntentions);
   const { base, input, button } = variant({ theme });
-  const [response, setCurrentResponse] = useState('');
-  const [timerId, setTimerId] = useState(null);
+  const [response, setCurrentResponse] = useState<string | ''>('');
+  const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
   const groupId = useAppSelector(state => state.chat.lastGroupId);
-  const inputElement = useRef(null);
+  const inputElement = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     setTimeout(() => {
@@ -25,12 +27,12 @@ export const ResponseForm = () => {
     }, 500);
   }, []);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentResponse(e.target.value);
     setTimerToSendMessage();
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     if (response.trim()) {
@@ -42,7 +44,9 @@ export const ResponseForm = () => {
   };
 
   const setTimerToSendMessage = () => {
-    clearTimeout(timerId);
+    if (timerId) {
+      clearTimeout(timerId);
+    }
     const currentId = setTimeout(() => {
       dispatch(setTypingTimeoutExpired(true));
       dispatch(setLastGroupPointer(uid()));
@@ -52,23 +56,23 @@ export const ResponseForm = () => {
 
   return (
     <form
-      className={ base() } onSubmit={ handleFormSubmit }
+      className={base()} onSubmit={handleFormSubmit}
       data-e2e="user-form"
     >
-      <div className={ input() }>
+      <div className={input()}>
         <Input
-          disabled={ !connected }
-          isLoading={ isLoading }
+          disabled={!connected}
+          isLoading={isLoading}
           name="response"
-          onChange={ handleInputChange }
+          onChange={handleInputChange}
           placeholder="Write your message here..."
           type="response"
-          value={ response }
-          passRef={ inputElement }
+          value={response}
+          ref={inputElement}
         />
       </div>
-      <div className={ button() }>
-        <IconBtn onClick={ handleFormSubmit } disabled={ !connected }>
+      <div className={button()}>
+        <IconBtn onClick={handleFormSubmit} disabled={!connected}>
           <svg
             fill="currentColor" viewBox="0 0 24 24"
             width="20px" height="20px"

@@ -1,6 +1,6 @@
-import { useAppDispatch, useAppSelector } from '@/hooks';
-import { getConfig, setTheme, togglePluginMode } from '@/store/slices/config';
-import { Toggler } from '@/components/Toggle';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { getConfig, setTheme, togglePluginMode } from '../../store/slices/config';
+import { Toggler } from '../Toggle';
 import { wrapper } from './variants';
 
 export const DevTools = () => {

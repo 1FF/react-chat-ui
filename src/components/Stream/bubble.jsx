@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { string } from 'prop-types';
 import { useAppSelector } from '@/hooks';
+import { useAppSelector, useAppDispatch } from '@/hooks';
 import { getConfig } from '@/store/slices/config';
 import { roles } from '@/config';
 import { Assistant } from '@/components/Stream/assistant';

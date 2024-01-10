@@ -2,9 +2,14 @@ import { useAppSelector } from '@/hooks';
 import { getConfig } from '@/store/slices/config';
 import { formatDateByLocale } from '@/utils';
 import { uid } from 'uid';
+import { useAppSelector } from '../../hooks';
+import { getConfig } from '../../store/slices/config';
+
+import { formatDateByLocale } from '../../utils';
 import { StreamHead } from './head';
 import { StreamBubble } from './bubble';
 import { streamBase, streamRow } from './variants';
+
 
 export const StreamBase = () => {
   const { themeId: theme } = useAppSelector(getConfig);

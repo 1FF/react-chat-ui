@@ -9,7 +9,7 @@ const configSlice = createSlice({
   name: 'chat',
   initialState,
   reducers: {
-    setOutgoing(state, { payload }) {
+    setOutgoing(state, { payload }: PayloadAction<string>) {
       state.outgoing = {
         term: getQueryParam(window.location.search, 'utm_chat'),
         user_id: localStorage.getItem('__cid'),
@@ -20,11 +20,11 @@ const configSlice = createSlice({
     resetOutgoing(state) {
       state.outgoing = initialState.outgoing;
     },
-    pushQueue(state, { payload }) {
+    pushQueue(state, { payload }: PayloadAction<{ groupId: string; content: string }>) {
       const notFound = !state.queue.find(it => it.groupId === payload.groupId || it.content === payload.content);
       if (notFound) state.queue.push(payload);
     },
-    removeFromQueue(state, { payload }) {
+    removeFromQueue(state, { payload }: PayloadAction<{ groupId: string; content: string }>) {
       state.queue = state.queue.filter(it => it.groupId !== payload.groupId || it.content !== payload.content) || [];
     },
     setExistingHistory(state, { payload }) {
@@ -89,16 +89,17 @@ const configSlice = createSlice({
         }
       });
     },
-    setLastQuestionId(state, { payload }) {
-      state.history = state.history.map(item => {
+    setLastQuestionId(state, { payload }: PayloadAction<string>) {
+      state.history = state.history.map((item: HistoryItem) => {
         if (!item.id) {
           item.id = payload;
         }
         return item;
       });
     },
-    setQueuedId(state, { payload }) {
-      state.history = state.history.map(item => {
+    setQueuedId(state, { payload }: PayloadAction<{ groupId: string; id: string, content: string }>) {
+
+      state.history = state.history.map((item: HistoryItem) => {
         if (!item.id && item.groupId === payload.groupId) {
           item.id = payload.id;
         }
@@ -114,16 +115,16 @@ const configSlice = createSlice({
     resetIsLoading(state) {
       state.isLoading = initialState.isLoading;
     },
-    setTypingTimeoutExpired(state, { payload }) {
+    setTypingTimeoutExpired(state, { payload }: PayloadAction<boolean>) {
       state.typingTimeoutExpired = payload;
     },
-    setConnected(state, { payload }) {
+    setConnected(state, { payload }: PayloadAction<boolean>) {
       state.connected = payload;
     },
     setClosed(state) {
       state.closed = true;
     },
-    updateResendStatus(state, { payload }) {
+    updateResendStatus(state, { payload }: PayloadAction<{ groupId: string; resend: boolean; sent: boolean }>) {
       state.history = state.history.map(item => {
         if (!item.id && payload.groupId === item.groupId) {
           item = { ...item, resend: payload.resend, sent: payload.sent };
@@ -147,13 +148,13 @@ const configSlice = createSlice({
         return item;
       });
     },
-    setLastGroupPointer(state, { payload }) {
+    setLastGroupPointer(state, { payload }: PayloadAction<string>) {
       state.lastGroupId = payload;
     },
-    resendMessage(state, { payload }) {
+    resendMessage(state, { payload }: PayloadAction<any>) {
       state.history = state.history.map(item => item);
     },
-    setError(state, { payload }) {
+    setError(state, { payload }: PayloadAction<any>) {
       state.error = payload;
     },
     resetError(state) {
@@ -165,7 +166,7 @@ const configSlice = createSlice({
   },
 });
 
-export const getChat = state => state.chat;
+export const getChat = (state: { chat: ChatState }) => state.chat;
 
 export const {
   setOutgoing, resetOutgoing, setExistingHistory,

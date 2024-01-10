@@ -1,5 +1,5 @@
 /* eslint-disable spaced-comment */
-import { tv } from 'tailwind-variants';
+import { tv, type VariantProps } from 'tailwind-variants';
 
 export const basic = /*tw*/ tv({
   slots: {
@@ -32,3 +32,6 @@ export const icon = /*tw*/ tv({
     },
   },
 });
+
+export type BasicVariants = VariantProps<typeof basic>;
+export type IconVariants = VariantProps<typeof icon>;
