@@ -1,13 +1,17 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import metaReducer from '@/store/slices/meta';
-import configReducer from '@/store/slices/config';
-import chatReducer from '@/store/slices/chat';
-import intentionsReducer from '@/store/slices/intentions';
-import chatMiddleware from '@/middleware/socket';
-import intentionsMiddleware from '@/middleware/intentions';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import disableReactDevTools from '@/utils/reactDevTools';
+
+// @ts-ignore
+import chatMiddleware from '../middleware/socket';
+import chatReducer from './slices/chat';
+import configReducer from './slices/config';
+import disableReactDevTools from './../utils/reactDevTools';
+
+// @ts-ignore
+import intentionsMiddleware from '../middleware/intentions';
+import intentionsReducer from './slices/intentions';
+import metaReducer from './slices/meta';
 
 disableReactDevTools();
 
@@ -26,5 +30,9 @@ export const store = configureStore({
   })),
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }).concat(chatMiddleware, intentionsMiddleware),
 });
+
+
+export type AppDispatch = typeof store.dispatch
+export type RootState = ReturnType<typeof store.getState>
 
 export const persistor = persistStore(store);

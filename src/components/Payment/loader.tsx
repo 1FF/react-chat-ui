@@ -1,6 +1,5 @@
-import { array, string } from 'prop-types';
-import { useAppSelector } from '@/hooks';
-import { getConfig } from '@/store/slices/config';
+import { useAppSelector } from '../../hooks';
+import { getConfig } from '../../store/slices/config';
 import { loader as variants } from './variants';
 
 export const PaymentLoader = ({ texts = [], title = '' }) => {
@@ -49,11 +48,6 @@ export const PaymentLoader = ({ texts = [], title = '' }) => {
       </div>
     </div>
   );
-};
-
-PaymentLoader.propTypes = {
-  texts: array.isRequired,
-  title: string.isRequired,
 };
 
 export default PaymentLoader;

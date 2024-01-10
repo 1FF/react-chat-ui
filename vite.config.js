@@ -1,7 +1,6 @@
 import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import eslint from 'vite-plugin-eslint';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import path from 'path';
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
@@ -10,7 +9,7 @@ import autoprefixer from 'autoprefixer';
 import tailwindConfig from './tailwind.config';
 
 export default defineConfig({
-  plugins: [react(), eslint(), nodePolyfills({ include: ['events'] }),
+  plugins: [react(), nodePolyfills({ include: ['events'] }),
   cssInjectedByJsPlugin({
     injectCode: (cssCode, options) => `try {
       if(typeof document != 'undefined') {

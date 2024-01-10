@@ -1,4 +1,3 @@
-/* eslint-disable spaced-comment */
 import { tv } from 'tailwind-variants';
 
 export const basic = /*tw*/ tv({

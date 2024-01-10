@@ -8,7 +8,8 @@ export const profile = /*tw*/ tv({
     info: '',
     name: '',
     role: '',
-    imgWrapper: ''
+    imgWrapper: '',
+    minimized: ''
   },
   variants: {
     theme: {
@@ -30,6 +31,10 @@ export const profile = /*tw*/ tv({
         base: 'tw--flex-col tw--text-center',
         name: 'tw--text-[24px] tw--font-semibold',
       },
+    },
+    minimized: {
+      true: '',
+      false: '',
     },
   },
   compoundSlots: [
@@ -61,7 +66,8 @@ export const profile = /*tw*/ tv({
       slots: ['imgWrapper'],
       orientation: 'horizontal',
       minimized: false,
-      class: 'tw--relative tw--h-fit after:tw--absolute after:tw--w-[10px] after:tw--h-[10px] after:tw--bottom-[-2px] after:tw--left-[37px] after:tw--z-10 after:tw--rounded-full after:tw--bg-light-iota-dots' },
+      class: 'tw--relative tw--h-fit after:tw--absolute after:tw--w-[10px] after:tw--h-[10px] after:tw--bottom-[-2px] after:tw--left-[37px] after:tw--z-10 after:tw--rounded-full after:tw--bg-light-iota-dots'
+    },
     {
       slots: ['avatar'],
       orientation: 'horizontal',

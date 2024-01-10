@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { intent } from '@/services/intentions';
-import { getEmailIntentions, setEmail, setIsEmailLoading } from '@/store/slices/intentions';
-import { getConfig } from '@/store/slices/config';
-import { useAppDispatch, useAppSelector } from '@/hooks';
-import { Input } from '@/components/Input';
-import { IconBtn } from '@/components/Button';
+import { intent } from '../../services/intentions';
+import { getEmailIntentions, setEmail, setIsEmailLoading } from '../../store/slices/intentions';
+import { getConfig } from '../../store/slices/config';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { Input } from '../Input/basic';
+import { IconBtn } from '../Button';
 import { layoutFoot as variant } from '../Layout/variants';
 
 export const EmailForm = () => {
@@ -12,21 +12,22 @@ export const EmailForm = () => {
   const { themeId: theme, translations } = useAppSelector(getConfig);
   const { isLoading } = useAppSelector(getEmailIntentions);
   const { base, input, button } = variant({ theme });
-  const [email, setCurrentEmail] = useState('');
-  const inputElement = useRef(null);
+  const [email, setCurrentEmail] = useState<string | ''>('');
+  const inputElement = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setTimeout(() => {
-      inputElement.current?.focus();
+      if (!inputElement.current) { return }
+      inputElement.current.focus();
     }, 500);
   }, []);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const currentValue = e.target.value.trim();
     setCurrentEmail(currentValue);
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     if (email === '') {
@@ -41,23 +42,23 @@ export const EmailForm = () => {
 
   return (
     <form
-      className={ base() } onSubmit={ handleFormSubmit }
+      className={base()} onSubmit={handleFormSubmit}
       data-e2e="email-form"
     >
-      <div className={ input() }>
+      <div className={input()}>
         <Input
           e2e="email-input"
-          isLoading={ isLoading }
+          isLoading={isLoading}
           name="email"
-          onChange={ handleInputChange }
-          placeholder={ translations.emailPlaceholder }
+          onChange={handleInputChange}
+          ref={inputElement}
+          placeholder={translations.emailPlaceholder}
           type="email"
-          value={ email }
-          passRef={ inputElement }
+          value={email}
         />
       </div>
-      <div className={ button() }>
-        <IconBtn onClick={ handleFormSubmit } e2e="email-validate-btn">
+      <div className={button()}>
+        <IconBtn onClick={handleFormSubmit} e2e="email-validate-btn">
           <svg
             fill="currentColor" viewBox="0 0 24 24"
             width="20px" height="20px"

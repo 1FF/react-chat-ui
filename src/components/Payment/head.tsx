@@ -1,5 +1,4 @@
-import { object } from 'prop-types';
-import { useAppSelector } from '@/hooks';
+import { useAppSelector } from '../../hooks';
 import { head as variants } from './variants';
 
 export const PaymentHead = ({ config = { price: '', period: '' } }) => {
@@ -32,10 +31,6 @@ export const PaymentHead = ({ config = { price: '', period: '' } }) => {
       </div>
     </header>
   );
-};
-
-PaymentHead.propTypes = {
-  config: object
 };
 
 export default PaymentHead;

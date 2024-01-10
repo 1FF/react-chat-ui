@@ -1,17 +1,21 @@
-import chatbotPurpose from '@/config/purpose';
-import { getChat } from '@/store/slices/chat';
-import { getConfig } from '@/store/slices/config';
-import { getEmailIntentions, getLinkIntentions, getPaymentIntentions, getResponseIntentions } from '@/store/slices/intentions';
-import { getMeta } from '@/store/slices/meta';
+import { RootState, AppDispatch } from '../store/index';
+import chatbotPurpose, { ChatbotOptions } from '../config/purpose';
+import { getChat } from '../store/slices/chat';
+import { getConfig } from '../store/slices/config';
+import { getEmailIntentions, getLinkIntentions, getPaymentIntentions, getResponseIntentions } from '../store/slices/intentions';
+import { getMeta } from '../store/slices/meta';
 import { useLayoutEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 
-// DEV NOTE: We prep the react-redux hooks to be aliased with types when we switch to TS
-export const useAppDispatch = () => useDispatch();
-export const useAppSelector = useSelector;
+export const useAppDispatch: () => AppDispatch = useDispatch
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+
+const getPurpose = (purpose: keyof typeof chatbotPurpose): ChatbotOptions => {
+  return chatbotPurpose[purpose];
+}
 
 export const useWindowSize = () => {
-  const [size, setSize] = useState([0, 0]);
+  const [size, setSize] = useState<number[]>([0, 0]);
   useLayoutEffect(() => {
     function updateSize() {
       setSize([window.innerWidth, window.innerHeight]);
@@ -26,7 +30,7 @@ export const useWindowSize = () => {
 export const useHeadControls = () => {
   const { themeId: theme, closeVisible, purpose } = useAppSelector(getConfig);
   const { cid, systemType, marketing } = useAppSelector(getMeta);
-  const extendedOptions = chatbotPurpose[purpose];
+  const extendedOptions = getPurpose(purpose);
 
   return {
     theme,
@@ -46,7 +50,7 @@ export const useFootControls = () => {
   const { error: streamError } = useAppSelector(store => store.chat);
   const { isFormVisible: isEmailFormVisible, current, error: emailError } = useAppSelector(getEmailIntentions);
   const { isButtonVisible: isPaymentButtonVisible, isFormVisible: isPaymentFormVisible, error: paymentIntentError } = useAppSelector(getPaymentIntentions);
-  const extendedOptions = chatbotPurpose[purpose];
+  const extendedOptions = getPurpose(purpose);
 
   return {
     streamError,

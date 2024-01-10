@@ -1,10 +1,10 @@
-import { useAppDispatch, useHeadControls } from '@/hooks';
+import { MouseEvent } from 'react';
+import { useAppDispatch, useHeadControls } from '../../hooks';
 
-import { Profile } from '@/components/Profile';
-import { IconBtn } from '@/components/Button';
-import { customEvents } from '@/config/analytics';
-import { track } from '@/services/tracking';
-import { setClosed } from '@/store/slices/chat';
+import { Profile } from '../Profile';
+import { IconBtn } from '../Button';
+import { AllEvents, track } from '../../services/tracking';
+import { setClosed } from '../../store/slices/chat';
 import { layoutHead as variant } from './variants';
 
 export const LayoutHead = () => {
@@ -12,10 +12,10 @@ export const LayoutHead = () => {
   const headState = useHeadControls();
   const { base } = variant({ theme: headState.theme });
 
-  const onClick = (e) => {
+  const onClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.currentTarget.disabled = true;
     track({
-      eventType: customEvents.closeClicked,
+      eventType: AllEvents.closeClicked,
       systemType: headState.systemType,
       utmParams: headState.marketing.lastUtmParams,
       customerUuid: headState.cid,
@@ -26,10 +26,10 @@ export const LayoutHead = () => {
   };
 
   return (
-    <div className={ base() } data-e2e="chat-heading">
+    <div className={base()} data-e2e="chat-heading">
       <Profile />
-      { headState.closeVisible && (
-        <IconBtn e2e="chat-close-btn" onClick={ onClick }>
+      {headState.closeVisible && (
+        <IconBtn e2e="chat-close-btn" onClick={onClick}>
           <svg
             height="24px" viewBox="0 0 24 24"
             width="24px"
@@ -49,7 +49,7 @@ export const LayoutHead = () => {
             </g>
           </svg>
         </IconBtn>
-      ) }
+      )}
     </div>
   );
 };
