@@ -2,7 +2,7 @@ import { useAppSelector } from '../../hooks';
 import { getConfig } from '../../store/slices/config';
 import { profile as variant } from './variants';
 
-enum Orientation {
+export enum Orientation {
   horizontal = 'horizontal',
   vertical = 'vertical',
 }

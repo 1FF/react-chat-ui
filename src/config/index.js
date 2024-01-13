@@ -102,12 +102,6 @@ export const paymentData = {
 
 export const streamMock = [
   { type: 'text', text: '', id: '', time: new Date().getTime() },
-  {
-    type: 'buttons',
-    buttons: [{ sequence: 1, value: 'Okay', text: 'option 1' }, { sequence: 2, value: 'Goodbye', text: 'option 2' }],
-    sequence: 1,
-    id: ''
-  },
   { type: 'text', text: 'Hello ', sequence: 6, id: '', time: new Date().getTime() },
   { type: 'text', text: 'My favorite search engine is [Duck Duck Go](https://duckduckgo.com). [Google](https://google.com).', sequence: 2, id: '' },
   // {
@@ -127,6 +121,12 @@ export const streamMock = [
   { type: 'text', text: 'you', sequence: 12, id: '' },
   { type: 'text', text: 'you', sequence: 13, id: '' },
   { type: 'text', text: 'you', sequence: 14, id: '' },
+  {
+    type: 'buttons',
+    buttons: [{ sequence: 1, value: 'Okay', text: 'option 1' }, { sequence: 2, value: 'Goodbye', text: 'option 2' }],
+    sequence: 1,
+    id: ''
+  },
   //  {
   //   type: 'payment',
   //   payment: 'Continue by getting the best plan that suits you with customizing it for:',

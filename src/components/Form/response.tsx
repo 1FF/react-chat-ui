@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { uid } from 'uid';
-import { getChat, setLastGroupPointer, setTypingTimeoutExpired, fillUserHistoryData, getChat, setLastGroupPointer, setTypingTimeoutExpired } from '../../store/slices/chat';
+import { fillUserHistoryData, getChat, setLastGroupPointer, setTypingTimeoutExpired } from '../../store/slices/chat';
 import { getResponseIntentions } from '../../store/slices/intentions';
 import { getConfig } from '../../store/slices/config';
 import { useAppDispatch, useAppSelector } from '../../hooks';

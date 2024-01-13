@@ -1,9 +1,10 @@
+import { MouseEvent } from 'react';
 import { Overlay } from '../Overlay';
-import { PaymentHead, CloseButton, PaymentFooter, PaymentLoader, CloseButtonProps } from '../Payment';
+import { PaymentHead, CloseButton, PaymentFooter, PaymentLoader, } from '../Payment';
 import { useAppSelector } from '../../hooks';
 import { wrapper } from '../Payment/variants';
 
-export const PaymentScene = ({ onClose }: CloseButtonProps) => {
+export const PaymentScene = ({ onClose }: { onClose: (e: MouseEvent<HTMLButtonElement>) => void }) => {
   const { displayPlanPrice, billingFrequencyTmsg } = useAppSelector(state => state.meta.pd);
   const { translations, themeId: theme } = useAppSelector(state => state.config);
   const { base } = wrapper({ theme });

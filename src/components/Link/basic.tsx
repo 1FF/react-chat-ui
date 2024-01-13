@@ -7,7 +7,7 @@ import { basic as variant } from './variants';
 type LinkProps = {
   text: string,
   href: string,
-  onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void,
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void,
 };
 
 export const Link = ({ text, href, onClick }: LinkProps) => {

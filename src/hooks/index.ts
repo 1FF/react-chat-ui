@@ -1,6 +1,5 @@
 import { RootState, AppDispatch } from '../store/index';
 import chatbotPurpose, { ChatbotOptions } from '../config/purpose';
-import { getChat } from '../store/slices/chat';
 import { getConfig } from '../store/slices/config';
 import { getEmailIntentions, getLinkIntentions, getPaymentIntentions, getResponseIntentions } from '../store/slices/intentions';
 import { getMeta } from '../store/slices/meta';
@@ -46,28 +45,30 @@ export const useFootControls = () => {
   const { cid, systemType, marketing } = useAppSelector(getMeta);
   const { translations, purpose } = useAppSelector(getConfig);
   const { isVisible: isCtaVisible, text: ctaText, href: ctaHref } = useAppSelector(getLinkIntentions);
-  const { isLoading } = useAppSelector(getChat);
-  const { error: streamError } = useAppSelector(store => store.chat);
+  const { isStreaming, error: streamError, isLoading } = useAppSelector(store => store.chat);
   const { isFormVisible: isEmailFormVisible, current, error: emailError } = useAppSelector(getEmailIntentions);
   const { isButtonVisible: isPaymentButtonVisible, isFormVisible: isPaymentFormVisible, error: paymentIntentError } = useAppSelector(getPaymentIntentions);
   const extendedOptions = getPurpose(purpose);
+  const error = emailError || paymentIntentError || streamError;
 
   return {
-    streamError,
-    emailError,
-    paymentIntentError,
     cid,
-    systemType,
-    marketing,
-    translations,
-    ctaText,
     ctaHref,
-    isLoading,
+    ctaText,
     current,
+    emailError,
+    error,
+    isCtaVisible: isCtaVisible && extendedOptions.cta,
     isEmailFormVisible: isEmailFormVisible && extendedOptions.email,
-    isResponseFormVisible: isResponseFormVisible && extendedOptions.response,
+    isLoading,
     isPaymentButtonVisible: isPaymentButtonVisible && extendedOptions.payment,
     isPaymentFormVisible: isPaymentFormVisible && extendedOptions.payment,
-    isCtaVisible: isCtaVisible && extendedOptions.cta,
+    isResponseFormVisible: isResponseFormVisible && extendedOptions.response,
+    isStreaming,
+    marketing,
+    paymentIntentError,
+    streamError,
+    systemType,
+    translations,
   };
 };
