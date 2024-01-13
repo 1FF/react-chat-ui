@@ -1,5 +1,5 @@
-import { useAppSelector } from '@/hooks';
-import { getConfig } from '@/store/slices/config';
+import { useAppSelector } from '../../hooks';
+import { getConfig } from '../../store/slices/config';
 import { ellipsis as variant } from './variants';
 
 export const Ellipsis = () => {

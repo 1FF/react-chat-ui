@@ -3,9 +3,10 @@ import { useAppDispatch, useHeadControls } from '../../hooks';
 
 import { Profile } from '../Profile';
 import { IconBtn } from '../Button';
-import { AllEvents, track } from '../../services/tracking';
+import {  track } from '../../services/tracking';
 import { setClosed } from '../../store/slices/chat';
 import { layoutHead as variant } from './variants';
+import { AllEvents } from '../../config/analytics';
 
 export const LayoutHead = () => {
   const dispatch = useAppDispatch();

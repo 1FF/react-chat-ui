@@ -43,7 +43,7 @@ export const formatDateByLocale = (val, locale = undefined, options = dateFormat
  * @param {string} userId - The user ID used for query parameter construction.
  * @example constructLink('here is a link to a diet website https://usa.example.com', '12311231a2', hasQueryParams('https://usa.example.com'));
  * //output: https://usa.example.com/?utm_chat=salesmen-keto-redirect&chatSeen=true&cid=12311231a2
- * @returns {string|boolean} The extracted link with optional query parameters or `false` if no link is found.
+ * @returns {string} The extracted link with optional query parameters or `false` if no link is found.
  */
 export const constructLink = (val) => {
   const hasQueryParams = (url) => {
@@ -71,7 +71,7 @@ export const constructLink = (val) => {
   const link = matches ? matches[0] : '';
 
   if (!link) {
-    return false;
+    return '';
   }
 
   if (hasQueryParams(link)) {

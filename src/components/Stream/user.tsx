@@ -1,28 +1,33 @@
-import { bool, string } from 'prop-types';
-import { useAppSelector, useAppDispatch } from '@/hooks';
-import { getConfig } from '@/store/slices/config';
-import { resendMessage } from '@/store/slices/chat';
-import { IconBtn } from '@/components/Button';
-import { roles } from '@/config';
+import { useAppSelector, useAppDispatch } from '../../hooks';
+import { getConfig } from '../../store/slices/config';
+import { resendMessage } from '../../store/slices/chat';
+import { IconBtn } from '../../components/Button';
+import { roles } from '../../config';
 import { streamBubble as variant } from './variants';
 
-export const User = ({ content, resend, sent }) => {
+export type UserProps = {
+  content: string,
+  sent: boolean,
+  resend: boolean,
+}
+
+export const User = ({ content, resend, sent }: UserProps) => {
   const dispatch = useAppDispatch();
   const { themeId: theme } = useAppSelector(getConfig);
   const { action, separator } = variant({ theme, type: roles.user });
 
-  const onResend = (item) => {
+  const onResend = (item: string) => {
     dispatch(resendMessage(item));
   };
 
   return (
-    <div className={ separator() }>
+    <div className={separator()}>
       <span>
-        { content }
+        {content}
       </span>
-      { (resend && !sent) && (
-        <div className={ action() }>
-          <IconBtn outlined onClick={ () => onResend(content) }>
+      {(resend && !sent) && (
+        <div className={action()}>
+          <IconBtn outlined onClick={() => onResend(content)}>
             <svg
               fill="currentColor" viewBox="0 0 24 24"
               width="20px" height="20px"
@@ -32,15 +37,9 @@ export const User = ({ content, resend, sent }) => {
             </svg>
           </IconBtn>
         </div>
-      ) }
+      )}
     </div>
   );
-};
-
-User.propTypes = {
-  content: string.isRequired,
-  resend: bool.isRequired,
-  sent: bool.isRequired,
 };
 
 export default User;

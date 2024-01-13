@@ -1,9 +1,8 @@
-import { string } from 'prop-types';
-import { useAppSelector } from '@/hooks';
-import { isNonEmptyStr } from '@/utils';
+import { useAppSelector } from '../../hooks';
+import { isNonEmptyStr } from '../../utils';
 
-import { Profile } from '@/components/Profile';
-import { getConfig } from '@/store/slices/config';
+import { Orientation, Profile } from '../../components/Profile';
+import { getConfig } from '../../store/slices/config';
 import { streamHead as variant } from './variants';
 
 export const StreamHead = ({ titleTxt = '' }) => {
@@ -15,13 +14,9 @@ export const StreamHead = ({ titleTxt = '' }) => {
   return (
     <div className={ base() }>
       { hasTitle && <div className={ title() }>{ titleTxt }</div> }
-      <Profile orientation="vertical" />
+      <Profile orientation={Orientation.vertical} />
     </div>
   );
-};
-
-StreamHead.propTypes = {
-  titleTxt: string,
 };
 
 export default StreamHead;

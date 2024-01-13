@@ -9,7 +9,7 @@ const configSlice = createSlice({
   name: 'chat',
   initialState,
   reducers: {
-    setOutgoing(state, { payload }: PayloadAction<string>) {
+    setOutgoing(state, { payload}: PayloadAction<string>) {
       state.outgoing = {
         term: getQueryParam(window.location.search, 'utm_chat'),
         user_id: localStorage.getItem('__cid'),
