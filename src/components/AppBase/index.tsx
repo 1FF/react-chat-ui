@@ -5,20 +5,9 @@ import { setMeta } from '../../store/slices/meta';
 
 import { LayoutBase, LayoutHead, LayoutFoot } from '../Layout';
 import { StreamBase } from '../Stream';
+import { ConfigState, MetaState } from '../../interfaces/index';
 
-
-//TODO: define each prop into an interface or type(if we dont want to extend the interface additionally)
-interface AppConfig {
-  app: object;
-  meta: object;
-  theme: object;
-}
-
-interface AppBaseProps {
-  config: AppConfig;
-}
-
-export const AppBase: React.FC<AppBaseProps> = ({ config }) => {
+export const AppBase = ({ config }: { config: { app: ConfigState, meta: MetaState } }) => {
   const dispatch = useAppDispatch();
 
   // Set defaults

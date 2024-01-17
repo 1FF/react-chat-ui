@@ -48,7 +48,7 @@ export default defineConfig({
       external: [
         'react', 'react-dom', 'react-redux',
         'redux-persist', 'socket.io-client', '@reduxjs/toolkit',
-        'prop-types', 'events'
+        'prop-types', 'events', 'react-markdown'
       ],
     },
     sourcemap: true,
