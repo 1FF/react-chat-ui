@@ -1,7 +1,7 @@
 import { uid } from 'uid';
 import produce from 'immer';
 import { createSlice, PayloadAction, Draft } from '@reduxjs/toolkit';
-import { ChatState, UserHistoryData, AssistantHistoryData, MessageType, PredefinedMessagePayload } from '../../interfaces';
+import { ChatState, UserHistoryData, AssistantHistoryData, MessageType, PredefinedMessagePayload, TextMessage } from '../../interfaces';
 import { chat as initialState } from '../initialState'
 import { getQueryParam } from '../../utils';
 import { initialStructure, roles, typeReducer } from '../../config';
@@ -60,8 +60,7 @@ const configSlice = createSlice({
           draft.historyData[payload.id].push(data);
           const reducedText = draft.historyData[payload.id]
             .filter((obj) => obj.type === payload.type)
-            .reduce(typeReducer[payload.type], initialStructure[payload.type]);
-
+            .reduce(typeReducer[payload.type], initialStructure[payload.type] as MessageType);
           draft.historyData[payload.id] = [...draft.historyData[payload.id].filter(it => it.type !== payload.type), reducedText];
           draft.historyData[payload.id].sort((a, b) => a.sequence - b.sequence);
         }

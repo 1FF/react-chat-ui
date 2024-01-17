@@ -14,7 +14,7 @@ export interface BaseMessage {
   groupId?: string;
 }
 
-interface TextMessage extends BaseMessage {
+export interface TextMessage extends BaseMessage {
   type: 'text';
   text: string;
 }
@@ -80,6 +80,55 @@ export interface ChatState {
   isStreaming: boolean,
 }
 
+export interface ConfigState {
+  aiProfile: {
+    name: string,
+    role: string,
+    imgSrc: string,
+    welcome: string,
+    // initialMessage: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you. [yes|no|continue]',
+    initialMessage: MessageType[]
+  },
+  purpose: string,
+  chatUrl: string,
+  themeId: 'light' | 'dark',
+  translations: any,
+  closeVisible: boolean,
+  enableDevTools: boolean,
+  isPluginMode: boolean,
+}
+
+export interface MetaState { systemType: string, eid: string, cid: string, region: string, marketing: any, pd: any }
+
+export interface IntentionsState {
+  email: {
+    current: string,
+    success: boolean,
+    error: boolean,
+    isFormVisible: boolean,
+    isLoading: boolean,
+  },
+  response: {
+    value: string,
+    isFormVisible: boolean,
+    isLoading: boolean,
+    error: boolean,
+  },
+  payment: {
+    isButtonVisible: boolean,
+    isFormVisible: boolean,
+    isSuccessful: boolean,
+    error: boolean
+  },
+  messaging: {
+    isVisible: boolean
+  },
+  link: {
+    isVisible: boolean,
+    href: string,
+    text: string
+  }
+}
 export interface UserHistoryData {
   id: string;
   role: roles.user;

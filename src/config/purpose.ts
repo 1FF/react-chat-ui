@@ -14,10 +14,8 @@ const defaultOptions: ChatbotOptions = {
   email: true,
 };
 
-interface ChatbotPurpose {
-  [key: string]: object;
-}
-
-export default {
+const chatbotPurpose: Record<string, ChatbotOptions> = {
   default: defaultOptions,
 };
+
+export default chatbotPurpose;

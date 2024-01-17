@@ -26,6 +26,7 @@ export const streamHead = /*tw*/ tv({
   variants: {
     theme: {
       light: { title: 'tw--font-medium' },
+      dark: { title: '' },
     }
   }
 });

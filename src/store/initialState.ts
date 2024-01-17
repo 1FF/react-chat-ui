@@ -1,29 +1,31 @@
 import { uid } from 'uid';
 import { roles } from '../config';
-import { ChatState } from '../interfaces';
+import { ChatState, ConfigState, IntentionsState, MetaState } from '../interfaces';
 
-export const meta = {
-  pd: null,
-  cid: null,
-  eid: null,
-  region: null,
-  systemType: null,
+export const meta: MetaState = {
+  pd: '',
+  cid: '',
+  eid: '',
+  region: '',
+  systemType: '',
   marketing: {},
 };
 
-export const config = {
+export const config: ConfigState = {
   aiProfile: {
-    name: null,
-    role: null,
-    imgSrc: null,
-    initialMessage: '',
+    name: '',
+    role: '',
+    imgSrc: '',
+    welcome: '',
+    initialMessage: [],
   },
   translations: {},
-  themeId: null,
-  chatUrl: null,
+  themeId: 'light',
+  chatUrl: '',
   enableDevTools: false,
   isPluginMode: false,
-  purpose: 'default'
+  purpose: 'default',
+  closeVisible: false,
 };
 
 export const chat: ChatState = {
@@ -46,7 +48,7 @@ export const chat: ChatState = {
   isStreaming: false,
 };
 
-export const intentions = {
+export const intentions: IntentionsState = {
   email: {
     current: '',
     success: false,
@@ -71,7 +73,7 @@ export const intentions = {
   },
   link: {
     isVisible: false,
-    href: null,
+    href: '',
     text: ''
   }
 };
