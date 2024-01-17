@@ -9,7 +9,7 @@ import { streamBase, streamRow } from './variants';
 export const StreamBase = () => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { aiProfile } = useAppSelector(getConfig);
-  const historyIds = useAppSelector(state => state.chat.historyIds);
+  const historyIds = useAppSelector(state => state.chat.historyIds || []);
   const historyData = useAppSelector(state => state.chat.historyData);
   const { base, second, date } = streamBase({ theme });
   const { base: baseRow } = streamRow({ theme });

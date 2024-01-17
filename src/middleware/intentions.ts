@@ -1,15 +1,24 @@
-import { customEvents } from '@/config/analytics';
-import { track } from '@/services/tracking';
-import intent from '@/services/intentions';
-import { setIsEmailLoading, setEmailSuccess, setIsEmailFormVisible, setEmailError, setLink } from '@/store/slices/intentions';
-import { setPd, setMarketing } from '@/store/slices/meta';
-import { addPredefinedAssistantMessage, fillUserHistoryData, setOutgoing } from '@/store/slices/chat';
-import { STORING_CHECKER_INTERVAL } from '@/config/env';
+import { Middleware } from '@reduxjs/toolkit';
+import { AllEvents } from '../config/analytics';
+import { track } from '../services/tracking';
+import intent from '../services/intentions';
+import { setIsEmailLoading, setEmailSuccess, setIsEmailFormVisible, setEmailError, setLink } from '../store/slices/intentions';
+import { setPd, setMarketing } from '../store/slices/meta';
+import { addPredefinedAssistantMessage, fillUserHistoryData, setOutgoing } from '../store/slices/chat';
+import { STORING_CHECKER_INTERVAL } from '../config/env';
+import { PredefinedMessagePayload } from '../interfaces/index';
+import { RootState, AppDispatch } from '../store';
 
-export const intentionsMiddleware = store => next => {
-  const setPaymentDataTranslationAccordingly = (data) => {
+type PaymentDataSetterProps = {
+  billingFrequencyTmsg: string, billingOptionType: 'one-time' | 'subscription', frequencyInMonths: string
+}
+type setPaymentDataTranslationAccordingly = (data: PaymentDataSetterProps) => PaymentDataSetterProps;
+
+export const intentionsMiddleware: Middleware = store => next => {
+
+  const setPaymentDataTranslationAccordingly: setPaymentDataTranslationAccordingly = (data) => {
     const { meta } = store.getState();
-    if (!meta.pd) return;
+    if (!meta.pd) return {} as PaymentDataSetterProps;
     data.billingFrequencyTmsg = data.billingOptionType === 'one-time'
       ? meta.pd.oneTimer
       : meta.pd.subscriberBillingFrequency.replace('{1}', data.frequencyInMonths);
@@ -29,7 +38,7 @@ export const intentionsMiddleware = store => next => {
     store.dispatch(setEmailSuccess(true));
     store.dispatch(setIsEmailFormVisible(false));
     track({
-      eventType: customEvents.emailEntered,
+      eventType: AllEvents.emailEntered,
       systemType: meta.systemType,
       utmParams: meta.marketing.lastUtmParams,
       customerUuid: meta.cid,
@@ -47,13 +56,13 @@ export const intentionsMiddleware = store => next => {
       store.dispatch(addPredefinedAssistantMessage({
         content: tm716,
         buttons: [
-          { id: 'opt-1', text: tm526, value: 'link', link: response.data.buttonLink },
-          { id: 'opt-2', text: tm715, value: 'button', noStream: true }
+          { sequence: 1, id: 'opt-1', text: tm526, value: 'link', link: response.data.buttonLink, noStream: true },
+          { sequence: 2, id: 'opt-2', text: tm715, value: 'button', link: '', noStream: true }
         ]
-      }));
+      } as PredefinedMessagePayload));
 
       track({
-        eventType: customEvents.emailExist,
+        eventType: AllEvents.emailExist,
         systemType: meta.systemType,
         utmParams: meta.marketing.lastUtmParams,
         customerUuid: meta.cid,
@@ -69,7 +78,7 @@ export const intentionsMiddleware = store => next => {
       store.dispatch(setEmailError(response.errors.email[0] || tm505));
 
       track({
-        eventType: customEvents.emailWrong,
+        eventType: AllEvents.emailWrong,
         systemType: meta.systemType,
         utmParams: meta.marketing.lastUtmParams,
         customerUuid: meta.cid,
@@ -86,7 +95,7 @@ export const intentionsMiddleware = store => next => {
       const { meta, intentions } = store.getState();
 
       track({
-        eventType: customEvents.linkProvided,
+        eventType: AllEvents.linkProvided,
         systemType: meta.systemType,
         utmParams: meta.marketing.lastUtmParams,
         customerUuid: meta.cid,
@@ -97,21 +106,24 @@ export const intentionsMiddleware = store => next => {
   };
 };
 
-const dataIntervalChecker = (key, store, setValue, transformData = null) => {
+const dataIntervalChecker = (
+  key: string, store: RootState, setValue: (data: any) => void, transformData?: setPaymentDataTranslationAccordingly
+) => {
   const intervalId = setInterval(() => {
-    let storedItem = localStorage.getItem(key);
+    let storedItem: string | PaymentDataSetterProps = localStorage.getItem(key) || '';
 
     try {
       storedItem = JSON.parse(storedItem);
     } catch (e) {
-      storedItem = localStorage.getItem(key);
+      storedItem = localStorage.getItem(key) || '';
+    }
+
+
+    if (transformData && storedItem) {
+      storedItem = transformData(storedItem as PaymentDataSetterProps);
     }
 
     if (transformData && storedItem) {
-      storedItem = transformData(storedItem);
-    }
-
-    if (storedItem) {
       store.dispatch(setValue(storedItem));
       clearInterval(intervalId);
     }

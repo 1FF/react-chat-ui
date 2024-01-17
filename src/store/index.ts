@@ -1,14 +1,10 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-
-// @ts-ignore
 import chatMiddleware from '../middleware/socket';
 import chatReducer from './slices/chat';
 import configReducer from './slices/config';
 import disableReactDevTools from './../utils/reactDevTools';
-
-// @ts-ignore
 import intentionsMiddleware from '../middleware/intentions';
 import intentionsReducer from './slices/intentions';
 import metaReducer from './slices/meta';

@@ -1,4 +1,6 @@
 import { uid } from 'uid';
+import { roles } from '../config';
+import { ChatState } from '../interfaces';
 
 export const meta = {
   pd: null,
@@ -24,13 +26,18 @@ export const config = {
   purpose: 'default'
 };
 
-export const chat = {
-  outgoing: null,
+export const chat: ChatState = {
+  outgoing: {
+    term: '',
+    user_id: '',
+    role: roles.user,
+    message: ''
+  },
   queue: [],
   history: [],
   historyData: {},
   historyIds: [],
-  error: null,
+  error: '',
   isLoading: false,
   typingTimeoutExpired: false,
   lastGroupId: uid(),

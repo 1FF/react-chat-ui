@@ -17,6 +17,7 @@ export const User = ({ content, resend, sent }: UserProps) => {
   const { action, separator } = variant({ theme, type: roles.user });
 
   const onResend = (item: string) => {
+    // TODO must include some type of id when trying to resend; not only the string
     dispatch(resendMessage(item));
   };
 
