@@ -8,62 +8,7 @@ import { getMeta } from '../../store/slices/meta';
 import { flickerEffect } from './variants';
 import OptionList from './options';
 import MarkdownLink from '../Markdown/link';
-
-interface TextMessage {
-  type: 'text';
-  text: string;
-  sequence: number;
-  id: string;
-}
-
-export interface ButtonOptions {
-  sequence: number; value: string; text: string; id: string; link: string; noStream: boolean;
-}
-
-interface ButtonsMessage {
-  type: 'buttons';
-  buttons: ButtonOptions[];
-  sequence: number;
-  id: string;
-}
-
-interface PaymentMessage {
-  type: 'payment';
-  payment: string;
-  sequence: number;
-  id: string;
-}
-
-interface EmailMessage {
-  type: 'email';
-  email: string;
-  sequence: number;
-  id: string;
-}
-
-interface VideoMessage {
-  type: 'video';
-  video: {
-    url: string, title: string | null
-  };
-  sequence: number;
-  id: string;
-  title: string;
-}
-
-interface ImageMessage {
-  type: 'image';
-  image: { url: string, alt: string | null };
-  sequence: number;
-  id: string;
-}
-
-type MessageType = TextMessage | ButtonsMessage | PaymentMessage | EmailMessage | VideoMessage | ImageMessage;
-
-type AssistantProps = {
-  message: Array<MessageType>;
-  isLast?: boolean;
-}
+import { AssistantProps } from '../../interfaces';
 
 export const Assistant = ({ message = [], isLast = false }: AssistantProps) => {
   const { themeId: theme } = useAppSelector(getConfig);

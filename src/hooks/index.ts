@@ -6,8 +6,9 @@ import { getMeta } from '../store/slices/meta';
 import { useLayoutEffect, useState } from 'react';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 
-export const useAppDispatch: () => AppDispatch = useDispatch
-export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+type DispatchFunc = () => AppDispatch;
+export const useAppDispatch: DispatchFunc = useDispatch;
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 const getPurpose = (purpose: keyof typeof chatbotPurpose): ChatbotOptions => {
   return chatbotPurpose[purpose];

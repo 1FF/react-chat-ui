@@ -6,8 +6,8 @@ import { useAppDispatch, useAppSelector } from '../../hooks';
 import { track } from '../../services/tracking';
 import { fillUserHistoryData, setOutgoing } from '../../store/slices/chat';
 import { getMeta } from '../../store/slices/meta';
-import { ButtonOptions } from './assistant';
 import { AllEvents } from '../../config/analytics';
+import { ButtonOptions } from '../../interfaces/index';
 
 export interface BaseOptions extends ButtonOptions {
   id: string, link: string, noStream: boolean

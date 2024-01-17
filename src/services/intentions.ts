@@ -1,6 +1,6 @@
 import { EventEmitter } from 'node:events';
 
-import { intentions } from '@/config';
+import { intentions } from '../config';
 
 export const intent = {
   type: intentions,
