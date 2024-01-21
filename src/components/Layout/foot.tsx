@@ -9,7 +9,7 @@ import { PaymentScene } from '../../components/Scenes/payment';
 import { track } from '../../services/tracking';
 import { Ellipsis } from '../../components/Stream/ellipsis';
 import { LINK_CLICKED_KEY } from '../../config/env';
-import { AllEvents } from '../../config/analytics';
+import { AllEvents } from '../../config/enums';
 
 export const LayoutFoot = () => {
   const dispatch = useAppDispatch();

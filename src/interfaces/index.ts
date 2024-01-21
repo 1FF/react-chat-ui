@@ -1,60 +1,77 @@
-import roles from '../config/roles';
+import { Definition, Roles, Theme } from '../config/enums';
 
-export interface BaseMessage {
-  sequence: number;
-  id: string;
-  role: roles.user | roles.assistant;
-  // TODO rethink why we use content currently is for user messages that are set upon input or else
-  content?: {
-    type: string;
-    image: string;
-    sequence: string;
-    id: string;
-  };
-  groupId?: string;
-}
-
-export interface TextMessage extends BaseMessage {
-  type: 'text';
+export interface TextMessage {
+  type: Definition.text;
   text: string;
 }
 
-export interface ButtonOptions {
-  sequence: number; value: string; text: string; id: string; link: string; noStream: boolean;
+export interface ButtonsMessage {
+  type: Definition.buttons;
+  buttons: Array<ButtonOptions>;
 }
 
-export interface ButtonsMessage extends BaseMessage {
-  type: 'buttons';
-  buttons: ButtonOptions[];
-}
-
-export interface PaymentMessage extends BaseMessage {
-  type: 'payment';
+export interface PaymentMessage {
+  type: Definition.payment;
   payment: string;
 }
 
-export interface EmailMessage extends BaseMessage {
-  type: 'email';
+export interface EmailMessage {
+  type: Definition.email;
   email: string;
 }
 
-export interface VideoMessage extends BaseMessage {
-  type: 'video';
+export interface VideoMessage {
+  type: Definition.video;
   video: {
-    url: string, title: string | null
+    url: string;
+    title: string | null;
   };
-  title: string;
 }
 
-export interface ImageMessage extends BaseMessage {
-  type: 'image';
-  image: { url: string, alt: string | null };
+export interface ImageMessage {
+  type: Definition.image;
+  image: {
+    url: string;
+    alt: string | null;
+  };
 }
 
-export type MessageType = TextMessage | ButtonsMessage | PaymentMessage | EmailMessage | VideoMessage | ImageMessage;
+export interface ButtonOptions {
+  sequence: number;
+  value: string;
+  text: string;
+  id: string;
+  link: string;
+  noStream: boolean;
+}
+
+export interface BaseOptions extends ButtonOptions {
+  id: string, link: string, noStream: boolean
+}
+
+export interface OptionsListProps {
+  options: Array<BaseOptions>
+}
+
+export type AssistantMessageTypeUnion = TextMessage | ButtonsMessage | EmailMessage | VideoMessage | ImageMessage | PaymentMessage;
+
+export interface AssistantHistoryData {
+  id: string;
+  role: Roles.assistant;
+  content: Array<AssistantMessageTypeUnion>
+}
+
+export type SupportedMessageTypes = Definition.text | Definition.buttons | Definition.payment | Definition.email | Definition.video | Definition.image;
+
+export type StreamData = {
+  id: string
+  role: Roles.user | Roles.assistant,
+  type: SupportedMessageTypes,
+  sequence?: number
+}
 
 export interface AssistantProps {
-  message: Array<MessageType>;
+  message: { content: Array<AssistantMessageTypeUnion> };
   isLast?: boolean;
 }
 
@@ -62,14 +79,14 @@ export interface ChatState {
   outgoing: {
     term: string,
     user_id: string,
-    role: roles.user,
+    role: Roles.user,
     message: string,
   },
   //TODO: define those below
   queue: any[],
   history: any[],
-  historyData: Record<string, Array<MessageType>>;
-  historyIds: string[],
+  historyData: Record<string, AssistantHistoryData | UserHistoryData>;
+  historyIds: Array<string>,
 
   error: string,
   isLoading: boolean,
@@ -87,11 +104,11 @@ export interface ConfigState {
     imgSrc: string,
     welcome: string,
     // initialMessage: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you. [yes|no|continue]',
-    initialMessage: MessageType[]
+    initialMessage: Array<AssistantMessageTypeUnion>
   },
   purpose: string,
   chatUrl: string,
-  themeId: 'light' | 'dark',
+  themeId: Theme.light | Theme.dark,
   translations: any,
   closeVisible: boolean,
   enableDevTools: boolean,
@@ -129,26 +146,46 @@ export interface IntentionsState {
     text: string
   }
 }
-export interface UserHistoryData {
-  id: string;
-  role: roles.user;
-  // TODO define user history data item
-  content: Array<MessageType>;
-  groupId: string;
-  resend: boolean;
-  sent: boolean;
-}
-
-export interface AssistantHistoryData {
-  id: string;
-  role: roles.assistant;
-  // TODO: define all possible types
-  type: string;
-  content: Array<MessageType>;
-}
-
 
 export type PredefinedMessagePayload = {
   content: string,
-  buttons?: ButtonOptions[],
+  buttons?: Array<ButtonOptions>,
 }
+
+export type UserMessageContent = {
+  groupId: string, sent: boolean, resend: boolean, message: string
+}
+
+export interface UserHistoryData {
+  id: string;
+  role: Roles.user;
+  content: Array<UserMessageContent>
+}
+
+export interface UserHistoryDataFiller {
+  id: string;
+  role: Roles.user;
+  content: UserMessageContent
+}
+
+
+export interface AssistantHistoryDataFiller {
+  id: string;
+  content: AssistantMessageTypeUnion;
+}
+
+
+export interface ClientMessage {
+  role: Roles.assistant | Roles.user;
+  term: string;
+  user_id: string;
+  message: string;
+  messageId: string;
+  region: string;
+}
+
+export interface PaymentDataSetterProps {
+  billingFrequencyTmsg: string, billingOptionType: 'one-time' | 'subscription', frequencyInMonths: string
+}
+
+export type PaymentDataSetter = (data: PaymentDataSetterProps) => PaymentDataSetterProps;

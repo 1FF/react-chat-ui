@@ -1,4 +1,4 @@
-import { AllEvents } from '../config/analytics';
+import { AllEvents } from '../config/enums';
 
 type trackingData = {
   eventType: AllEvents | string, systemType: string, utmParams: object, customerUuid: string, email?: string, phone?: string

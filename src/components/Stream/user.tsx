@@ -2,19 +2,19 @@ import { useAppSelector, useAppDispatch } from '../../hooks';
 import { getConfig } from '../../store/slices/config';
 import { resendMessage } from '../../store/slices/chat';
 import { IconBtn } from '../../components/Button';
-import { roles } from '../../config';
+import { Roles } from '../../config/enums';
 import { streamBubble as variant } from './variants';
 
 export type UserProps = {
-  content: string,
+  message: string,
   sent: boolean,
   resend: boolean,
 }
 
-export const User = ({ content, resend, sent }: UserProps) => {
+export const User = ({ message, resend, sent }: UserProps) => {
   const dispatch = useAppDispatch();
   const { themeId: theme } = useAppSelector(getConfig);
-  const { action, separator } = variant({ theme, type: roles.user });
+  const { action, separator } = variant({ theme, type: Roles.user });
 
   const onResend = (item: string) => {
     // TODO must include some type of id when trying to resend; not only the string
@@ -24,11 +24,11 @@ export const User = ({ content, resend, sent }: UserProps) => {
   return (
     <div className={separator()}>
       <span>
-        {content}
+        {message}
       </span>
       {(resend && !sent) && (
         <div className={action()}>
-          <IconBtn outlined onClick={() => onResend(content)}>
+          <IconBtn outlined onClick={() => onResend(message)}>
             <svg
               fill="currentColor" viewBox="0 0 24 24"
               width="20px" height="20px"

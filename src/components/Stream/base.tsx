@@ -13,7 +13,7 @@ export const StreamBase = () => {
   const historyData = useAppSelector(state => state.chat.historyData);
   const { base, second, date } = streamBase({ theme });
   const { base: baseRow } = streamRow({ theme });
-  const time = historyIds.length > 0 && (historyData[historyIds[0]][0].time || new Date().getTime());
+  const time = historyIds.length > 0 && (historyData[historyIds[0]].time || new Date().getTime());
 
   return (
     <div className={base()}>

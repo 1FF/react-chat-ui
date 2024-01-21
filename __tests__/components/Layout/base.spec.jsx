@@ -1,7 +1,8 @@
 /* eslint-env jest */
-import { render, waitFor } from '@testing-library/react';
-import { LayoutBase } from '@/components/Layout';
-import renderWithProviders from '@/utils/storeMockWrapper';
+import { waitFor } from '@testing-library/react';
+
+import { LayoutBase } from '../../../src/components/Layout';
+import renderWithProviders from '../../../src/utils/storeMockWrapper';
 
 const original = console.error;
 

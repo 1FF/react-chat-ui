@@ -1,16 +1,17 @@
 /* eslint-env jest */
 import { act } from 'react-dom/test-utils';
 import { serverSocket, cleanup, io } from 'socket.io-client';
-import AppBase from '@/components/AppBase';
-import { events, serverHistoryMock, serverHistoryMockWithEmailIntent, serverHistoryMockWithLink, serverHistoryMockWithPaymentIntent, streamMocks } from '@/config';
-import { formatDateByLocale } from '@/utils';
-import renderWithProviders from '@/utils/storeMockWrapper';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
-import { LINK_CLICKED_KEY, STORING_CHECKER_INTERVAL } from '@/config/env';
-import { intent } from '@/main';
-import initialState from '@/store/initialState';
-import { initialConfig } from '@/chatMocks';
 import { faker } from '@faker-js/faker';
+
+import AppBase from '../../../src/components/AppBase/index';
+import { Events, events, serverHistoryMock, serverHistoryMockWithEmailIntent, serverHistoryMockWithLink, serverHistoryMockWithPaymentIntent, streamMocks } from '../../../src/config';
+import { formatDateByLocale } from '../../../src/utils';
+import renderWithProviders from '../../../src/utils/storeMockWrapper';
+import { LINK_CLICKED_KEY, STORING_CHECKER_INTERVAL } from '../../../src/config/env';
+import { intent } from '../../../src/main';
+import initialState from '../../../src/store/initialState';
+import { initialConfig } from '../../../src/chatMocks';
 
 const actualWindow = window.location;
 
@@ -258,14 +259,14 @@ describe('Close button closes chat', () => {
 
 function mockServerHistoryEmit(history = serverHistoryMock) {
   serverSocket.emit('connect');
-  serverSocket.emit(events.chatHistory, { history, errors: [], region });
+  serverSocket.emit(Events.chatHistory, { history, errors: [], region });
 }
 
 function dispatchStreaming(chunks) {
   serverSocket.emit('connect');
-  serverSocket.emit(events.streamStart, chunks[0]);
-  chunks.slice(1, -1).forEach(chunk => serverSocket.emit(events.streamData, chunk));
-  serverSocket.emit(events.streamEnd, [...chunks].pop());
+  serverSocket.emit(Events.streamStart, chunks[0]);
+  chunks.slice(1, -1).forEach(chunk => serverSocket.emit(Events.streamData, chunk));
+  serverSocket.emit(Events.streamEnd, [...chunks].pop());
 }
 
 async function localSetup() {

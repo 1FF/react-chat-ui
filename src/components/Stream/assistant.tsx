@@ -1,7 +1,6 @@
 import Markdown from 'react-markdown';
 import { uid } from 'uid';
 import { useAppSelector } from '../../hooks';
-import { isNonEmptyArr } from '../../utils';
 import { getConfig } from '../../store/slices/config';
 import { getChat } from '../../store/slices/chat';
 import { getMeta } from '../../store/slices/meta';
@@ -9,8 +8,9 @@ import { flickerEffect } from './variants';
 import OptionList from './options';
 import MarkdownLink from '../Markdown/link';
 import { AssistantProps } from '../../interfaces';
+import { Definition } from '../../config/enums';
 
-export const Assistant = ({ message = [], isLast = false }: AssistantProps) => {
+export const Assistant = ({ message, isLast = false }: AssistantProps) => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { isStreaming } = useAppSelector(getChat);
   const { pd } = useAppSelector(getMeta);
@@ -18,8 +18,8 @@ export const Assistant = ({ message = [], isLast = false }: AssistantProps) => {
 
   return (
     <>
-      {message.map(it => {
-        if (it.type === 'text') {
+      {message.content.map(it => {
+        if (it.type === Definition.text) {
           return (
             <div
               key={uid()}
@@ -39,7 +39,7 @@ export const Assistant = ({ message = [], isLast = false }: AssistantProps) => {
           );
         }
 
-        if (it.type === 'buttons' && isNonEmptyArr(it.buttons) && isLast) {
+        if (it.type === Definition.buttons && isLast) {
           return (
             <div key={uid()} className="tw--flex tw--flex-col tw--space-y-[10px]">
               <OptionList options={it[it.type]} />
@@ -47,7 +47,7 @@ export const Assistant = ({ message = [], isLast = false }: AssistantProps) => {
           );
         }
 
-        if (it.type === 'video') {
+        if (it.type === Definition.video) {
           return (
             <iframe
               className="w-full tw--h-80 tw--py-4" key={uid()}
@@ -57,7 +57,7 @@ export const Assistant = ({ message = [], isLast = false }: AssistantProps) => {
           );
         }
 
-        if (it.type === 'image') {
+        if (it.type === Definition.image) {
           return (
             <img
               key={uid()}
@@ -68,9 +68,9 @@ export const Assistant = ({ message = [], isLast = false }: AssistantProps) => {
           );
         }
 
-        if (it.type === 'payment') return it[it.type] + ' ' + pd.displayPlanPrice + ' ' + pd.billingFrequencyTmsg;
+        if (it.type === Definition.payment) return it[it.type] + ' ' + pd.displayPlanPrice + ' ' + pd.billingFrequencyTmsg;
 
-        if (it.type === 'email') return it[it.type];
+        if (it.type === Definition.email) return it[it.type];
       })}
     </>
   );

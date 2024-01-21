@@ -1,7 +1,8 @@
 /* eslint-env jest */
 import { waitFor } from '@testing-library/react';
-import { LayoutFoot } from '@/components/Layout';
-import renderWithProviders from '@/utils/storeMockWrapper';
+
+import { LayoutFoot } from '../../../src/components/Layout';
+import renderWithProviders from '../../../src/utils/storeMockWrapper';
 
 describe('LayoutFoot Component', () => {
   let root;

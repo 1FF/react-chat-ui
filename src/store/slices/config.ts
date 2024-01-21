@@ -1,11 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { config as initialState } from '../../store/initialState';
 import { ConfigState } from '../../interfaces/index';
+import { Theme } from '../../config/enums';
 
 type ConfigProps = {
   aiProfile: {};
   translations: {};
-  themeId: 'light' | 'dark';
+  themeId: Theme.light | Theme.dark;
   chatUrl: string;
   closeVisible: boolean;
   purpose: string;

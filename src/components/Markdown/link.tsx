@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { constructLink } from '../../utils/formatting';
+import formatting from '../../utils/formatting';
 import { LINK_CLICKED_KEY } from '../../config/env';
 import { track } from '../../services/tracking';
 import { setClosed } from '../../store/slices/chat';
 import { getMeta } from '../../store/slices/meta';
 import { setLink } from '../../store/slices/intentions';
 import { getConfig } from '../../store/slices/config';
-import { AllEvents } from '../../config/analytics';
+import { AllEvents } from '../../config/enums';
 
 export type MarkdownProperties = {
   href?: string | undefined,
@@ -21,7 +21,7 @@ export const MarkdownLink = ({ properties }: MarkdownLinkProps) => {
   const { translations } = useAppSelector(getConfig);
   const { cid, marketing, systemType } = useAppSelector(getMeta);
   const dispatch = useAppDispatch();
-  const link = properties.href ? constructLink(properties.href) : '#';
+  const link = properties.href ? formatting.constructLink(properties.href) : '#';
   useEffect(() => {
     dispatch(setLink({
       isVisible: true,

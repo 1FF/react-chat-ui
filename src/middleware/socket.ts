@@ -1,7 +1,6 @@
 import { Middleware } from '@reduxjs/toolkit';
 import { Socket, io } from 'socket.io-client';
-import { uid } from 'uid';
-import { config as socketConfig, events, roles, streamMock, serverHistoryMock } from '../config';
+import { config as socketConfig, Events } from '../config';
 import {
   setExistingHistory, setIsLoading,
   setTypingTimeoutExpired, setError,
@@ -18,18 +17,8 @@ import { setConfig } from '../store/slices/config';
 import { track } from '../services/tracking';
 import { setRegion } from '../store/slices/meta';
 import { CHAT_FINISHED_TIMESTAMP } from '../config/env';
-import { AllEvents } from '../config/analytics';
-import { AssistantHistoryData, BaseMessage, MessageType, UserHistoryData } from '../interfaces'
-
-interface ClientMessage {
-  role: roles.assistant | roles.user;
-  term: string;
-  user_id: string;
-  message: string;
-  messageId: string;
-  region: string;
-}
-
+import { Definition, Roles, AllEvents } from '../config/enums';
+import { AssistantHistoryData, StreamData, UserHistoryData, UserMessageContent, ClientMessage, AssistantMessageTypeUnion } from '../interfaces'
 
 let socket: Socket;
 
@@ -48,12 +37,12 @@ const chatMiddleware: Middleware = store => next => action => {
   };
 
   const handleMessageSending = (data: ClientMessage): void => {
-    if (data.role === roles.user) {
+    if (data.role === Roles.user) {
       store.dispatch(setIsLoading());
     }
 
     if (socket && socket.connected && data.message.trim() !== '') {
-      socket.volatile.emit(events.chat, { time: new Date().getTime(), ...data }, withTimeout(dispatchRetry));
+      socket.volatile.emit(Events.chat, { time: new Date().getTime(), ...data }, withTimeout(dispatchRetry));
       store.dispatch(resetError());
       return;
     }
@@ -78,9 +67,9 @@ const chatMiddleware: Middleware = store => next => action => {
 
     if (socket && socket.connected && message.trim() !== '') {
       socket.volatile.emit(
-        events.chat,
+        Events.chat,
         {
-          role: roles.user,
+          role: Roles.user,
           message,
           term: getQueryParam(window.location.search, 'utm_chat'),
           user_id: meta.cid,
@@ -96,7 +85,7 @@ const chatMiddleware: Middleware = store => next => action => {
 
   if (setOutgoing.match(action)) {
     handleMessageSending({
-      role: roles.user,
+      role: Roles.user,
       message: action.payload,
       term: getQueryParam(window.location.search, 'utm_chat') ?? '',
       user_id: meta.cid,
@@ -120,11 +109,11 @@ const chatMiddleware: Middleware = store => next => action => {
 
   if (setTypingTimeoutExpired.match(action) && action.payload) {
     const messageId = [...chat.historyIds].pop();
-    const lastMessage = chat.historyData[messageId].map(({ content }: BaseMessage) => content).join('\n');
+    const lastMessage = chat.historyData[messageId].content.map(({ message }: { message: UserMessageContent }) => message).join('\n');
 
     if (lastMessage.trim() !== '') {
       handleMessageSending({
-        role: roles.user,
+        role: Roles.user,
         message: lastMessage,
         term: getQueryParam(window.location.search, 'utm_chat') || '',
         user_id: meta.cid,
@@ -168,17 +157,18 @@ const chatMiddleware: Middleware = store => next => action => {
 
   store.dispatch(setIsLoading());
 
-  //@ts-ignore
+  // @ts-ignore;
   socket = io.connect(action.payload.chatUrl, { query: 'cid=' + meta.cid, ...socketConfig });
 
-  socket.on(events.connect, () => {
+  socket.on(Events.connect, () => {
     const { meta } = store.getState();
     socket.sendBuffer = [];
-    socket.emit(events.chatHistory, { user_id: meta.cid, region: meta.region });
+    socket.emit(Events.chatHistory, { user_id: meta.cid, region: meta.region });
     store.dispatch(setConnected(true));
   });
 
-  socket.on(events.chatHistory, ({ history, errors, region }: { history: UserHistoryData[] | AssistantHistoryData[], errors: string[], region: string }) => {
+  socket.on(Events.chatHistory, ({ history: servedHistory, errors, region }
+    : { history: Array<UserHistoryData> | Array<AssistantHistoryData>, errors: string[], region: string }) => {
     store.dispatch(resetIsLoading());
     store.dispatch(setRegion(region));
     const { config, meta, chat } = store.getState();
@@ -190,99 +180,73 @@ const chatMiddleware: Middleware = store => next => action => {
       return;
     }
 
-    if (history.length) {
-      store.dispatch(setExistingHistory(history));
-      const last = [...history].pop();
+    if (servedHistory.length) {
+      store.dispatch(setExistingHistory(servedHistory));
+      const last = [...servedHistory].pop();
       if (!last) return;
       store.dispatch(setResponseFormVisibility(last.content));
-      store.dispatch(setIsEmailFormVisible(last.content.some(el => el.type === 'email')));
-      store.dispatch(setIsPaymentButtonVisible(last.content.some(el => el.type === 'payment')));
+      store.dispatch(setIsEmailFormVisible(last.content.some(el => Definition.email in el && el.type === Definition.email)));
+      store.dispatch(setIsPaymentButtonVisible(last.content.some(el => Definition.payment in el && el.type === Definition.payment)));
       return;
     }
 
-    const id = uid();
-    config.aiProfile.initialMessage
-      .map((content: MessageType) =>
-      // there may be an id prop either from the MessageType as a requirement or will be not required or should separate types for assistant or user types
-      // comming from client of from server and vice/versa
-        store.dispatch(fillAssistantHistoryData({ ...content, role: roles.assistant }))
-      );
-    store.dispatch(setResponseFormVisibility(config.aiProfile.initialMessage));
+    const initialMessageId = config.aiProfile.initialMessage[0].id
+    const initialMessageData = { id: initialMessageId, role: Roles.assistant, content: config.aiProfile.initialMessage } as AssistantHistoryData
+    store.dispatch(
+      setExistingHistory([initialMessageData])
+    );
+    store.dispatch(setResponseFormVisibility(initialMessageData.content));
+
     handleMessageSending({
-      role: roles.assistant,
+      role: Roles.assistant,
       term: getQueryParam(window.location.search, 'utm_chat') || '',
       user_id: meta.cid,
       message: JSON.stringify(config.aiProfile.initialMessage),
-      messageId: id,
+      messageId: initialMessageId,
       region: meta.region,
     });
   });
 
-  // remove => meant to be for socket mock
-  // let idx = 0;
-  // let messageUuid = faker.string.uuid();
-
-  // let mockedDataForEachStream = streamMock;
-
-  // const resetUUID = () => {
-  //   messageUuid = faker.string.uuid();
-  //   mockedDataForEachStream = mockedDataForEachStream.map(i => ({ ...i, id: messageUuid }));
-  // };
-
-  socket.on(events.streamStart, (data: MessageType) => {
-    // remove => meant to be for socket mock
-    // resetUUID();
-    // idx = 0;
+  socket.on(Events.streamStart, (data: StreamData) => {
     store.dispatch(setIsStreaming(true));
     store.dispatch(resetIsLoading());
     store.dispatch(resetOutgoing());
     store.dispatch(resetError());
-
-    store.dispatch(fillAssistantHistoryData({ ...data, role: roles.assistant }));
-    // store.dispatch(fillAssistantHistoryData(mockedDataForEachStream[idx]));
+    store.dispatch(fillAssistantHistoryData({ id: data.id, content: {} }));
   });
 
-  socket.on(events.streamData, (data: MessageType & { errors: string[] }) => {
-    const { chat } = store.getState();
+  socket.on(Events.streamData, (data: StreamData & { errors: Array<string> }) => {
+    const assistantData = { id: data.id, content: { type: 'text', text: 'hello' } }
+    if (data.type === Definition.email) store.dispatch(setIsEmailFormVisible(true));
+    if (data.type === Definition.payment) store.dispatch(setIsPaymentButtonVisible(true));
+    store.dispatch(fillAssistantHistoryData({ id: data.id, content: { ...assistantData } }));
 
-    if (data.type === 'email') store.dispatch(setIsEmailFormVisible(true));
-    if (data.type === 'payment') store.dispatch(setIsPaymentButtonVisible(true));
-    store.dispatch(fillAssistantHistoryData({ ...data, role: roles.assistant }));
-    // store.dispatch(fillAssistantHistoryData(mockedDataForEachStream[idx]));
-    store.dispatch(setResponseFormVisibility(chat.historyData[[...chat.historyIds].pop()]));
+    const { chat } = store.getState();
+    store.dispatch(setResponseFormVisibility(chat.historyData[[...chat.historyIds].pop()].content));
 
     if ('errors' in data && data.errors.length && !chat.error) {
       store.dispatch(setError(data.errors[0]));
     }
-
-    // remove => meant to be for socket mock
-    // if (mockedDataForEachStream[idx + 1]) {
-    // idx += 1;
-    // }
   });
 
-  socket.on(events.streamEnd, (data: { question_id: string }) => {
+  socket.on(Events.streamEnd, (data: StreamData) => {
     const { chat } = store.getState();
     const queued = chat.queue.length && chat.queue[chat.queue.length - 1];
 
     if (queued) {
-      store.dispatch(setQueuedId({ ...queued, id: data.question_id }));
+      store.dispatch(setQueuedId({ ...queued, id: data.id }));
       store.dispatch(removeFromQueue(queued));
     } else {
-      store.dispatch(setLastQuestionId(data.question_id));
+      store.dispatch(setLastQuestionId(data.id));
     }
 
     store.dispatch(setIsStreaming(false));
-
-    // remove => meant to be for socket mock
-    // idx = 0;
-    // resetUUID();
   });
 
-  socket.on(events.streamError, onError);
-  socket.on(events.error, onError);
+  socket.on(Events.streamError, onError);
+  socket.on(Events.error, onError);
 
-  socket.on(events.disconnect, () => {
+  socket.on(Events.disconnect, () => {
     store.dispatch(setConnected(false));
   });
 

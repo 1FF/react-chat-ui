@@ -1,12 +1,13 @@
 /* eslint-env jest */
 import { render } from '@testing-library/react';
-import { useAppSelector } from '@/hooks';
-import Profile from '@/components/Profile/index';
-import profile from '@/components/Profile/variants';
-import { roles } from '@/config';
 
-jest.mock('@/hooks');
-jest.mock('@/components/Profile/variants');
+import { useAppSelector } from '../../../src/hooks';
+import Profile from '../../../src/components/Profile/index';
+import profile from '../../../src/components/Profile/variants';
+import { roles } from '../../../src/config';
+
+jest.mock('../../../src/hooks');
+jest.mock('../../../src/components/Profile/variants');
 
 describe('Profile Component', () => {
   beforeEach(() => {
