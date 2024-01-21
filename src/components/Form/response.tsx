@@ -35,7 +35,7 @@ export const ResponseForm = () => {
     e.preventDefault();
 
     if (response.trim()) {
-      dispatch(fillUserHistoryData({ role: Roles.user, id: uid(), content: { message: response, groupId, resend: false, sent: true } }));
+      dispatch(fillUserHistoryData({ role: Roles.user, id: uid(), sequence: 1, content: { sequence: 1, message: response, groupId, resend: false, sent: true } }));
     }
 
     setCurrentResponse('');

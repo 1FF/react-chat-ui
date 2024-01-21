@@ -18,7 +18,7 @@ import { track } from '../services/tracking';
 import { setRegion } from '../store/slices/meta';
 import { CHAT_FINISHED_TIMESTAMP } from '../config/env';
 import { Definition, Roles, AllEvents } from '../config/enums';
-import { AssistantHistoryData, StreamData, UserHistoryData, UserMessageContent, ClientMessage, AssistantMessageTypeUnion } from '../interfaces'
+import { AssistantHistoryData, StreamData, UserHistoryData, UserMessageContent, ClientMessage, AssistantMessageTypeUnion, TextMessage } from '../interfaces'
 
 let socket: Socket;
 
@@ -212,14 +212,15 @@ const chatMiddleware: Middleware = store => next => action => {
     store.dispatch(resetIsLoading());
     store.dispatch(resetOutgoing());
     store.dispatch(resetError());
-    store.dispatch(fillAssistantHistoryData({ id: data.id, content: {} }));
+    store.dispatch(fillAssistantHistoryData({ id: data.id, sequence: 1, content: { type: Definition.text, text: '', sequence: 1 } }));
   });
 
   socket.on(Events.streamData, (data: StreamData & { errors: Array<string> }) => {
-    const assistantData = { id: data.id, content: { type: 'text', text: 'hello' } }
+    const assistantData = { id: data.id, sequence: data.sequence, content: { type: data.type, [data.type]: data[data.type], sequence: data.sequence } };
+
     if (data.type === Definition.email) store.dispatch(setIsEmailFormVisible(true));
     if (data.type === Definition.payment) store.dispatch(setIsPaymentButtonVisible(true));
-    store.dispatch(fillAssistantHistoryData({ id: data.id, content: { ...assistantData } }));
+    store.dispatch(fillAssistantHistoryData(assistantData));
 
     const { chat } = store.getState();
     store.dispatch(setResponseFormVisibility(chat.historyData[[...chat.historyIds].pop()].content));

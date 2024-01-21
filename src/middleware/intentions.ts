@@ -33,7 +33,8 @@ export const intentionsMiddleware: Middleware = store => next => {
       fillUserHistoryData({
         id: uid(),
         role: Roles.user,
-        content: { message: intentions.email.current, resend: false, sent: true, groupId: '' }
+        sequence:1,
+        content: {sequence:1, message: intentions.email.current, resend: false, sent: true, groupId: '' }
       }));
     store.dispatch(setOutgoing(intentions.email.current));
 

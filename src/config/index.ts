@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { colors as baseThemeColors } from './themes/base';
 import { Definition, Roles } from './enums';
-import { ImageMessage, PaymentMessage, EmailMessage, TextMessage, VideoMessage, ButtonsMessage } from '../interfaces/index';
+import { PossibleProps } from '../interfaces/index';
 export { Events } from './enums';
 export { config } from './socket';
 
@@ -255,7 +255,7 @@ export const serverHistoryMockWithPaymentIntent = [
 ];
 
 export const typeReducer = {
-  text: (initial: TextMessage, current: TextMessage) => {
+  text: (initial: PossibleProps, current: PossibleProps): PossibleProps => {
     if (Definition.text in initial && Definition.text in current) {
       return {
         ...initial,
@@ -265,7 +265,7 @@ export const typeReducer = {
     }
     return initial;
   },
-  buttons: (initial: ButtonsMessage, current: ButtonsMessage) => {
+  buttons: (initial: PossibleProps, current: PossibleProps): PossibleProps => {
     if (Definition.buttons in initial && Definition.buttons in current) {
       return {
         ...initial,
@@ -275,8 +275,8 @@ export const typeReducer = {
     }
     return initial;
   },
-  image: (initial: ImageMessage, current: ImageMessage) => {
-    if (Definition.image in initial && Definition.image in current) {
+  image: (initial: PossibleProps, current: PossibleProps): PossibleProps => {
+    if (initial.image && current.image) {
       return {
         ...initial,
         ...current,
@@ -285,8 +285,8 @@ export const typeReducer = {
     }
     return initial;
   },
-  video: (initial: VideoMessage, current: VideoMessage) => {
-    if (Definition.video in initial && Definition.video in current) {
+  video: (initial: PossibleProps, current: PossibleProps): PossibleProps => {
+    if (initial.video && current.video) {
       return {
         ...initial,
         ...current,
@@ -295,8 +295,8 @@ export const typeReducer = {
     }
     return initial;
   },
-  email: (initial: EmailMessage, current: EmailMessage) => {
-    if (Definition.email in initial && Definition.email in current) {
+  email: (initial: PossibleProps, current: PossibleProps): PossibleProps => {
+    if (initial.email && initial.email) {
       return {
         ...initial,
         ...current,
@@ -305,8 +305,8 @@ export const typeReducer = {
     }
     return initial
   },
-  payment: (initial: PaymentMessage, current: PaymentMessage) => {
-    if (Definition.payment in initial && Definition.payment in current) {
+  payment: (initial: PossibleProps, current: PossibleProps): PossibleProps => {
+    if (initial.payment && current.payment) {
       return {
         ...initial,
         ...current,
@@ -318,12 +318,12 @@ export const typeReducer = {
 };
 
 export const initialStructure = {
-  text: { type: Definition.text, text: '' },
-  payment: { type: Definition.payment, payment: '' },
-  email: { type: Definition.email, email: '' },
-  image: { type: Definition.image, image: {} },
-  video: { type: Definition.video, video: {} },
-  buttons: { type: Definition.buttons, buttons: [] },
+  text: { type: Definition.text, text: '', sequence: 0 },
+  payment: { type: Definition.payment, payment: '', sequence: 0 },
+  email: { type: Definition.email, email: '', sequence: 0 },
+  image: { type: Definition.image, image: { url: '', alt: '', title: '' }, sequence: 0 },
+  video: { type: Definition.video, video: { url: '', alt: '', title: '' }, sequence: 0 },
+  buttons: { type: Definition.buttons, buttons: [], sequence: 0 },
 };
 
 export default { colors };
