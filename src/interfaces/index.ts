@@ -1,39 +1,40 @@
 import { Definition, Roles, Theme } from '../config/enums';
 
 export interface TextMessage {
-  type: Definition.text;
+  type: 'text';
   text: string;
 }
 
 export interface ButtonsMessage {
-  type: Definition.buttons;
+  type: 'buttons';
   buttons: Array<ButtonOptions>;
 }
 
 export interface PaymentMessage {
-  type: Definition.payment;
+  type: 'payment';
   payment: string;
 }
 
 export interface EmailMessage {
-  type: Definition.email;
+  type: 'email';
   email: string;
 }
-
+interface VideoProps {
+  url: string;
+  title: string | null;
+};
 export interface VideoMessage {
-  type: Definition.video;
-  video: {
-    url: string;
-    title: string | null;
-  };
+  type: 'video';
+  video: VideoProps
 }
 
+interface ImageProps {
+  url: string;
+  alt: string | null
+}
 export interface ImageMessage {
-  type: Definition.image;
-  image: {
-    url: string;
-    alt: string | null;
-  };
+  type: 'image';
+  image: ImageProps
 }
 
 export interface ButtonOptions {
@@ -63,16 +64,26 @@ export interface AssistantHistoryData {
 
 export type SupportedMessageTypes = Definition.text | Definition.buttons | Definition.payment | Definition.email | Definition.video | Definition.image;
 
-export type StreamData = {
-  id: string
-  role: Roles.user | Roles.assistant,
-  type: SupportedMessageTypes,
-  sequence?: number
-}
-
 export interface AssistantProps {
   message: { content: Array<AssistantMessageTypeUnion> };
   isLast?: boolean;
+}
+export interface PossibleProps {
+  //assistant
+  type?: Definition.text | Definition.video | Definition.image | Definition.buttons | Definition.payment | Definition.email;
+  sequence: number;
+  text?: string;
+  video?: VideoProps;
+  image?: ImageProps;
+  buttons?: Array<ButtonOptions>;
+  email?: string;
+  payment?: string;
+
+  //user
+  groupId?: string;
+  sent?: boolean;
+  resend?: boolean;
+  message?: string;
 }
 
 export interface ChatState {
@@ -85,7 +96,11 @@ export interface ChatState {
   //TODO: define those below
   queue: any[],
   history: any[],
-  historyData: Record<string, AssistantHistoryData | UserHistoryData>;
+  historyData: Record<string, {
+    id: string,
+    role: Roles.assistant | Roles.user;
+    content: Array<PossibleProps>
+  }>;
   historyIds: Array<string>,
 
   error: string,
@@ -153,7 +168,7 @@ export type PredefinedMessagePayload = {
 }
 
 export type UserMessageContent = {
-  groupId: string, sent: boolean, resend: boolean, message: string
+  groupId: string, sent: boolean, resend: boolean, message: string, sequence: number
 }
 
 export interface UserHistoryData {
@@ -165,13 +180,15 @@ export interface UserHistoryData {
 export interface UserHistoryDataFiller {
   id: string;
   role: Roles.user;
+  sequence: number
   content: UserMessageContent
 }
 
 
 export interface AssistantHistoryDataFiller {
   id: string;
-  content: AssistantMessageTypeUnion;
+  sequence: number;
+  content: MessageTypes;
 }
 
 
@@ -189,3 +206,36 @@ export interface PaymentDataSetterProps {
 }
 
 export type PaymentDataSetter = (data: PaymentDataSetterProps) => PaymentDataSetterProps;
+
+
+type MessageTypeMap = {
+  text: TextMessage;
+  buttons: ButtonsMessage;
+  payment: PaymentMessage;
+  email: EmailMessage;
+  video: VideoMessage;
+  image: ImageMessage;
+};
+
+// export type mapwithdynamicprops = {
+//   [K in keyof MessageTypeMap]: MessageTypeMap[K];
+// };
+
+interface BaseStream {
+  id: string
+  role: Roles.assistant,
+  sequence: number
+}
+
+interface MessageTypes {
+  type: Definition.text | Definition.video | Definition.image | Definition.buttons | Definition.payment | Definition.email;
+  sequence: number;
+  text?: string;
+  video?: VideoProps;
+  image?: ImageProps;
+  buttons?: Array<ButtonOptions>;
+  email?: string;
+  payment?: string;
+}
+
+export type StreamData = BaseStream & MessageTypes

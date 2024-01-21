@@ -1,7 +1,7 @@
 import { uid } from 'uid';
 import produce from 'immer';
 import { createSlice, PayloadAction, Draft } from '@reduxjs/toolkit';
-import { ChatState, UserHistoryData, AssistantHistoryData, AssistantHistoryDataFiller, PredefinedMessagePayload, UserHistoryDataFiller, ButtonOptions, AssistantMessageTypeUnion } from '../../interfaces';
+import { ChatState, UserHistoryData, AssistantHistoryData, AssistantHistoryDataFiller, PredefinedMessagePayload, UserHistoryDataFiller, ButtonOptions, PossibleProps } from '../../interfaces';
 import { chat as initialState } from '../initialState'
 import { getQueryParam } from '../../utils';
 import { initialStructure, typeReducer } from '../../config';
@@ -44,33 +44,29 @@ const configSlice = createSlice({
       const id = uid();
       return produce(state, (draft: Draft<ChatState>): void => {
         draft.historyIds.push(id);
-        draft.historyData[id] as AssistantHistoryData;
         draft.historyData[id] = {
           id,
           role: Roles.assistant,
           content: [
-            { type: Definition.text, text: payload.content }
+            { type: Definition.text, text: payload.content, sequence: 1 },
+            { type: Definition.buttons, buttons: payload.buttons || [], sequence: 2 }
           ]
-        }
-
-        if (payload.buttons) {
-          draft.historyData[id].content.push({ type: Definition.buttons, buttons: payload.buttons });
         }
       });
     },
     fillAssistantHistoryData(state, { payload }: PayloadAction<AssistantHistoryDataFiller>) {
       return produce(state, (draft: Draft<ChatState>) => {
         const id = payload.id;
+
         if (!draft.historyData[id]) {
           draft.historyData[id] = { id, role: Roles.assistant, content: [payload.content] };
           draft.historyIds.push(id);
           return;
         }
 
-
         // here we order items by sequence and accumulate the types into one object
         const dataType = payload.content.type;
-        const data = { type: dataType, [dataType]: payload.content[dataType] };
+        const data = { sequence: payload.sequence, type: dataType, [dataType]: payload.content[payload.content.type] };
         draft.historyData[id].content.push(data);
 
         const reducedText = draft.historyData[id].content
@@ -78,8 +74,6 @@ const configSlice = createSlice({
           .reduce(typeReducer[dataType], initialStructure[dataType]);
         draft.historyData[id].content = [...draft.historyData[id].content.filter(it => it.type !== dataType), reducedText];
         draft.historyData[id].content.sort(sortBySequence);
-
-
       });
     },
     fillUserHistoryData(state, { payload }: PayloadAction<UserHistoryDataFiller>) {
@@ -94,14 +88,14 @@ const configSlice = createSlice({
           });
         }
 
-        if (belongsTo && payload.role === Roles.user) {
+        if (belongsTo) {
           // this is due to keyboard interaction we send messages after timeout
-          const userMessageRecord = draft.historyData[belongsTo] as UserHistoryData;
+          const userMessageRecord = draft.historyData[belongsTo];
           userMessageRecord.content.push(payload.content);
           return;
         }
 
-        if (!draft.historyData[payload.id] && payload.role === Roles.user) {
+        if (!draft.historyData[payload.id]) {
           draft.historyData[payload.id] = { id: payload.id, role: Roles.user, content: [payload.content] };
           draft.historyIds.push(payload.id);
         }
@@ -187,7 +181,7 @@ const configSlice = createSlice({
 
 export const getChat = (state: { chat: ChatState }) => state.chat;
 export const userMessageFindOne = (state: { chat: ChatState }) => state.chat.historyIds.find((historyId) => state.chat.historyData[historyId].role === Roles.user);
-export const sortBySequence = (a: ButtonOptions, b: ButtonOptions) => a.sequence - b.sequence;
+export const sortBySequence = (a: ButtonOptions | PossibleProps, b: ButtonOptions | PossibleProps) => a.sequence - b.sequence;
 
 export const {
   setOutgoing, resetOutgoing, setExistingHistory,

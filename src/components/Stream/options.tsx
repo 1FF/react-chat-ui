@@ -14,7 +14,7 @@ export const OptionList = ({ options = [] }: OptionsListProps) => {
   const isFirstUserMessage = !useAppSelector(userMessageFindOne);
 
   const setOption = (val: string, sequence: number) => {
-    dispatch(fillUserHistoryData({ id: uid(), role: Roles.user, content: { message: val, resend: false, sent: true, groupId: '' } }));
+    dispatch(fillUserHistoryData({ id: uid(),sequence:1, role: Roles.user, content: {sequence:1, message: val, resend: false, sent: true, groupId: '' } }));
     dispatch(setOutgoing(val));
     if (isFirstUserMessage) {
       track({
@@ -27,7 +27,7 @@ export const OptionList = ({ options = [] }: OptionsListProps) => {
   };
 
   const setMessage = (val: string) => {
-    dispatch(fillUserHistoryData({ id: uid(), role: Roles.user, content: { message: val, resend: false, sent: true, groupId: '' } }));
+    dispatch(fillUserHistoryData({ id: uid(), sequence:1,role: Roles.user, content: { sequence:1,message: val, resend: false, sent: true, groupId: '' } }));
   };
 
   return [...options].sort(sortBySequence).map(({ id, text, value, link, sequence, noStream }) => (
