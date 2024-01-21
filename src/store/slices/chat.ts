@@ -1,10 +1,11 @@
 import { uid } from 'uid';
 import produce from 'immer';
 import { createSlice, PayloadAction, Draft } from '@reduxjs/toolkit';
-import { ChatState, UserHistoryData, AssistantHistoryData, MessageType, PredefinedMessagePayload, TextMessage } from '../../interfaces';
+import { ChatState, UserHistoryData, AssistantHistoryData, AssistantHistoryDataFiller, PredefinedMessagePayload, UserHistoryDataFiller, ButtonOptions, AssistantMessageTypeUnion } from '../../interfaces';
 import { chat as initialState } from '../initialState'
 import { getQueryParam } from '../../utils';
-import { initialStructure, roles, typeReducer } from '../../config';
+import { initialStructure, typeReducer } from '../../config';
+import { Definition, Roles } from '../../config/enums';
 
 const configSlice = createSlice({
   name: 'chat',
@@ -14,7 +15,7 @@ const configSlice = createSlice({
       state.outgoing = {
         term: getQueryParam(window.location.search, 'utm_chat') || '',
         user_id: localStorage.getItem('__cid') || '',
-        role: roles.user,
+        role: Roles.user,
         message: payload,
       };
     },
@@ -33,7 +34,9 @@ const configSlice = createSlice({
         draft.historyIds = payload.map((item) => item.id);
         draft.historyData = payload.reduce((prev, current) => ({
           ...prev,
-          [current.id]: current.role === 'user' ? [{ ...current, resend: false, sent: true }] : current.content
+          [current.id]: current.role === Roles.user
+            ? { ...current, content: [{ resend: false, sent: true, message: current.content }] }
+            : current
         }), {});
       });
     },
@@ -41,55 +44,66 @@ const configSlice = createSlice({
       const id = uid();
       return produce(state, (draft: Draft<ChatState>): void => {
         draft.historyIds.push(id);
+        draft.historyData[id] as AssistantHistoryData;
+        draft.historyData[id] = {
+          id,
+          role: Roles.assistant,
+          content: [
+            { type: Definition.text, text: payload.content }
+          ]
+        }
 
-        draft.historyData[id] = [
-          { type: 'text', text: payload.content, role: roles.assistant, sequence: 1, id },
-        ];
-
-        payload.buttons && draft.historyData[id].push({ type: 'buttons', buttons: payload.buttons, role: roles.assistant, sequence: 2, id })
-      });
-    },
-    fillAssistantHistoryData(state, { payload }: PayloadAction<MessageType>) {
-      const data = { ...payload };
-      return produce(state, (draft: Draft<ChatState>): void => {
-        if (!draft.historyData[payload.id]) {
-          draft.historyData[payload.id] = [data];
-          draft.historyIds.push(payload.id);
-        } else {
-          // here we order items by sequence and accumulate the types into one object
-          draft.historyData[payload.id].push(data);
-          const reducedText = draft.historyData[payload.id]
-            .filter((obj) => obj.type === payload.type)
-            .reduce(typeReducer[payload.type], initialStructure[payload.type] as MessageType);
-          draft.historyData[payload.id] = [...draft.historyData[payload.id].filter(it => it.type !== payload.type), reducedText];
-          draft.historyData[payload.id].sort((a, b) => a.sequence - b.sequence);
+        if (payload.buttons) {
+          draft.historyData[id].content.push({ type: Definition.buttons, buttons: payload.buttons });
         }
       });
     },
-    fillUserHistoryData(state, { payload }: PayloadAction<{ content: string, groupId?: string }>) {
-      const id = uid();
-      const content = { role: roles.user, content: payload.content, groupId: payload.groupId, resend: false, sent: true };
-      return produce(state, (draft) => {
+    fillAssistantHistoryData(state, { payload }: PayloadAction<AssistantHistoryDataFiller>) {
+      return produce(state, (draft: Draft<ChatState>) => {
+        const id = payload.id;
+        if (!draft.historyData[id]) {
+          draft.historyData[id] = { id, role: Roles.assistant, content: [payload.content] };
+          draft.historyIds.push(id);
+          return;
+        }
+
+
+        // here we order items by sequence and accumulate the types into one object
+        const dataType = payload.content.type;
+        const data = { type: dataType, [dataType]: payload.content[dataType] };
+        draft.historyData[id].content.push(data);
+
+        const reducedText = draft.historyData[id].content
+          .filter((obj) => obj.type === dataType)
+          .reduce(typeReducer[dataType], initialStructure[dataType]);
+        draft.historyData[id].content = [...draft.historyData[id].content.filter(it => it.type !== dataType), reducedText];
+        draft.historyData[id].content.sort(sortBySequence);
+
+
+      });
+    },
+    fillUserHistoryData(state, { payload }: PayloadAction<UserHistoryDataFiller>) {
+      return produce(state, (draft: Draft<ChatState>) => {
         let belongsTo;
 
-        if (payload.groupId) {
+        if (payload.content.groupId) {
           Object.entries(draft.historyData).forEach(([key, value]) => {
-            if (value.find(el => el.groupId === payload.groupId)) {
+            if (value.content.find(el => 'groupId' in el && el.groupId === payload.content.groupId)) {
               belongsTo = key;
             }
           });
         }
 
-        if (belongsTo) {
-          //@ts-ignore
-          draft.historyData[belongsTo].push(content);
+        if (belongsTo && payload.role === Roles.user) {
+          // this is due to keyboard interaction we send messages after timeout
+          const userMessageRecord = draft.historyData[belongsTo] as UserHistoryData;
+          userMessageRecord.content.push(payload.content);
           return;
         }
 
-        if (!draft.historyData[id]) {
-          //@ts-ignore must find a way to refactor the data so it is unified
-          draft.historyData[id] = [content];
-          draft.historyIds.push(id);
+        if (!draft.historyData[payload.id] && payload.role === Roles.user) {
+          draft.historyData[payload.id] = { id: payload.id, role: Roles.user, content: [payload.content] };
+          draft.historyIds.push(payload.id);
         }
       });
     },
@@ -146,7 +160,7 @@ const configSlice = createSlice({
           item = { ...item, resend: true, sent: false };
         }
 
-        if (item.role === roles.user && !item.id) {
+        if (item.role === Roles.user && !item.id) {
           item = { ...item, resend: true, sent: false };
         }
 
@@ -172,6 +186,8 @@ const configSlice = createSlice({
 });
 
 export const getChat = (state: { chat: ChatState }) => state.chat;
+export const userMessageFindOne = (state: { chat: ChatState }) => state.chat.historyIds.find((historyId) => state.chat.historyData[historyId].role === Roles.user);
+export const sortBySequence = (a: ButtonOptions, b: ButtonOptions) => a.sequence - b.sequence;
 
 export const {
   setOutgoing, resetOutgoing, setExistingHistory,

@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { intentions as initialState } from '../initialState';
-import { IntentionsState, MessageType } from '../../interfaces/index';
+import { IntentionsState, AssistantMessageTypeUnion } from '../../interfaces/index';
 
 const intentionsSlice = createSlice({
   name: 'intentions',
@@ -40,7 +40,7 @@ const intentionsSlice = createSlice({
       state.response.value = payload;
     },
     setResponseFormVisibility(state, { payload }) {
-      state.response.isFormVisible = !payload.some((el: MessageType) => el.type === 'buttons' || el.type === 'payment' || el.type === 'email');
+      state.response.isFormVisible = !payload.some((el: AssistantMessageTypeUnion) => el.type === 'buttons' || el.type === 'payment' || el.type === 'email');
     },
     setResponseLoadingStatus(state, { payload }) {
       state.response.isLoading = payload;

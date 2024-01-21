@@ -5,15 +5,15 @@ export default {
   resetMocks: true,
   resetModules: true,
   restoreMocks: true,
-  moduleFileExtensions: ['js', 'jsx', 'json', 'node'],
+  moduleFileExtensions: ['js', 'jsx', 'json', 'node', 'ts', 'tsx'],
   transform: {
+    '^.+\\.(ts|tsx)$': 'ts-jest',
     '^.+\\.(js|jsx)$': 'babel-jest',
   },
   testPathIgnorePatterns: ['/node_modules/', '/build/', '<rootDir>/__tests__/setupTests.js'],
   setupFilesAfterEnv: ['<rootDir>/__tests__/setupTests.js'],
   moduleNameMapper: {
     '\\.(css|less)$': '<rootDir>/__mocks__/styleMock.js',
-    '^@/(.*)$': '<rootDir>/src/$1',
   },
   workerIdleMemoryLimit: '512MB',
   coverageProvider: 'v8',

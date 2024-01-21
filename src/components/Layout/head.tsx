@@ -6,7 +6,7 @@ import { IconBtn } from '../Button';
 import {  track } from '../../services/tracking';
 import { setClosed } from '../../store/slices/chat';
 import { layoutHead as variant } from './variants';
-import { AllEvents } from '../../config/analytics';
+import { AllEvents } from '../../config/enums';
 
 export const LayoutHead = () => {
   const dispatch = useAppDispatch();

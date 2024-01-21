@@ -1,22 +1,20 @@
 import { Middleware } from '@reduxjs/toolkit';
-import { AllEvents } from '../config/analytics';
+import { uid } from 'uid';
+import { AllEvents, Roles } from '../config/enums';
 import { track } from '../services/tracking';
 import intent from '../services/intentions';
 import { setIsEmailLoading, setEmailSuccess, setIsEmailFormVisible, setEmailError, setLink } from '../store/slices/intentions';
 import { setPd, setMarketing } from '../store/slices/meta';
 import { addPredefinedAssistantMessage, fillUserHistoryData, setOutgoing } from '../store/slices/chat';
 import { STORING_CHECKER_INTERVAL } from '../config/env';
-import { PredefinedMessagePayload } from '../interfaces/index';
-import { RootState, AppDispatch } from '../store';
+import { RootState } from '../store';
+import { PaymentDataSetter, PaymentDataSetterProps } from '../interfaces';
 
-type PaymentDataSetterProps = {
-  billingFrequencyTmsg: string, billingOptionType: 'one-time' | 'subscription', frequencyInMonths: string
-}
-type setPaymentDataTranslationAccordingly = (data: PaymentDataSetterProps) => PaymentDataSetterProps;
+
 
 export const intentionsMiddleware: Middleware = store => next => {
 
-  const setPaymentDataTranslationAccordingly: setPaymentDataTranslationAccordingly = (data) => {
+  const setPaymentDataTranslationAccordingly: PaymentDataSetter = (data) => {
     const { meta } = store.getState();
     if (!meta.pd) return {} as PaymentDataSetterProps;
     data.billingFrequencyTmsg = data.billingOptionType === 'one-time'
@@ -31,7 +29,12 @@ export const intentionsMiddleware: Middleware = store => next => {
 
     store.dispatch(setIsEmailLoading(false));
     store.dispatch(setEmailError(''));
-    store.dispatch(fillUserHistoryData({ content: intentions.email.current }));
+    store.dispatch(
+      fillUserHistoryData({
+        id: uid(),
+        role: Roles.user,
+        content: { message: intentions.email.current, resend: false, sent: true, groupId: '' }
+      }));
     store.dispatch(setOutgoing(intentions.email.current));
 
     // DEV: setEmailSuccess this status is for us to know if mail is validated in the endpoint
@@ -59,7 +62,7 @@ export const intentionsMiddleware: Middleware = store => next => {
           { sequence: 1, id: 'opt-1', text: tm526, value: 'link', link: response.data.buttonLink, noStream: true },
           { sequence: 2, id: 'opt-2', text: tm715, value: 'button', link: '', noStream: true }
         ]
-      } as PredefinedMessagePayload));
+      }));
 
       track({
         eventType: AllEvents.emailExist,
@@ -107,7 +110,7 @@ export const intentionsMiddleware: Middleware = store => next => {
 };
 
 const dataIntervalChecker = (
-  key: string, store: RootState, setValue: (data: any) => void, transformData?: setPaymentDataTranslationAccordingly
+  key: string, store: RootState, setValue: (data: any) => void, transformData?: PaymentDataSetter
 ) => {
   const intervalId = setInterval(() => {
     let storedItem: string | PaymentDataSetterProps = localStorage.getItem(key) || '';

@@ -1,14 +1,13 @@
-import React from 'react';
 import { render } from '@testing-library/react';
 import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 // As a basic setup, import your same slice reducers
-import metaReducer from '@/store/slices/meta';
-import configReducer from '@/store/slices/config';
-import chatReducer from '@/store/slices/chat';
-import intentionsReducer from '@/store/slices/intentions';
-import chatMiddleware from '@/middleware/socket';
-import intentionsMiddleware from '@/middleware/intentions';
+import metaReducer from '../store/slices/meta';
+import configReducer from '../store/slices/config';
+import chatReducer from '../store/slices/chat';
+import intentionsReducer from '../store/slices/intentions';
+import chatMiddleware from '../middleware/socket';
+import intentionsMiddleware from '../middleware/intentions';
 
 function renderWithProviders(
   ui,

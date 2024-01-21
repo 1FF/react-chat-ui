@@ -1,31 +1,20 @@
 import { uid } from 'uid';
 import { Btn } from '../Button';
 import { Link } from '../Link';
-import { roles } from '../../config';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { track } from '../../services/tracking';
-import { fillUserHistoryData, setOutgoing } from '../../store/slices/chat';
+import { fillUserHistoryData, setOutgoing, sortBySequence, userMessageFindOne } from '../../store/slices/chat';
 import { getMeta } from '../../store/slices/meta';
-import { AllEvents } from '../../config/analytics';
-import { ButtonOptions } from '../../interfaces/index';
-
-export interface BaseOptions extends ButtonOptions {
-  id: string, link: string, noStream: boolean
-}
-
-interface OptionsListProps {
-  options: BaseOptions[]
-}
-
-type HistoryId = string
+import { AllEvents, Roles } from '../../config/enums';
+import { OptionsListProps } from '../../interfaces/index';
 
 export const OptionList = ({ options = [] }: OptionsListProps) => {
   const dispatch = useAppDispatch();
   const meta = useAppSelector(getMeta);
-  const isFirstUserMessage = !useAppSelector(state => state.chat.historyIds.find((historyId: HistoryId) => state.chat.historyData[historyId][0] === roles.user));
+  const isFirstUserMessage = !useAppSelector(userMessageFindOne);
 
   const setOption = (val: string, sequence: number) => {
-    dispatch(fillUserHistoryData({ content: val }));
+    dispatch(fillUserHistoryData({ id: uid(), role: Roles.user, content: { message: val, resend: false, sent: true, groupId: '' } }));
     dispatch(setOutgoing(val));
     if (isFirstUserMessage) {
       track({
@@ -38,22 +27,22 @@ export const OptionList = ({ options = [] }: OptionsListProps) => {
   };
 
   const setMessage = (val: string) => {
-    dispatch(fillUserHistoryData({ content: val }));
+    dispatch(fillUserHistoryData({ id: uid(), role: Roles.user, content: { message: val, resend: false, sent: true, groupId: '' } }));
   };
 
-  return options.map(({ id, text, value, link, sequence, noStream }) => (
+  return [...options].sort(sortBySequence).map(({ id, text, value, link, sequence, noStream }) => (
     link
       ? (
         <Link
           key={uid()}
-          text={text}
+          text={value}
           href={link}
         />
       )
       : (
         <Btn
           key={uid()}
-          text={text}
+          text={value}
           onClick={noStream ? () => setMessage(value) : () => setOption(value, sequence)}
           e2e="option-button"
         />

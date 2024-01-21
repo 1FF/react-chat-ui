@@ -6,9 +6,8 @@ import { getConfig } from '../../store/slices/config';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { Input } from '../../components/Input';
 import { IconBtn } from '../../components/Button';
-
-import { roles } from '../../config';
 import { layoutFoot as variant } from '../Layout/variants';
+import { Roles } from '../../config/enums';
 
 export const ResponseForm = () => {
   const dispatch = useAppDispatch();
@@ -36,7 +35,7 @@ export const ResponseForm = () => {
     e.preventDefault();
 
     if (response.trim()) {
-      dispatch(fillUserHistoryData({ content: response, groupId }));
+      dispatch(fillUserHistoryData({ role: Roles.user, id: uid(), content: { message: response, groupId, resend: false, sent: true } }));
     }
 
     setCurrentResponse('');

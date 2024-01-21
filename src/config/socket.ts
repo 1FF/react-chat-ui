@@ -7,16 +7,4 @@ export const config = {
   reconnect: true,
 };
 
-export enum events {
-  chat = 'chat',
-  chatHistory = 'chat-history',
-  connect = 'connect',
-  error = 'error',
-  disconnect = 'disconnect',
-  streamStart = 'stream-start',
-  streamData = 'stream-data',
-  streamEnd = 'stream-end',
-  streamError = 'stream-error',
-};
-
-export default { config, events };
+export default { config };

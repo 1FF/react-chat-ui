@@ -1,8 +1,8 @@
 import { EventEmitter } from 'node:events';
-import { intentions } from '../config/intentions';
+import { Intentions } from '../config/enums';
 
 export const intent = {
-  type: intentions,
+  type: Intentions,
   core: new EventEmitter()
 };
 

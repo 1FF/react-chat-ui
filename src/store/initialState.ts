@@ -1,5 +1,5 @@
 import { uid } from 'uid';
-import { roles } from '../config';
+import { Roles, Theme } from '../config/enums';
 import { ChatState, ConfigState, IntentionsState, MetaState } from '../interfaces';
 
 export const meta: MetaState = {
@@ -20,7 +20,7 @@ export const config: ConfigState = {
     initialMessage: [],
   },
   translations: {},
-  themeId: 'light',
+  themeId: Theme.light,
   chatUrl: '',
   enableDevTools: false,
   isPluginMode: false,
@@ -32,7 +32,7 @@ export const chat: ChatState = {
   outgoing: {
     term: '',
     user_id: '',
-    role: roles.user,
+    role: Roles.user,
     message: ''
   },
   queue: [],

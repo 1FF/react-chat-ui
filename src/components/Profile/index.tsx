@@ -1,18 +1,14 @@
+import { ScreenOrientation } from '../../config/enums';
 import { useAppSelector } from '../../hooks';
 import { getConfig } from '../../store/slices/config';
 import { profile as variant } from './variants';
 
-export enum Orientation {
-  horizontal = 'horizontal',
-  vertical = 'vertical',
-}
-
 type ProfileProps = {
-  orientation?: Orientation;
+  orientation?: ScreenOrientation.vertical | ScreenOrientation.horizontal;
   minimized?: boolean,
 }
 
-export const Profile = ({ orientation = Orientation.horizontal, minimized = false }: ProfileProps) => {
+export const Profile = ({ orientation = ScreenOrientation.horizontal, minimized = false }: ProfileProps) => {
   const { aiProfile, themeId: theme } = useAppSelector(getConfig);
   const { base, avatar, info, name, role, imgWrapper } = variant({ theme, orientation, minimized });
 

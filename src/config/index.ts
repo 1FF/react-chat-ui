@@ -1,11 +1,11 @@
 import { faker } from '@faker-js/faker';
 import { colors as baseThemeColors } from './themes/base';
-import roles from './roles';
-import { ButtonsMessage, ImageMessage, MessageType, TextMessage, VideoMessage, PaymentMessage, EmailMessage } from '../interfaces';
-export { config, events } from './socket';
-export { roles } from './roles';
+import { Definition, Roles } from './enums';
+import { ImageMessage, PaymentMessage, EmailMessage, TextMessage, VideoMessage, ButtonsMessage } from '../interfaces/index';
+export { Events } from './enums';
+export { config } from './socket';
 
-export const dateFormattingOptions = {
+export const dateFormattingOptions: { [key: string]: string } = {
   day: 'numeric',
   month: 'long',
   year: 'numeric',
@@ -47,14 +47,31 @@ export const chat = (id: string) => ({
       imgSrc: 'https://storage.1forfit.com/4oZrkOwbOQcSIGJopBG5qsf0CmBbVDKDqflzEkXq.jpg',
       welcome: 'Welcome to our live support. We\'re here to understand your requirements and suggest the best Keto diet suited for you.',
       // initialMessage: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you. [yes|no|continue]',
+      // initialMessage: [
+      //   { type: 'text', text: '[Google](https://google.com). Do you want to lose weight?My favorite search engine is [Duck Duck Go](https://duckduckgo.com).', sequence: 6, id: '', time: new Date().getTime() },
+      //   {
+      //     type: 'buttons',
+      //     buttons: [{ sequence: 1, value: 'Okay', text: 'option 1' }, { sequence: 2, value: 'Goodbye', text: 'option 2' }],
+      //     sequence: 1,
+      //     id: ''
+      //   },
+      // ],
+
       initialMessage: [
-        { type: 'text', text: '[Google](https://google.com). Do you want to lose weight?My favorite search engine is [Duck Duck Go](https://duckduckgo.com).', sequence: 6, id: '', time: new Date().getTime() },
         {
-          type: 'buttons',
-          buttons: [{ sequence: 1, value: 'Okay', text: 'option 1' }, { sequence: 2, value: 'Goodbye', text: 'option 2' }],
-          sequence: 1,
-          id: ''
+          type: 'text',
+          // text: '[Google](https://google.com). Do you want to lose weight?My favorite search engine is [Duck Duck Go](https://duckduckgo.com).',
+          text: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you.',
+          sequence: 6,
+          id: 'asdaawe4534',
+          time: new Date().getTime()
         },
+        {
+          type: "buttons",
+          role: 'assistant',
+          id: 'asdaawe4534',
+          "buttons": [{ sequence: 1, value: 'Okay', text: 'Okay' }, { sequence: 2, value: 'Goodbye', text: 'Goodbye' }]
+        }
       ]
     },
     purpose: 'default',
@@ -201,10 +218,10 @@ export const streamMocks = {
 };
 
 const contentMock = [
-  { type: 'text', text: 'hello', role: roles.assistant, sequence: 1, time: 1700119723000 },
+  { type: 'text', text: 'hello', role: Roles.assistant, sequence: 1, time: 1700119723000 },
   {
     type: 'buttons',
-    role: roles.assistant,
+    role: Roles.assistant,
     buttons: [
       { sequence: 1, value: 'Okay', text: 'option 1' },
       { sequence: 2, value: 'Goodbye', text: 'option 2' }],
@@ -224,91 +241,89 @@ export const serverHistoryMock = [
 
 export const serverHistoryMockWithLink = [
   ...serverHistoryMock,
-  { id: faker.string.uuid(), role: 'assistant', content: [{ type: 'text', text: 'hello [test](https://test.com).', role: roles.assistant, sequence: 1, time: 1700119723000 }] }
+  { id: faker.string.uuid(), role: 'assistant', content: [{ type: 'text', text: 'hello [test](https://test.com).', role: Roles.assistant, sequence: 1, time: 1700119723000 }] }
 ];
 
 export const serverHistoryMockWithEmailIntent = [
   ...serverHistoryMock,
-  { id: faker.string.uuid(), role: 'assistant', content: [{ type: 'email', email: 'Give us email', role: roles.assistant, sequence: 1, time: 1700119723000 }] }
+  { id: faker.string.uuid(), role: 'assistant', content: [{ type: 'email', email: 'Give us email', role: Roles.assistant, sequence: 1, time: 1700119723000 }] }
 ];
 
 export const serverHistoryMockWithPaymentIntent = [
   ...serverHistoryMock,
-  { id: faker.string.uuid(), role: 'assistant', content: [{ type: 'payment', payment: 'Give us email', role: roles.assistant, sequence: 1, time: 1700119723000 }] }
+  { id: faker.string.uuid(), role: 'assistant', content: [{ type: 'payment', payment: 'Give us email', role: Roles.assistant, sequence: 1, time: 1700119723000 }] }
 ];
 
-type MessageReducer<T extends MessageType> = (initial: T, current: T) => T;
-
-export const typeReducer: Record<string, MessageReducer<MessageType>> = {
-  text: (initial, current) => {
-    if ('text' in initial && 'text' in current) {
+export const typeReducer = {
+  text: (initial: TextMessage, current: TextMessage) => {
+    if (Definition.text in initial && Definition.text in current) {
       return {
         ...initial,
         ...current,
         text: (initial.text || '') + (current.text || ''),
-      } as TextMessage;
+      }
     }
     return initial;
   },
-  buttons: (initial, current) => {
-    if ('buttons' in initial && 'buttons' in current) {
+  buttons: (initial: ButtonsMessage, current: ButtonsMessage) => {
+    if (Definition.buttons in initial && Definition.buttons in current) {
       return {
         ...initial,
         ...current,
         buttons: [...(initial.buttons || []), ...(current.buttons || [])],
-      } as ButtonsMessage;
+      }
     }
     return initial;
   },
-  image: (initial, current) => {
-    if ('image' in initial && 'image' in current) {
+  image: (initial: ImageMessage, current: ImageMessage) => {
+    if (Definition.image in initial && Definition.image in current) {
       return {
         ...initial,
         ...current,
         image: { ...initial.image, ...current.image }
-      } as ImageMessage
+      }
     }
     return initial;
   },
-  video: (initial, current) => {
-    if ('video' in initial && 'video' in current) {
+  video: (initial: VideoMessage, current: VideoMessage) => {
+    if (Definition.video in initial && Definition.video in current) {
       return {
         ...initial,
         ...current,
         video: { ...initial.video, ...current.video }
-      } as VideoMessage
+      }
     }
     return initial;
   },
-  email: (initial, current) => {
-    if ('email' in initial && 'email' in current) {
+  email: (initial: EmailMessage, current: EmailMessage) => {
+    if (Definition.email in initial && Definition.email in current) {
       return {
         ...initial,
         ...current,
         email: initial.email + current.email
-      } as EmailMessage
+      }
     }
     return initial
   },
-  payment: (initial, current) => {
-    if ('payment' in initial && 'payment' in current) {
+  payment: (initial: PaymentMessage, current: PaymentMessage) => {
+    if (Definition.payment in initial && Definition.payment in current) {
       return {
         ...initial,
         ...current,
         payment: initial.payment + current.payment
-      } as PaymentMessage
+      }
     }
     return initial
   },
 };
 
 export const initialStructure = {
-  text: { type: 'text', text: '' },
-  buttons: { type: 'buttons', buttons: [] },
-  image: { type: 'image', image: {} },
-  video: { type: 'video', video: {} },
-  payment: { type: 'payment', payment: '' },
-  email: { type: 'email', email: '' },
+  text: { type: Definition.text, text: '' },
+  payment: { type: Definition.payment, payment: '' },
+  email: { type: Definition.email, email: '' },
+  image: { type: Definition.image, image: {} },
+  video: { type: Definition.video, video: {} },
+  buttons: { type: Definition.buttons, buttons: [] },
 };
 
 export default { colors };
