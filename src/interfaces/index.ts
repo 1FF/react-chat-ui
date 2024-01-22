@@ -1,30 +1,31 @@
-import { Definition, Roles, Theme } from '../config/enums';
+import { Definition, Roles } from '../config/enums';
 
 export interface TextMessage {
-  type: 'text';
+  type: Definition.text;
   text: string;
 }
 
 export interface ButtonsMessage {
-  type: 'buttons';
+  type: Definition.buttons;
   buttons: Array<ButtonOptions>;
 }
 
 export interface PaymentMessage {
-  type: 'payment';
+  type: Definition.payment;
   payment: string;
 }
 
 export interface EmailMessage {
-  type: 'email';
+  type: Definition.email;
   email: string;
 }
 interface VideoProps {
   url: string;
   title: string | null;
-};
+}
+
 export interface VideoMessage {
-  type: 'video';
+  type: Definition.video;
   video: VideoProps
 }
 
@@ -33,7 +34,7 @@ interface ImageProps {
   alt: string | null
 }
 export interface ImageMessage {
-  type: 'image';
+  type: Definition.image;
   image: ImageProps
 }
 
@@ -51,27 +52,37 @@ export interface BaseOptions extends ButtonOptions {
 }
 
 export interface OptionsListProps {
-  options: Array<BaseOptions>
+  options: Array<BaseOptions> | undefined
 }
 
 export type AssistantMessageTypeUnion = TextMessage | ButtonsMessage | EmailMessage | VideoMessage | ImageMessage | PaymentMessage;
 
-export interface AssistantHistoryData {
-  id: string;
-  role: Roles.assistant;
-  content: Array<AssistantMessageTypeUnion>
-}
-
 export type SupportedMessageTypes = Definition.text | Definition.buttons | Definition.payment | Definition.email | Definition.video | Definition.image;
 
-export interface AssistantProps {
-  message: { content: Array<AssistantMessageTypeUnion> };
-  isLast?: boolean;
+export interface AssistantRecord {
+  type: SupportedMessageTypes,
+  sequence: number,
+  text?: string;
+  video?: VideoProps;
+  image?: ImageProps;
+  buttons?: Array<ButtonOptions>;
+  email?: string;
+  payment?: string;
 }
-export interface PossibleProps {
+
+export interface SocketHistoryRecord {
+  id: string,
+  role: string,
+  time: number,
+  content: string | Array<AssistantRecord>
+}
+
+export interface MessageProperties {
+  id?: string;
+
   //assistant
-  type?: Definition.text | Definition.video | Definition.image | Definition.buttons | Definition.payment | Definition.email;
-  sequence: number;
+  type?: SupportedMessageTypes;
+  sequence?: number;
   text?: string;
   video?: VideoProps;
   image?: ImageProps;
@@ -84,82 +95,6 @@ export interface PossibleProps {
   sent?: boolean;
   resend?: boolean;
   message?: string;
-}
-
-export interface ChatState {
-  outgoing: {
-    term: string,
-    user_id: string,
-    role: Roles.user,
-    message: string,
-  },
-  //TODO: define those below
-  queue: any[],
-  history: any[],
-  historyData: Record<string, {
-    id: string,
-    role: Roles.assistant | Roles.user;
-    content: Array<PossibleProps>
-  }>;
-  historyIds: Array<string>,
-
-  error: string,
-  isLoading: boolean,
-  typingTimeoutExpired: boolean,
-  lastGroupId: string,
-  connected: boolean,
-  closed: boolean,
-  isStreaming: boolean,
-}
-
-export interface ConfigState {
-  aiProfile: {
-    name: string,
-    role: string,
-    imgSrc: string,
-    welcome: string,
-    // initialMessage: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you. [yes|no|continue]',
-    initialMessage: Array<AssistantMessageTypeUnion>
-  },
-  purpose: string,
-  chatUrl: string,
-  themeId: Theme.light | Theme.dark,
-  translations: any,
-  closeVisible: boolean,
-  enableDevTools: boolean,
-  isPluginMode: boolean,
-}
-
-export interface MetaState { systemType: string, eid: string, cid: string, region: string, marketing: any, pd: any }
-
-export interface IntentionsState {
-  email: {
-    current: string,
-    success: boolean,
-    error: boolean,
-    isFormVisible: boolean,
-    isLoading: boolean,
-  },
-  response: {
-    value: string,
-    isFormVisible: boolean,
-    isLoading: boolean,
-    error: boolean,
-  },
-  payment: {
-    isButtonVisible: boolean,
-    isFormVisible: boolean,
-    isSuccessful: boolean,
-    error: boolean
-  },
-  messaging: {
-    isVisible: boolean
-  },
-  link: {
-    isVisible: boolean,
-    href: string,
-    text: string
-  }
 }
 
 export type PredefinedMessagePayload = {
@@ -184,13 +119,11 @@ export interface UserHistoryDataFiller {
   content: UserMessageContent
 }
 
-
 export interface AssistantHistoryDataFiller {
   id: string;
-  sequence: number;
-  content: MessageTypes;
+  content?: AssistantRecord;
+  sequence?: number;
 }
-
 
 export interface ClientMessage {
   role: Roles.assistant | Roles.user;
@@ -206,36 +139,3 @@ export interface PaymentDataSetterProps {
 }
 
 export type PaymentDataSetter = (data: PaymentDataSetterProps) => PaymentDataSetterProps;
-
-
-type MessageTypeMap = {
-  text: TextMessage;
-  buttons: ButtonsMessage;
-  payment: PaymentMessage;
-  email: EmailMessage;
-  video: VideoMessage;
-  image: ImageMessage;
-};
-
-// export type mapwithdynamicprops = {
-//   [K in keyof MessageTypeMap]: MessageTypeMap[K];
-// };
-
-interface BaseStream {
-  id: string
-  role: Roles.assistant,
-  sequence: number
-}
-
-interface MessageTypes {
-  type: Definition.text | Definition.video | Definition.image | Definition.buttons | Definition.payment | Definition.email;
-  sequence: number;
-  text?: string;
-  video?: VideoProps;
-  image?: ImageProps;
-  buttons?: Array<ButtonOptions>;
-  email?: string;
-  payment?: string;
-}
-
-export type StreamData = BaseStream & MessageTypes

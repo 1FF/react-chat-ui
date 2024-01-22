@@ -1,15 +1,9 @@
-import { FC, ReactElement, MouseEvent } from 'react';
+import { ButtonProps } from '../../interfaces/component';
 import { useAppSelector } from '../../hooks';
 import { getConfig } from '../../store/slices/config';
-import { BasicVariants, basic as variant } from './variants';
+import { basic as variant } from './variants';
 
-interface BtnProps extends BasicVariants {
-  text?: string;
-  onClick?: (event: MouseEvent<HTMLButtonElement>) => void;
-  e2e?: string;
-}
-
-export const Btn: FC<BtnProps> = ({ text = '', onClick, e2e }): ReactElement => {
+export const Btn = ({ text = '', onClick, e2e }: ButtonProps) => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { base } = variant({ theme });
 

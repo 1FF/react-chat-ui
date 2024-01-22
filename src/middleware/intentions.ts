@@ -1,5 +1,4 @@
 import { Middleware } from '@reduxjs/toolkit';
-import { uid } from 'uid';
 import { AllEvents, Roles } from '../config/enums';
 import { track } from '../services/tracking';
 import intent from '../services/intentions';
@@ -9,7 +8,7 @@ import { addPredefinedAssistantMessage, fillUserHistoryData, setOutgoing } from 
 import { STORING_CHECKER_INTERVAL } from '../config/env';
 import { RootState } from '../store';
 import { PaymentDataSetter, PaymentDataSetterProps } from '../interfaces';
-
+import { uuidV4 } from '../utils';
 
 
 export const intentionsMiddleware: Middleware = store => next => {
@@ -31,7 +30,7 @@ export const intentionsMiddleware: Middleware = store => next => {
     store.dispatch(setEmailError(''));
     store.dispatch(
       fillUserHistoryData({
-        id: uid(),
+        id: uuidV4(),
         role: Roles.user,
         sequence:1,
         content: {sequence:1, message: intentions.email.current, resend: false, sent: true, groupId: '' }

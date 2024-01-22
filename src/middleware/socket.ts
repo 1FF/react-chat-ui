@@ -6,24 +6,21 @@ import {
   setTypingTimeoutExpired, setError,
   setOutgoing, setConnected,
   resetIsLoading, setClosed, resetError, resetOutgoing,
-  updateResendStatus, resendMessage,
-  setLastQuestionId, showResendStatus, pushQueue,
-  removeFromQueue, setQueuedId,
+  hideResendIcon, resendMessage, showResendIcon,
   setIsStreaming, fillAssistantHistoryData,
 } from '../store/slices/chat';
 import { getQueryParam } from '../utils';
-import { setIsEmailFormVisible, setIsPaymentButtonVisible, setResponseFormVisibility } from '../store/slices/intentions';
+import { setResponseFormVisibility } from '../store/slices/intentions';
 import { setConfig } from '../store/slices/config';
-import { track } from '../services/tracking';
 import { setRegion } from '../store/slices/meta';
 import { CHAT_FINISHED_TIMESTAMP } from '../config/env';
-import { Definition, Roles, AllEvents } from '../config/enums';
-import { AssistantHistoryData, StreamData, UserHistoryData, UserMessageContent, ClientMessage, AssistantMessageTypeUnion, TextMessage } from '../interfaces'
+import { Roles } from '../config/enums';
+import { AssistantRecord, UserMessageContent, ClientMessage, SocketHistoryRecord } from '../interfaces'
 
 let socket: Socket;
 
 const chatMiddleware: Middleware = store => next => action => {
-  const { meta, chat, intentions } = store.getState();
+  const { meta, chat } = store.getState();
 
   const onError = () => {
     const { config } = store.getState();
@@ -32,7 +29,7 @@ const chatMiddleware: Middleware = store => next => action => {
   };
 
   const dispatchRetry = () => {
-    store.dispatch(showResendStatus());
+    store.dispatch(showResendIcon({ itemId: chat.historyIds.pop() }));
     onError();
   };
 
@@ -42,7 +39,7 @@ const chatMiddleware: Middleware = store => next => action => {
     }
 
     if (socket && socket.connected && data.message.trim() !== '') {
-      socket.volatile.emit(Events.chat, { time: new Date().getTime(), ...data }, withTimeout(dispatchRetry));
+      socket.emit(Events.chat, { time: new Date().getTime(), ...data }, withTimeout(dispatchRetry));
       store.dispatch(resetError());
       return;
     }
@@ -50,27 +47,23 @@ const chatMiddleware: Middleware = store => next => action => {
     dispatchRetry();
   };
 
-  const handleMessageResending = (data: { groupId: string, content: string }) => {
-    store.dispatch(updateResendStatus({ groupId: data.groupId, content: data.content || '', resend: false, sent: true }));
+  const handleMessageResending = (data: { itemId: string, message: string }) => {
+    store.dispatch(hideResendIcon(data));
     store.dispatch(setIsLoading());
-    store.dispatch(pushQueue(data));
 
     const onResendError = () => {
       const { config } = store.getState();
-      store.dispatch(removeFromQueue(data));
-      store.dispatch(updateResendStatus({ groupId: data.groupId, content: data.content || '', resend: true, sent: false }));
+      store.dispatch(showResendIcon(data));
       store.dispatch(resetIsLoading());
       store.dispatch(setError(config.translations.error));
     };
-    // TODO define those types correctly
-    const message = data.groupId ? chat.history.filter((item: { groupId: string }) => item.groupId === data.groupId).map((item: { content: string }) => item.content).join('\n') : data.content;
 
-    if (socket && socket.connected && message.trim() !== '') {
+    if (socket && socket.connected && data.message.trim() !== '') {
       socket.volatile.emit(
         Events.chat,
         {
           role: Roles.user,
-          message,
+          message: data.message,
           term: getQueryParam(window.location.search, 'utm_chat'),
           user_id: meta.cid,
           region: meta.region,
@@ -123,30 +116,6 @@ const chatMiddleware: Middleware = store => next => action => {
     }
   }
 
-  if (setIsPaymentButtonVisible.match(action) && action.payload === true) {
-    const data = {
-      eventType: AllEvents.addToCart,
-      systemType: meta.systemType,
-      utmParams: meta.marketing.lastUtmParams,
-      customerUuid: meta.cid,
-      email: intentions.email.current
-    };
-
-    track(data);
-
-    data.eventType = AllEvents.priceSeen;
-    track(data);
-  }
-
-  if (setIsEmailFormVisible.match(action) && action.payload) {
-    track({
-      eventType: AllEvents.emailField,
-      systemType: meta.systemType,
-      utmParams: meta.marketing.lastUtmParams,
-      customerUuid: meta.cid,
-    });
-  }
-
   if (resendMessage.match(action)) {
     handleMessageResending(action.payload);
   }
@@ -168,12 +137,10 @@ const chatMiddleware: Middleware = store => next => action => {
   });
 
   socket.on(Events.chatHistory, ({ history: servedHistory, errors, region }
-    : { history: Array<UserHistoryData> | Array<AssistantHistoryData>, errors: string[], region: string }) => {
+    : { history: Array<SocketHistoryRecord>, errors: string[], region: string }) => {
     store.dispatch(resetIsLoading());
     store.dispatch(setRegion(region));
-    const { config, meta, chat } = store.getState();
-
-    if (chat.error) return;
+    const { config, meta } = store.getState();
 
     if (errors.length) {
       store.dispatch(setError(errors[0]));
@@ -183,64 +150,46 @@ const chatMiddleware: Middleware = store => next => action => {
     if (servedHistory.length) {
       store.dispatch(setExistingHistory(servedHistory));
       const last = [...servedHistory].pop();
-      if (!last) return;
-      store.dispatch(setResponseFormVisibility(last.content));
-      store.dispatch(setIsEmailFormVisible(last.content.some(el => Definition.email in el && el.type === Definition.email)));
-      store.dispatch(setIsPaymentButtonVisible(last.content.some(el => Definition.payment in el && el.type === Definition.payment)));
-      return;
+      if (last && Array.isArray(last.content)) {
+        store.dispatch(setResponseFormVisibility(last.content));
+      }
+      return
     }
 
-    const initialMessageId = config.aiProfile.initialMessage[0].id
-    const initialMessageData = { id: initialMessageId, role: Roles.assistant, content: config.aiProfile.initialMessage } as AssistantHistoryData
-    store.dispatch(
-      setExistingHistory([initialMessageData])
-    );
-    store.dispatch(setResponseFormVisibility(initialMessageData.content));
-
-    handleMessageSending({
-      role: Roles.assistant,
-      term: getQueryParam(window.location.search, 'utm_chat') || '',
-      user_id: meta.cid,
-      message: JSON.stringify(config.aiProfile.initialMessage),
-      messageId: initialMessageId,
-      region: meta.region,
-    });
+    store.dispatch(setExistingHistory(config.aiProfile.initialMessage));
+    config.aiProfile.initialMessage.forEach((message: SocketHistoryRecord) =>
+      handleMessageSending({
+        role: Roles.assistant,
+        term: getQueryParam(window.location.search, 'utm_chat') || '',
+        user_id: meta.cid,
+        message: JSON.stringify(message.content),
+        messageId: message.id,
+        region: meta.region,
+      }));
   });
 
-  socket.on(Events.streamStart, (data: StreamData) => {
+  socket.on(Events.streamStart, (data: AssistantRecord & { id: string }) => {
     store.dispatch(setIsStreaming(true));
     store.dispatch(resetIsLoading());
     store.dispatch(resetOutgoing());
     store.dispatch(resetError());
-    store.dispatch(fillAssistantHistoryData({ id: data.id, sequence: 1, content: { type: Definition.text, text: '', sequence: 1 } }));
+    store.dispatch(fillAssistantHistoryData({ id: data.id }));
   });
 
-  socket.on(Events.streamData, (data: StreamData & { errors: Array<string> }) => {
+  socket.on(Events.streamData, (data: AssistantRecord & { id: string, errors: Array<string> }) => {
     const assistantData = { id: data.id, sequence: data.sequence, content: { type: data.type, [data.type]: data[data.type], sequence: data.sequence } };
 
-    if (data.type === Definition.email) store.dispatch(setIsEmailFormVisible(true));
-    if (data.type === Definition.payment) store.dispatch(setIsPaymentButtonVisible(true));
     store.dispatch(fillAssistantHistoryData(assistantData));
 
     const { chat } = store.getState();
-    store.dispatch(setResponseFormVisibility(chat.historyData[[...chat.historyIds].pop()].content));
+    store.dispatch(setResponseFormVisibility(chat.historyData[data.id].content));
 
-    if ('errors' in data && data.errors.length && !chat.error) {
+    if (data.errors?.length && !chat.error) {
       store.dispatch(setError(data.errors[0]));
     }
   });
 
-  socket.on(Events.streamEnd, (data: StreamData) => {
-    const { chat } = store.getState();
-    const queued = chat.queue.length && chat.queue[chat.queue.length - 1];
-
-    if (queued) {
-      store.dispatch(setQueuedId({ ...queued, id: data.id }));
-      store.dispatch(removeFromQueue(queued));
-    } else {
-      store.dispatch(setLastQuestionId(data.id));
-    }
-
+  socket.on(Events.streamEnd, (data: AssistantRecord & { id: string }) => {
     store.dispatch(setIsStreaming(false));
   });
 
@@ -262,7 +211,6 @@ const withTimeout = (onTimeout: () => void, timeout: number = 5000) => {
     onTimeout();
   }, timeout);
 
-  // this part is executed by the server according to socket io docs
   return () => {
     if (called) return;
     called = true;

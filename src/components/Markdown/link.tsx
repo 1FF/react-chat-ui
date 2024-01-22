@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect,MouseEvent } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import formatting from '../../utils/formatting';
 import { LINK_CLICKED_KEY } from '../../config/env';
@@ -8,14 +8,7 @@ import { getMeta } from '../../store/slices/meta';
 import { setLink } from '../../store/slices/intentions';
 import { getConfig } from '../../store/slices/config';
 import { AllEvents } from '../../config/enums';
-
-export type MarkdownProperties = {
-  href?: string | undefined,
-}
-
-type MarkdownLinkProps = {
-  properties: MarkdownProperties
-}
+import { MarkdownLinkProps } from '../../interfaces/component';
 
 export const MarkdownLink = ({ properties }: MarkdownLinkProps) => {
   const { translations } = useAppSelector(getConfig);
@@ -30,7 +23,7 @@ export const MarkdownLink = ({ properties }: MarkdownLinkProps) => {
     }));
   });
 
-  const onClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const onClick = (e: MouseEvent<HTMLAnchorElement>) => {
     localStorage.setItem(LINK_CLICKED_KEY, e.currentTarget.href);
     track({
       eventType: AllEvents.linkClicked,

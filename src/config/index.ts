@@ -1,6 +1,7 @@
 import { colors as baseThemeColors } from './themes/base';
-import { Definition } from './enums';
-import { PossibleProps } from '../interfaces/index';
+import { Definition, Roles } from './enums';
+import { AssistantRecord } from '../interfaces/index';
+import { uuidV4 } from '../utils';
 export { Events, Roles } from './enums';
 export { config } from './socket';
 
@@ -37,32 +38,30 @@ export const chat = (id: string) => ({
       role: 'AI-powered nutritionist',
       imgSrc: 'https://storage.1forfit.com/4oZrkOwbOQcSIGJopBG5qsf0CmBbVDKDqflzEkXq.jpg',
       welcome: 'Welcome to our live support. We\'re here to understand your requirements and suggest the best Keto diet suited for you.',
-      // initialMessage: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you. [yes|no|continue]',
-      // initialMessage: [
-      //   { type: 'text', text: '[Google](https://google.com). Do you want to lose weight?My favorite search engine is [Duck Duck Go](https://duckduckgo.com).', sequence: 6, id: '', time: new Date().getTime() },
-      //   {
-      //     type: 'buttons',
-      //     buttons: [{ sequence: 1, value: 'Okay', text: 'option 1' }, { sequence: 2, value: 'Goodbye', text: 'option 2' }],
-      //     sequence: 1,
-      //     id: ''
-      //   },
-      // ],
-
       initialMessage: [
         {
-          type: 'text',
-          // text: '[Google](https://google.com). Do you want to lose weight?My favorite search engine is [Duck Duck Go](https://duckduckgo.com).',
-          text: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you.',
-          sequence: 6,
-          id: 'asdaawe4534',
-          time: new Date().getTime()
+          id: uuidV4(),
+          role: Roles.assistant,
+          time: new Date().getTime(),
+          content: [
+            { "type": "text", "text": "See this picture", "sequence": 2 },
+            { "type": "text", "text": "See this picture", "sequence": 2 },
+            {
+              type: 'image',
+              image: { url: 'https://static.boredpanda.com/blog/wp-content/uploads/2016/08/wet-dogs-before-after-bath-fb6__700-png.jpg' },
+              sequence: 1,
+            }
+          ]
         },
         {
-          type: "buttons",
-          role: 'assistant',
-          id: 'asdaawe4534',
-          "buttons": [{ sequence: 1, value: 'Okay', text: 'Okay' }, { sequence: 2, value: 'Goodbye', text: 'Goodbye' }]
-        }
+          id: uuidV4(),
+          role: Roles.assistant,
+          time: new Date().getTime(),
+          content: [
+            { "type": "text", "text": "Do you want to lose weight?", "sequence": 2 },
+            { "type": "buttons", "sequence": 1, "buttons": [{ "value": "Yes", "sequence": 1, "text": "Yes" }, { "value": "No", "sequence": 2, "text": "No" }] }
+          ]
+        },
       ]
     },
     purpose: 'default',
@@ -107,76 +106,20 @@ export const paymentData = {
   displayPlanPrice: '$29.90'
 };
 
-export const typeReducer = {
-  text: (initial: PossibleProps, current: PossibleProps): PossibleProps => {
-    if (Definition.text in initial && Definition.text in current) {
-      return {
-        ...initial,
-        ...current,
-        text: (initial.text || '') + (current.text || ''),
-      }
-    }
-    return current;
-  },
-  buttons: (initial: PossibleProps, current: PossibleProps): PossibleProps => {
-    if (Definition.buttons in initial && Definition.buttons in current) {
-      return {
-        ...initial,
-        ...current,
-        buttons: [...(initial.buttons || []), ...(current.buttons || [])],
-      }
-    }
-    return current;
-  },
-  image: (initial: PossibleProps, current: PossibleProps): PossibleProps => {
-    if (initial.image && current.image) {
-      return {
-        ...initial,
-        ...current,
-        image: { ...initial.image, ...current.image }
-      }
-    }
-    return current;
-  },
-  video: (initial: PossibleProps, current: PossibleProps): PossibleProps => {
-    if (initial.video && current.video) {
-      return {
-        ...initial,
-        ...current,
-        video: { ...initial.video, ...current.video }
-      }
-    }
-    return current;
-  },
-  email: (initial: PossibleProps, current: PossibleProps): PossibleProps => {
-    if (initial.email && current.email) {
-      return {
-        ...initial,
-        ...current,
-        email: initial.email + current.email
-      }
-    }
-    return current
-  },
-  payment: (initial: PossibleProps, current: PossibleProps): PossibleProps => {
-    if (initial.payment && current.payment) {
-      return {
-        ...initial,
-        ...current,
-        payment: initial.payment + current.payment
-      }
-    }
-    return current
-  },
-};
+export const getUnifiedSequence = (current: Array<AssistantRecord>, incoming: AssistantRecord) => {
+  return current.map((record: AssistantRecord) => {
+    const hasMatch = record.sequence === incoming.sequence && record.type === incoming.type;
 
-export const initialStructure = {
-  text: { type: Definition.text, text: '', sequence: 0 },
-  payment: { type: Definition.payment, payment: '', sequence: 0 },
-  email: { type: Definition.email, email: '', sequence: 0 },
-  image: { type: Definition.image, image: { url: '', alt: '', title: '' }, sequence: 0 },
-  video: { type: Definition.video, video: { url: '', alt: '', title: '' }, sequence: 0 },
-  buttons: { type: Definition.buttons, buttons: [], sequence: 0 },
+    if (hasMatch && record.type === Definition.text && incoming.text) {
+      return { ...record, text: record.text + incoming.text }
+    }
+
+    if (hasMatch && record.type === Definition.buttons && incoming?.buttons?.length && record?.buttons?.length) {
+      return { ...record, buttons: [...record.buttons, ...incoming.buttons] }
+    }
+
+    return record;
+  })
 };
 
 export default { colors };

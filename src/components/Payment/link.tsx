@@ -1,12 +1,6 @@
-import { MouseEvent, forwardRef } from 'react';
+import { forwardRef } from 'react';
 import payment from './variants';
-
-type LinkProps = {
-  href: string,
-  text: string,
-  onClick?: (event: MouseEvent<HTMLAnchorElement>) => void,
-  e2e?: string
-};
+import { LinkProps } from '../../interfaces/component';
 
 export const Link = forwardRef<HTMLAnchorElement, LinkProps>((props, ref) => {
   const { link } = payment();

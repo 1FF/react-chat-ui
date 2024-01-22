@@ -7,12 +7,6 @@ export const streamMock = [
   { type: 'text', text: '', id: '', time: new Date().getTime() },
   { type: 'text', text: 'Hello ', sequence: 6, id: '', time: new Date().getTime() },
   { type: 'text', text: 'My favorite search engine is [Duck Duck Go](https://duckduckgo.com). [Google](https://google.com).', sequence: 2, id: '' },
-  // {
-  //   type: 'image',
-  //   image: { url: 'https://static.boredpanda.com/blog/wp-content/uploads/2016/08/wet-dogs-before-after-bath-fb6__700-png.jpg' },
-  //   sequence: 38,
-  //   id: ''
-  // },
   { type: 'text', text: 'to ', sequence: 3, id: '' },
   { type: 'text', text: 'talk with I just love **bold text**.', sequence: 4, id: '' },
   { type: 'text', text: 'you', sequence: 5, id: '' },
@@ -110,10 +104,11 @@ export const streamMocks = {
 };
 
 const contentMock = [
-  { type: 'text', text: 'hello', role: Roles.assistant, sequence: 1 },
+  { type: 'text', time: 1700119723000, text: 'hello', role: Roles.assistant, sequence: 1 },
   {
     type: 'buttons',
     role: Roles.assistant,
+    time: 1700119723000,
     buttons: [
       { sequence: 1, value: 'Okay', text: 'option 1' },
       { sequence: 2, value: 'Goodbye', text: 'option 2' }],
@@ -121,13 +116,13 @@ const contentMock = [
   }];
 
 export const serverHistoryMock = [
-  { id: faker.string.uuid(), time: 1700119723000, role: Roles.assistant, content: contentMock },
-  { id: faker.string.uuid(), time: 1700119723001, role: Roles.user, content: 'user test' },
-  { id: faker.string.uuid(), time: 1700119723002, role: Roles.assistant, content: contentMock },
-  { id: faker.string.uuid(), time: 1700119723003, role: Roles.user, content: 'user test' },
-  { id: faker.string.uuid(), time: 1700119723004, role: Roles.assistant, content: contentMock },
-  { id: faker.string.uuid(), time: 1700119723005, role: Roles.user, content: 'user test' },
-  { id: faker.string.uuid(), time: 1700119723006, role: Roles.assistant, content: contentMock },
+  { id: faker.string.uuid(), role: Roles.assistant, content: contentMock },
+  { id: faker.string.uuid(), role: Roles.user, content: 'user test' },
+  { id: faker.string.uuid(), role: Roles.assistant, content: contentMock },
+  { id: faker.string.uuid(), role: Roles.user, content: 'user test' },
+  { id: faker.string.uuid(), role: Roles.assistant, content: contentMock },
+  { id: faker.string.uuid(), role: Roles.user, content: 'user test' },
+  { id: faker.string.uuid(), role: Roles.assistant, content: contentMock },
 ];
 
 export const serverHistoryMockWithLink = [

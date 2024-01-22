@@ -1,19 +1,31 @@
-import { MouseEvent } from 'react';
+import { useEffect } from 'react';
+import { PaymentButtonProps } from '../../interfaces/component';
 import { useAppSelector } from '../../hooks';
 import { getConfig } from '../../store/slices/config';
-
 import { payment as variant } from './variants';
-
-type PaymentButtonProps = {
-  text: string,
-  onClick: (event: MouseEvent<HTMLButtonElement>) => void,
-  e2e?: string,
-  disabled: boolean,
-};
+import { track } from '../../services/tracking';
+import { AllEvents } from '../../config/enums';
 
 export const PaymentButton = ({ text, onClick, e2e, disabled = false }: PaymentButtonProps) => {
   const { themeId: theme } = useAppSelector(getConfig);
+  const meta = useAppSelector(state => state.meta);
+  const currentEmail = useAppSelector(state => state.intentions.email.current);
   const { btn } = variant({ theme });
+
+  useEffect(() => {
+    const data = {
+      eventType: AllEvents.addToCart,
+      systemType: meta.systemType,
+      utmParams: meta.marketing.lastUtmParams,
+      customerUuid: meta.cid,
+      email: currentEmail
+    };
+
+    track(data);
+
+    data.eventType = AllEvents.priceSeen;
+    track(data);
+  }, [])
 
   return (
     <button

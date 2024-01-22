@@ -1,11 +1,12 @@
-import { uid } from 'uid';
 import produce from 'immer';
 import { createSlice, PayloadAction, Draft } from '@reduxjs/toolkit';
-import { ChatState, UserHistoryData, AssistantHistoryData, AssistantHistoryDataFiller, PredefinedMessagePayload, UserHistoryDataFiller, ButtonOptions, PossibleProps } from '../../interfaces';
+import { AssistantHistoryDataFiller, PredefinedMessagePayload, UserHistoryDataFiller, SocketHistoryRecord, AssistantRecord } from '../../interfaces';
+import { ChatState } from '../../interfaces/store';
 import { chat as initialState } from '../initialState'
 import { getQueryParam } from '../../utils';
-import { initialStructure, typeReducer } from '../../config';
+import { getUnifiedSequence } from '../../config';
 import { Definition, Roles } from '../../config/enums';
+import { uuidV4 } from '../../utils';
 
 const configSlice = createSlice({
   name: 'chat',
@@ -22,26 +23,26 @@ const configSlice = createSlice({
     resetOutgoing(state) {
       state.outgoing = initialState.outgoing;
     },
-    pushQueue(state, { payload }: PayloadAction<{ groupId: string; content: string }>) {
-      const notInQueue = !state.queue.find(it => it.groupId === payload.groupId || it.content === payload.content);
-      if (notInQueue) state.queue.push(payload);
-    },
-    removeFromQueue(state, { payload }: PayloadAction<{ groupId: string; content: string }>) {
-      state.queue = state.queue.filter(it => it.groupId !== payload.groupId || it.content !== payload.content) || [];
-    },
-    setExistingHistory(state, { payload }: PayloadAction<Array<UserHistoryData> | Array<AssistantHistoryData>>) {
+    setExistingHistory(state, { payload }: PayloadAction<Array<SocketHistoryRecord>>) {
       return produce(state, (draft) => {
-        draft.historyIds = payload.map((item) => item.id);
+
+        // server has LESS data than frontend -> update the status to unsent
+        if (state.historyIds.length > payload.length) {
+          const unsentMessages = state.historyIds.filter(id => !payload.find(record => record.id === id));
+          unsentMessages.forEach(id => (
+            draft.historyData[id].content = draft.historyData[id].content.map(record => ({ ...record, sent: false, resend: true }))));
+          return
+        }
+
+        draft.historyIds = payload.map(({ id }) => id);
         draft.historyData = payload.reduce((prev, current) => ({
           ...prev,
-          [current.id]: current.role === Roles.user
-            ? { ...current, content: [{ resend: false, sent: true, message: current.content }] }
-            : current
+          [current.id]: fillMissingData(current)
         }), {});
       });
     },
     addPredefinedAssistantMessage(state, { payload }: PayloadAction<PredefinedMessagePayload>) {
-      const id = uid();
+      const id = uuidV4();
       return produce(state, (draft: Draft<ChatState>): void => {
         draft.historyIds.push(id);
         draft.historyData[id] = {
@@ -59,22 +60,24 @@ const configSlice = createSlice({
         const id = payload.id;
 
         if (!draft.historyData[id]) {
-          draft.historyData[id] = { id, role: Roles.assistant, content: [payload.content] };
+          draft.historyData[id] = { id, role: Roles.assistant, content: [] };
           draft.historyIds.push(id);
           return;
         }
 
-        // here we order items by sequence and accumulate the types into one object
+        if (!payload.content) return;
+
         const dataType = payload.content.type;
-        const data = { sequence: payload.sequence, type: dataType, [dataType]: payload.content[payload.content.type] };
+        const data = { sequence: payload.sequence || 1, type: dataType, [dataType]: payload.content[payload.content.type] };
+
+        const hasDuplicatedSequenceAndType = draft.historyData[id].content.some(record => record.sequence === data.sequence && record.type === data.type);
+
+        if (hasDuplicatedSequenceAndType) {
+          draft.historyData[id].content = getUnifiedSequence(draft.historyData[id].content as Array<AssistantRecord>, data);
+          return;
+        }
+
         draft.historyData[id].content.push(data);
-
-        const reducedDataType = draft.historyData[id].content
-          .filter((obj) => obj.type === dataType)
-          .reduce(typeReducer[dataType], initialStructure[dataType]);
-
-        draft.historyData[id].content = [...draft.historyData[id].content.filter(it => it.type !== dataType), reducedDataType];
-        draft.historyData[id].content.sort(sortBySequence);
       });
     },
     fillUserHistoryData(state, { payload }: PayloadAction<UserHistoryDataFiller>) {
@@ -83,7 +86,7 @@ const configSlice = createSlice({
 
         if (payload.content.groupId) {
           Object.entries(draft.historyData).forEach(([key, value]) => {
-            if (value.content.find(el => 'groupId' in el && el.groupId === payload.content.groupId)) {
+            if (value.content.find(el => el.groupId === payload.content.groupId)) {
               belongsTo = key;
             }
           });
@@ -102,26 +105,6 @@ const configSlice = createSlice({
         }
       });
     },
-    // TODO i don't know if we are going to use it; those below
-    setLastQuestionId(state, { payload }: PayloadAction<string>) {
-      // state.history = state.history.map((item: HistoryItem) => {
-      //   if (!item.id) {
-      //     item.id = payload;
-      //   }
-      //   return item;
-      // });
-    },
-    setQueuedId(state, { payload }: PayloadAction<{ groupId: string; id: string, content: string }>) {
-      // state.history = state.history.map((item: HistoryItem) => {
-      //   if (!item.id && item.groupId === payload.groupId) {
-      //     item.id = payload.id;
-      //   }
-      //   if (!item.id && item.content === payload.content) {
-      //     item.id = payload.id;
-      //   }
-      //   return item;
-      // });
-    },
     setIsLoading(state) {
       state.isLoading = true;
     },
@@ -137,36 +120,21 @@ const configSlice = createSlice({
     setClosed(state) {
       state.closed = true;
     },
-    updateResendStatus(state, { payload }: PayloadAction<{ groupId: string; content: string; resend: boolean; sent: boolean }>) {
-      state.history = state.history.map(item => {
-        if (!item.id && payload.groupId === item.groupId) {
-          item = { ...item, resend: payload.resend, sent: payload.sent };
-        }
-        if (!item.id && payload.content === item.content) {
-          item = { ...item, resend: payload.resend, sent: payload.sent };
-        }
-        return item;
+    hideResendIcon(state, { payload }: PayloadAction<{ itemId: string }>) {
+      return produce(state, (draft: Draft<ChatState>) => {
+        draft.historyData[payload.itemId].content = draft.historyData[payload.itemId].content.map(record => ({ ...record, sent: true, resend: false }));
       });
     },
-    showResendStatus(state) {
-      // TODO check error handling so that it is as it was on master maybe history will be deprecated
-      state.history = state.history.map((item, index, array) => {
-        if (index === array.length - 1) {
-          item = { ...item, resend: true, sent: false };
-        }
-
-        if (item.role === Roles.user && !item.id) {
-          item = { ...item, resend: true, sent: false };
-        }
-
-        return item;
+    showResendIcon(state, { payload }: PayloadAction<{ itemId: string }>) {
+      return produce(state, (draft: Draft<ChatState>) => {
+        draft.historyData[payload.itemId].content = draft.historyData[payload.itemId].content.map(record => ({ ...record, sent: false, resend: true }));
       });
     },
     setLastGroupPointer(state, { payload }: PayloadAction<string>) {
       state.lastGroupId = payload;
     },
     resendMessage(state, { payload }) {
-      state.history = state.history.map(item => item);
+      // empty - used only to listen in the middleware for changes
     },
     setError(state, { payload }: PayloadAction<string>) {
       state.error = payload;
@@ -182,17 +150,37 @@ const configSlice = createSlice({
 
 export const getChat = (state: { chat: ChatState }) => state.chat;
 export const userMessageFindOne = (state: { chat: ChatState }) => state.chat.historyIds.find((historyId) => state.chat.historyData[historyId].role === Roles.user);
-export const sortBySequence = (a: ButtonOptions | PossibleProps, b: ButtonOptions | PossibleProps) => a.sequence - b.sequence;
+export const sortBySequence = (a: AssistantRecord, b: AssistantRecord) => a.sequence - b.sequence;
 
 export const {
   setOutgoing, resetOutgoing, setExistingHistory,
   addPredefinedAssistantMessage,
   setIsLoading, resetIsLoading, setLastGroupPointer,
   setTypingTimeoutExpired, setError, resetError,
-  setConnected, setClosed, updateResendStatus,
-  resendMessage, setLastQuestionId, showResendStatus,
-  pushQueue, removeFromQueue, setQueuedId, setIsStreaming,
+  setConnected, setClosed, hideResendIcon, showResendIcon,
+  resendMessage, setIsStreaming,
   fillAssistantHistoryData, fillUserHistoryData
 } = configSlice.actions;
 
 export default configSlice.reducer;
+
+
+// this must be removed after data fields being unified;
+// @ts-ignore;
+const fillMissingData = (currentRecord) => {
+  if (currentRecord.role === Roles.assistant) {
+    return {
+      // @ts-ignore;
+      ...currentRecord, content: currentRecord.content.map(record => {
+        if (record.sequence) {
+          return record
+        }
+        return { ...record, sequence: Math.floor(Math.random() * 11) }
+      })
+    };
+  }
+
+  if (currentRecord.role == Roles.user) {
+    return { ...currentRecord, content: [{ resend: false, sent: true, message: currentRecord.content }] }
+  }
+}

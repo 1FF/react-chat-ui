@@ -1,21 +1,8 @@
-import { HTMLInputTypeAttribute, forwardRef } from 'react';
+import { forwardRef } from 'react';
 import { useAppSelector } from '../../hooks';
 import { getConfig } from '../../store/slices/config';
-
 import { basic as variant } from './variants';
-export type Ref = HTMLInputElement;
-
-interface BasicInputProps {
-  disabled?: boolean,
-  e2e?: null | string,
-  isLoading: boolean,
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
-  onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement>) => void,
-  name: string,
-  placeholder: string,
-  type: HTMLInputTypeAttribute,
-  value: string,
-}
+import { BasicInputProps } from '../../interfaces/component';
 
 export const Input = forwardRef<HTMLInputElement, BasicInputProps>((props, ref) => {
   const {

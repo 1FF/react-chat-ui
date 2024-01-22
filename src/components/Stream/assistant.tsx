@@ -1,28 +1,30 @@
 import Markdown from 'react-markdown';
-import { uid } from 'uid';
 import { useAppSelector } from '../../hooks';
 import { getConfig } from '../../store/slices/config';
-import { getChat } from '../../store/slices/chat';
+import { getChat, sortBySequence } from '../../store/slices/chat';
 import { getMeta } from '../../store/slices/meta';
 import { flickerEffect } from './variants';
 import OptionList from './options';
 import MarkdownLink from '../Markdown/link';
-import { AssistantProps } from '../../interfaces';
 import { Definition } from '../../config/enums';
+import { uuidV4 } from '../../utils';
+import { AssistantProps } from '../../interfaces/component';
 
-export const Assistant = ({ message, isLast = false }: AssistantProps) => {
+export const Assistant = ({ message, itemId }: AssistantProps) => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { isStreaming } = useAppSelector(getChat);
   const { pd } = useAppSelector(getMeta);
+  const isLast = useAppSelector(state => state.chat.historyIds.length - 1 === state.chat.historyIds.indexOf(itemId));
   const { base: baseFlicker } = flickerEffect({ isTyping: isStreaming && isLast, theme });
+  const sortedContent = [...message.content].sort(sortBySequence);
 
   return (
     <>
-      {message.content.map(it => {
+      {sortedContent.map(it => {
         if (it.type === Definition.text) {
           return (
             <div
-              key={uid()}
+              key={uuidV4()}
               className="tw--flex tw--flex-col tw--space-y-[10px]"
             >
               <span
@@ -41,7 +43,7 @@ export const Assistant = ({ message, isLast = false }: AssistantProps) => {
 
         if (it.type === Definition.buttons && isLast) {
           return (
-            <div key={uid()} className="tw--flex tw--flex-col tw--space-y-[10px]">
+            <div key={uuidV4()} className="tw--flex tw--flex-col tw--space-y-[10px]">
               <OptionList options={it[it.type]} />
             </div>
           );
@@ -50,8 +52,8 @@ export const Assistant = ({ message, isLast = false }: AssistantProps) => {
         if (it.type === Definition.video) {
           return (
             <iframe
-              className="w-full tw--h-80 tw--py-4" key={uid()}
-              title={it[it.type].title || 'Missing title'} src={it[it.type].url + '?enablejsapi=1&rel=0'}
+              className="w-full tw--h-80 tw--py-4" key={uuidV4()}
+              title={it[it.type]?.title || 'Missing title'} src={it[it.type]?.url + '?enablejsapi=1&rel=0'}
               allow="fullscreen"
             />
           );
@@ -60,10 +62,10 @@ export const Assistant = ({ message, isLast = false }: AssistantProps) => {
         if (it.type === Definition.image) {
           return (
             <img
-              key={uid()}
+              key={uuidV4()}
               className="w-full tw--h-auto tw--py-4"
-              src={it[it.type].url}
-              alt={it[it.type].alt || 'chat-image'}
+              src={it[it.type]?.url}
+              alt={it[it.type]?.alt || 'chat-image'}
             />
           );
         }
