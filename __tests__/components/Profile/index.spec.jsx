@@ -4,7 +4,7 @@ import { render } from '@testing-library/react';
 import { useAppSelector } from '../../../src/hooks';
 import Profile from '../../../src/components/Profile/index';
 import profile from '../../../src/components/Profile/variants';
-import { roles } from '../../../src/config';
+import { Roles } from '../../../src/config/enums';
 
 jest.mock('../../../src/hooks');
 jest.mock('../../../src/components/Profile/variants');
@@ -12,7 +12,7 @@ jest.mock('../../../src/components/Profile/variants');
 describe('Profile Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    useAppSelector.mockReturnValue({ themeId: 'light', aiProfile: roles.assistant });
+    useAppSelector.mockReturnValue({ themeId: 'light', aiProfile: Roles.assistant });
     profile.mockReturnValue({ base: jest.fn(),
       avatar: jest.fn(),
       info: jest.fn(),
@@ -27,7 +27,7 @@ describe('Profile Component', () => {
     const { container } = render(<Profile />);
 
     // Assert
-    expect(profile).toBeCalledWith({ orientation: 'horizontal', minimized: false, theme: 'light' });
+    expect(profile).toHaveBeenCalledWith({ orientation: 'horizontal', minimized: false, theme: 'light' });
     expect(container).toBeInTheDocument();
   });
 
@@ -38,7 +38,7 @@ describe('Profile Component', () => {
     const { container } = render(<Profile orientation={ orientation } minimized={ minimized } />);
 
     // Assert
-    expect(profile).toBeCalledWith({ orientation, minimized, theme: 'light' });
+    expect(profile).toHaveBeenCalledWith({ orientation, minimized, theme: 'light' });
     expect(container).toBeInTheDocument();
   });
 });
