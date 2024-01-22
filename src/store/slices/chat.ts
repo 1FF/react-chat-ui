@@ -69,10 +69,11 @@ const configSlice = createSlice({
         const data = { sequence: payload.sequence, type: dataType, [dataType]: payload.content[payload.content.type] };
         draft.historyData[id].content.push(data);
 
-        const reducedText = draft.historyData[id].content
+        const reducedDataType = draft.historyData[id].content
           .filter((obj) => obj.type === dataType)
           .reduce(typeReducer[dataType], initialStructure[dataType]);
-        draft.historyData[id].content = [...draft.historyData[id].content.filter(it => it.type !== dataType), reducedText];
+
+        draft.historyData[id].content = [...draft.historyData[id].content.filter(it => it.type !== dataType), reducedDataType];
         draft.historyData[id].content.sort(sortBySequence);
       });
     },

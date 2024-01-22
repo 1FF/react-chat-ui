@@ -5,13 +5,13 @@ import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { faker } from '@faker-js/faker';
 
 import AppBase from '../../../src/components/AppBase/index';
-import { Events, events, serverHistoryMock, serverHistoryMockWithEmailIntent, serverHistoryMockWithLink, serverHistoryMockWithPaymentIntent, streamMocks } from '../../../src/config';
+import { Events } from '../../../src/config';
 import { formatDateByLocale } from '../../../src/utils';
 import renderWithProviders from '../../../src/utils/storeMockWrapper';
 import { LINK_CLICKED_KEY, STORING_CHECKER_INTERVAL } from '../../../src/config/env';
 import { intent } from '../../../src/main';
 import initialState from '../../../src/store/initialState';
-import { initialConfig } from '../../../src/chatMocks';
+import { initialConfig, serverHistoryMock, serverHistoryMockWithEmailIntent, serverHistoryMockWithLink, serverHistoryMockWithPaymentIntent, streamMocks} from '../../../src/chatMocks';
 
 const actualWindow = window.location;
 
@@ -26,8 +26,7 @@ describe('AppBase, chat-history event and execute properly', () => {
   test('on chat-history event state is shown and saved properly', async () => {
     const items = await screen.findAllByText(initialConfig.app.aiProfile.welcome);
     const name = await screen.findAllByText(initialConfig.app.aiProfile.name);
-    const expectedDate = formatDateByLocale(serverHistoryMock[0].content[0].time);
-
+    const expectedDate = formatDateByLocale(serverHistoryMock[0].time);
     // Act
     act(mockServerHistoryEmit);
 
@@ -50,11 +49,10 @@ describe('AppBase, chat-history event and execute properly', () => {
     expect(config.aiProfile).toStrictEqual(initialConfig.app.aiProfile);
     expect(config.translations).toStrictEqual(initialConfig.app.translations);
     expect(chat.historyIds.length).toStrictEqual(serverHistoryMock.length);
-    expect(chat.historyData[[...chat.historyIds].pop()][1].buttons.length).toBe(2);
+    expect(chat.historyData[[...chat.historyIds].pop()].content[1].buttons.length).toBe(2);
   });
 
   test('on chat-history event state is shown and link is visualized', async () => {
-    const extractedLink = 'https://test123.com';
     // Act
     act(() => mockServerHistoryEmit(serverHistoryMockWithLink));
 
@@ -193,7 +191,7 @@ describe('AppBase, streaming events execute properly', () => {
 
     // Assert
     const { intentions, chat } = root.store.getState();
-    expect(chat.historyData[[...chat.historyIds].pop()][0].email).toBe('EmailEmail');
+    expect(chat.historyData[[...chat.historyIds].pop()].content[0].email).toBe(streamMocks.email[1].email);
     expect(intentions.email.isFormVisible).toBe(true);
     expect(emailFormElement).toBeInTheDocument();
     expect(userFormElement).not.toBeInTheDocument();
@@ -277,7 +275,7 @@ async function localSetup() {
   spies.push(intentOnSpy);
   intentOnSpy.mockReturnValue(() => true);
   await waitFor(() => {
-    root = renderWithProviders(<div id="chatbot-container"><AppBase config={ initialConfig } /></div>);
+    root = renderWithProviders(<div id="chatbot-container"><AppBase config={initialConfig} /></div>);
   });
 }
 
