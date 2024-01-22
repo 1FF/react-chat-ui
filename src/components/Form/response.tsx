@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { uid } from 'uid';
 import { fillUserHistoryData, getChat, setLastGroupPointer, setTypingTimeoutExpired } from '../../store/slices/chat';
 import { getResponseIntentions } from '../../store/slices/intentions';
 import { getConfig } from '../../store/slices/config';
@@ -8,6 +7,7 @@ import { Input } from '../../components/Input';
 import { IconBtn } from '../../components/Button';
 import { layoutFoot as variant } from '../Layout/variants';
 import { Roles } from '../../config/enums';
+import { uuidV4 } from '../../utils';
 
 export const ResponseForm = () => {
   const dispatch = useAppDispatch();
@@ -35,7 +35,7 @@ export const ResponseForm = () => {
     e.preventDefault();
 
     if (response.trim()) {
-      dispatch(fillUserHistoryData({ role: Roles.user, id: uid(), sequence: 1, content: { sequence: 1, message: response, groupId, resend: false, sent: true } }));
+      dispatch(fillUserHistoryData({ role: Roles.user, id: uuidV4(), sequence: 1, content: { sequence: 1, message: response, groupId, resend: false, sent: true } }));
     }
 
     setCurrentResponse('');
@@ -48,7 +48,7 @@ export const ResponseForm = () => {
     }
     const currentId = setTimeout(() => {
       dispatch(setTypingTimeoutExpired(true));
-      dispatch(setLastGroupPointer(uid()));
+      dispatch(setLastGroupPointer(uuidV4()));
     }, 3000);
     setTimerId(currentId);
   };

@@ -1,18 +1,10 @@
-import React, { MouseEvent } from 'react';
 import { useAppSelector } from '../../hooks';
 import { getConfig } from '../../store/slices/config';
 
-import { BasicVariants, icon as variant } from './variants';
+import { icon as variant } from './variants';
+import { IconProps } from '../../interfaces/component';
 
-interface IconProps extends BasicVariants {
-  children: React.ReactNode,
-  outlined?: boolean,
-  onClick: (event: MouseEvent<HTMLButtonElement>) => void,
-  e2e?: null | string,
-  disabled?: boolean
-}
-
-export const IconBtn: React.FC<IconProps> = ({ children, outlined = false, onClick, e2e = null, disabled = false }) => {
+export const IconBtn = ({ children, outlined = false, onClick, e2e = null, disabled = false }: IconProps) => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { base } = variant({ theme, outlined });
 

@@ -1,8 +1,9 @@
+import { OverlayProps } from '../../interfaces/component';
 import { useAppSelector } from '../../hooks';
 import { getConfig } from '../../store/slices/config';
 import overlay from './variants';
 
-export const Overlay = ({ children }: { children: React.ReactNode }) => {
+export const Overlay = ({ children }: OverlayProps) => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { base } = overlay({ theme });
   return (

@@ -1,15 +1,10 @@
+import { LayoutBaseProps } from '../../interfaces/component';
 import { useAppSelector, useWindowSize } from '../../hooks';
 
 import { getConfig } from '../../store/slices/config';
 import { layoutBase as variant } from './variants';
 
-type LayoutBaseProps = {
-  head: React.ReactNode;
-  stream: React.ReactNode;
-  foot: React.ReactNode;
-}
-
-export const LayoutBase: React.FC<LayoutBaseProps> = ({ head, stream, foot }) => {
+export const LayoutBase = ({ head, stream, foot }: LayoutBaseProps) => {
   const { themeId: theme, isPluginMode } = useAppSelector(getConfig);
   const { base, wrapper } = variant({ theme });
   const [_, height] = useWindowSize();

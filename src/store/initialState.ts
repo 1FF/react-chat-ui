@@ -1,6 +1,6 @@
-import { uid } from 'uid';
+import { uuidV4 } from '../utils';
 import { Roles, Theme } from '../config/enums';
-import { ChatState, ConfigState, IntentionsState, MetaState } from '../interfaces';
+import { ChatState, ConfigState, IntentionsState, MetaState } from '../interfaces/store';
 
 export const meta: MetaState = {
   pd: '',
@@ -35,14 +35,13 @@ export const chat: ChatState = {
     role: Roles.user,
     message: ''
   },
-  queue: [],
-  history: [],
+  // queue: [],
   historyData: {},
   historyIds: [],
   error: '',
   isLoading: false,
   typingTimeoutExpired: false,
-  lastGroupId: uid(),
+  lastGroupId: uuidV4(),
   connected: false,
   closed: false,
   isStreaming: false,

@@ -26,11 +26,6 @@
       "./src/global.d.ts",
       "node_modules/@types"
     ],
-    "paths": {
-      "@": [
-        "./src/*"
-      ],
-    },
     "strict": true,
     "isolatedModules": true,
   },

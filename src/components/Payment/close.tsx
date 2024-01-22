@@ -1,9 +1,5 @@
+import { CloseButtonProps } from '../../interfaces/component';
 import { close as variants } from './variants';
-import { MouseEvent } from 'react';
-
-export type CloseButtonProps = {
-  onClick: (e: MouseEvent<HTMLButtonElement>) => void;
-}
 
 export const CloseButton = ({ onClick }: CloseButtonProps) => {
   const { base } = variants();

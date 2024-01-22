@@ -1,12 +1,8 @@
+import { ProfileProps } from '../../interfaces/component';
 import { ScreenOrientation } from '../../config/enums';
 import { useAppSelector } from '../../hooks';
 import { getConfig } from '../../store/slices/config';
 import { profile as variant } from './variants';
-
-type ProfileProps = {
-  orientation?: ScreenOrientation.vertical | ScreenOrientation.horizontal;
-  minimized?: boolean,
-}
 
 export const Profile = ({ orientation = ScreenOrientation.horizontal, minimized = false }: ProfileProps) => {
   const { aiProfile, themeId: theme } = useAppSelector(getConfig);

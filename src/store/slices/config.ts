@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { config as initialState } from '../../store/initialState';
-import { ConfigState } from '../../interfaces/index';
+import { ConfigState } from '../../interfaces/store';
 import { Theme } from '../../config/enums';
 
 type ConfigProps = {
@@ -54,7 +54,6 @@ const configSlice = createSlice({
 export const getConfig = (state: { config: ConfigState }) => state.config;
 export const getDevToolsStatus = (state: { config: ConfigState }) => state.config.enableDevTools;
 
-// DEV NOTE: the createSlice function automatically create both action creator functions
 export const {
   setConfig, resetConfig,
   setTheme, resetTheme,

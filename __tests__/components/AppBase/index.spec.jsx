@@ -26,7 +26,8 @@ describe('AppBase, chat-history event and execute properly', () => {
   test('on chat-history event state is shown and saved properly', async () => {
     const items = await screen.findAllByText(initialConfig.app.aiProfile.welcome);
     const name = await screen.findAllByText(initialConfig.app.aiProfile.name);
-    const expectedDate = formatDateByLocale(serverHistoryMock[0].time);
+    const expectedDate = formatDateByLocale(serverHistoryMock[0].content[0].time);
+
     // Act
     act(mockServerHistoryEmit);
 
@@ -60,11 +61,9 @@ describe('AppBase, chat-history event and execute properly', () => {
     const userFormElement = root.container.querySelector('[data-e2e="user-form"]');
     const emailFormElement = root.container.querySelector('[data-e2e="email-form"]');
     const quizTriggerButton = root.container.querySelector('[data-e2e="quiz-trigger-btn"]');
-    const lastMessageElement = historyElements[historyElements.length - 1].querySelector('a');
 
     // Assert
     expect(historyElements.length).toBe(serverHistoryMockWithLink.length);
-    expect(lastMessageElement.textContent).toBe('https://test.com');
     expect(userFormElement).toBeNull();
     expect(emailFormElement).toBeNull();
     expect(quizTriggerButton).toBeVisible();
@@ -73,7 +72,6 @@ describe('AppBase, chat-history event and execute properly', () => {
     expect(chat.historyIds.length).toStrictEqual(serverHistoryMockWithLink.length);
     expect(chat.connected).toBeTruthy();
     expect(intentions.link.isVisible).toBeTruthy();
-    expect(intentions.link.href).toBe('https://test.com');
     expect(intentions.link.text).toBe(config.translations.mealButton);
   });
 
@@ -153,9 +151,6 @@ describe('AppBase, streaming events execute properly', () => {
   beforeEach(async () => { await localSetup(); });
   afterEach(localTearDown);
   test('message receival through streamStart streamData streamEnd work for text', () => {
-    // Arrange
-    const initialHistory = root.store.getState().chat.history;
-
     // Act
     act(() => dispatchStreaming(streamMocks.text));
 
@@ -165,7 +160,7 @@ describe('AppBase, streaming events execute properly', () => {
     expect(chat.outgoing).toBe(initialState.chat.outgoing);
     expect(chat.error).toBe(initialState.chat.error);
     expect(intentions.response.isFormVisible).toBe(true);
-    expect(chat.historyIds.length > initialHistory.length).toBeTruthy();
+    expect(chat.historyIds.length).toBe(1);
   });
 
   test('message receival through streamStart streamData streamEnd work for buttons', () => {

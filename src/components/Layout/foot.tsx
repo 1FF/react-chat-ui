@@ -1,10 +1,10 @@
-import { useRef, useState, MouseEvent } from 'react';
+import { useRef, useState } from 'react';
 import intent from '../../services/intentions';
 import { useAppDispatch, useFootControls } from '../../hooks';
 import { ResponseForm, EmailForm } from '../Form/';
 import { setIsPaymentButtonVisible, setIsPaymentSuccessful, setLink, setPaymentFormVisibility, setPaymentIntentError } from '../../store/slices/intentions';
 import { PaymentButton, Link } from '../Payment';
-import { addPredefinedAssistantMessage, getChat, setClosed } from '../../store/slices/chat';
+import { addPredefinedAssistantMessage, setClosed } from '../../store/slices/chat';
 import { PaymentScene } from '../../components/Scenes/payment';
 import { track } from '../../services/tracking';
 import { Ellipsis } from '../../components/Stream/ellipsis';
@@ -29,7 +29,6 @@ export const LayoutFoot = () => {
   };
 
   const onPaymentSuccess = () => {
-    // TODO: set in store to be persisted the GO THROUGH QUIZ button
     dispatch(addPredefinedAssistantMessage({ content: footState.translations.tm1226 }));
     dispatch(setIsPaymentSuccessful(true));
     dispatch(setIsPaymentButtonVisible(false));

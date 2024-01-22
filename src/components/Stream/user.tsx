@@ -4,31 +4,25 @@ import { resendMessage } from '../../store/slices/chat';
 import { IconBtn } from '../../components/Button';
 import { Roles } from '../../config/enums';
 import { streamBubble as variant } from './variants';
+import { UserProps } from '../../interfaces/component';
 
-export type UserProps = {
-  message: string,
-  sent: boolean,
-  resend: boolean,
-}
-
-export const User = ({ message, resend, sent }: UserProps) => {
+export const User = ({ record }: UserProps) => {
   const dispatch = useAppDispatch();
   const { themeId: theme } = useAppSelector(getConfig);
   const { action, separator } = variant({ theme, type: Roles.user });
 
-  const onResend = (item: string) => {
-    // TODO must include some type of id when trying to resend; not only the string
-    dispatch(resendMessage(item));
+  const onResend = () => {
+    dispatch(resendMessage(record));
   };
 
   return (
     <div className={separator()}>
       <span>
-        {message}
+        {record.message}
       </span>
-      {(resend && !sent) && (
+      {(record.resend && !record.sent) && (
         <div className={action()}>
-          <IconBtn outlined onClick={() => onResend(message)}>
+          <IconBtn outlined onClick={() => onResend()}>
             <svg
               fill="currentColor" viewBox="0 0 24 24"
               width="20px" height="20px"

@@ -6,9 +6,12 @@ import { useAppDispatch, useAppSelector } from '../../hooks';
 import { Input } from '../Input/basic';
 import { IconBtn } from '../Button';
 import { layoutFoot as variant } from '../Layout/variants';
+import { track } from '../../services/tracking';
+import { AllEvents } from '../../config/enums';
 
 export const EmailForm = () => {
   const dispatch = useAppDispatch();
+  const meta = useAppSelector(state => state.meta);
   const { themeId: theme, translations } = useAppSelector(getConfig);
   const { isLoading } = useAppSelector(getEmailIntentions);
   const { base, input, button } = variant({ theme });
@@ -16,6 +19,13 @@ export const EmailForm = () => {
   const inputElement = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    track({
+      eventType: AllEvents.emailField,
+      systemType: meta.systemType,
+      utmParams: meta.marketing.lastUtmParams,
+      customerUuid: meta.cid,
+    });
+
     setTimeout(() => {
       if (!inputElement.current) { return }
       inputElement.current.focus();
