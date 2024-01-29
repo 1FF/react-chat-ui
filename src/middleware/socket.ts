@@ -97,7 +97,9 @@ const chatMiddleware: Middleware = store => next => action => {
     currentLocation.search = '';
     localStorage.setItem(CHAT_FINISHED_TIMESTAMP, new Date().getTime().toString());
     window.location.href = currentLocation.toString();
-    if (socket) socket.close();
+    if (socket) {
+      socket.close();
+    }
   }
 
   if (setTypingTimeoutExpired.match(action) && action.payload) {

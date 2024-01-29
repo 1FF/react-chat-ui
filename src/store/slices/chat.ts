@@ -80,13 +80,13 @@ const configSlice = createSlice({
         draft.historyData[id].content.push(data);
       });
     },
-    fillUserHistoryData(state, { payload }: PayloadAction<UserHistoryDataFiller>) {
+    fillUserHistoryData(state, { payload: { id, content } }: PayloadAction<UserHistoryDataFiller>) {
       return produce(state, (draft: Draft<ChatState>) => {
         let belongsTo;
 
-        if (payload.content.groupId) {
+        if (content.groupId) {
           Object.entries(draft.historyData).forEach(([key, value]) => {
-            if (value.content.find(el => el.groupId === payload.content.groupId)) {
+            if (value.content.find(el => el.groupId === content.groupId)) {
               belongsTo = key;
             }
           });
@@ -95,13 +95,13 @@ const configSlice = createSlice({
         if (belongsTo) {
           // this is due to keyboard interaction we send messages after timeout
           const userMessageRecord = draft.historyData[belongsTo];
-          userMessageRecord.content.push(payload.content);
+          userMessageRecord.content.push(content);
           return;
         }
 
-        if (!draft.historyData[payload.id]) {
-          draft.historyData[payload.id] = { id: payload.id, role: Roles.user, content: [payload.content] };
-          draft.historyIds.push(payload.id);
+        if (!draft.historyData[id]) {
+          draft.historyData[id] = { id, role: Roles.user, content: [content] };
+          draft.historyIds.push(id);
         }
       });
     },
