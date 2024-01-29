@@ -44,7 +44,7 @@ const intentionsSlice = createSlice({
     },
     setResponseFormVisibility(state, { payload }) {
       return produce(state, (draft: Draft<IntentionsState>) => {
-        draft.response.isFormVisible = !payload.some((el: AssistantMessageTypeUnion) => el.type === Definition.buttons || el.type === Definition.payment || el.type === Definition.email);
+        draft.response.isFormVisible = !payload.some((el: AssistantMessageTypeUnion) => [Definition.buttons, Definition.payment, Definition.email].includes(el.type));
         draft.email.isFormVisible = payload.some((el: AssistantMessageTypeUnion) => Definition.email in el && el.type === Definition.email);
         draft.payment.isButtonVisible = payload.some((el: AssistantMessageTypeUnion) => Definition.payment in el && el.type === Definition.payment);
       })

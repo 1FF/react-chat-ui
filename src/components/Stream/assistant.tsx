@@ -70,7 +70,7 @@ export const Assistant = ({ message, itemId }: AssistantProps) => {
           );
         }
 
-        if (it.type === Definition.payment) return it[it.type] + ' ' + pd.displayPlanPrice + ' ' + pd.billingFrequencyTmsg;
+        if (it.type === Definition.payment) return `${it[it.type]} ${pd.displayPlanPrice} ${pd.billingFrequencyTmsg}`;
 
         if (it.type === Definition.email) return it[it.type];
       })}
