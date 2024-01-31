@@ -18,7 +18,7 @@ export const intentionsMiddleware: Middleware = store => next => {
     if (!meta.pd) return {} as PaymentDataSetterProps;
     data.billingFrequencyTmsg = data.billingOptionType === 'one-time'
       ? meta.pd.oneTimer
-      : meta.pd.subscriberBillingFrequency.replace('{1}', data.frequencyInMonths);
+      : meta.pd.subscriberBillingFrequency?.replace('{1}', data.frequencyInMonths);
 
     return data;
   };

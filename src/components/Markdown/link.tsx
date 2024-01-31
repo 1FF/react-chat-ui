@@ -1,5 +1,5 @@
-import { useEffect,MouseEvent } from 'react';
-import { useAppDispatch, useAppSelector } from '../../hooks';
+import { useEffect, MouseEvent } from 'react';
+import { getPurpose, useAppDispatch, useAppSelector } from '../../hooks';
 import formatting from '../../utils/formatting';
 import { LINK_CLICKED_KEY } from '../../config/env';
 import { track } from '../../services/tracking';
@@ -11,13 +11,18 @@ import { AllEvents } from '../../config/enums';
 import { MarkdownLinkProps } from '../../interfaces/component';
 
 export const MarkdownLink = ({ properties }: MarkdownLinkProps) => {
-  const { translations } = useAppSelector(getConfig);
+  const { translations, purpose } = useAppSelector(getConfig);
+  const extendedOptions = getPurpose(purpose);
   const { cid, marketing, systemType } = useAppSelector(getMeta);
   const dispatch = useAppDispatch();
   const link = properties.href ? formatting.constructLink(properties.href) : '#';
+
+  // TODO add the special condition on which the button will be available
+  const supportNeeded = true;
+
   useEffect(() => {
     dispatch(setLink({
-      isVisible: true,
+      isVisible: extendedOptions.cta || supportNeeded,
       href: link,
       text: translations.mealButton
     }));

@@ -23,6 +23,11 @@ export interface ChatState {
   isStreaming: boolean,
 }
 
+export interface CloseProps {
+  visible: boolean;
+  href: undefined | string;
+}
+
 export interface ConfigState {
   aiProfile: {
     name: string,
@@ -36,7 +41,7 @@ export interface ConfigState {
   chatUrl: string,
   themeId: Theme.light | Theme.dark,
   translations: any,
-  closeVisible: boolean,
+  close: CloseProps,
   enableDevTools: boolean,
   isPluginMode: boolean,
 }

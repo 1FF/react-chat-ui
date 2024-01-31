@@ -18,10 +18,10 @@ export interface ButtonProps extends BasicVariants {
 
 export interface IconProps extends BasicVariants {
   children: ReactNode,
-  outlined?: boolean,
   onClick: (event: MouseEvent<HTMLButtonElement>) => void,
-  e2e?: null | string,
   disabled?: boolean
+  outlined?: boolean,
+  e2e?: null | string,
 }
 
 export type Ref = HTMLInputElement;

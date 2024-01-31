@@ -13,14 +13,14 @@ import { getQueryParam } from '../utils';
 import { setResponseFormVisibility } from '../store/slices/intentions';
 import { setConfig } from '../store/slices/config';
 import { setRegion } from '../store/slices/meta';
-import { CHAT_FINISHED_TIMESTAMP } from '../config/env';
+import { CHAT_FINISHED_TIMESTAMP, SCROLL_STOP_CLASS } from '../config/env';
 import { Roles } from '../config/enums';
 import { AssistantRecord, UserMessageContent, ClientMessage, SocketHistoryRecord } from '../interfaces'
 
 let socket: Socket;
 
 const chatMiddleware: Middleware = store => next => action => {
-  const { meta, chat } = store.getState();
+  const { meta, chat, config } = store.getState();
 
   const onError = () => {
     const { config } = store.getState();
@@ -89,17 +89,21 @@ const chatMiddleware: Middleware = store => next => action => {
 
   if (setClosed.match(action)) {
     const chatBotContainer = document.querySelector('#chatbot-container');
+
     if (document.body && chatBotContainer) {
       chatBotContainer.innerHTML = '';
-      document.body.classList.remove('scroll-stop');
+      document.body.classList.remove(SCROLL_STOP_CLASS);
     }
+
     const currentLocation = new URL(window.location.href);
     currentLocation.search = '';
     localStorage.setItem(CHAT_FINISHED_TIMESTAMP, new Date().getTime().toString());
-    window.location.href = currentLocation.toString();
+
     if (socket) {
       socket.close();
     }
+
+    window.location.href = config.close.href || currentLocation.toString();
   }
 
   if (setTypingTimeoutExpired.match(action) && action.payload) {

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { config as initialState } from '../../store/initialState';
-import { ConfigState } from '../../interfaces/store';
+import { CloseProps, ConfigState } from '../../interfaces/store';
 import { Theme } from '../../config/enums';
 
 type ConfigProps = {
@@ -8,7 +8,7 @@ type ConfigProps = {
   translations: {};
   themeId: Theme.light | Theme.dark;
   chatUrl: string;
-  closeVisible: boolean;
+  close: CloseProps;
   purpose: string;
 }
 
@@ -21,7 +21,7 @@ const configSlice = createSlice({
       state.translations = { ...initialState.translations, ...payload.translations };
       state.themeId = payload.themeId;
       state.chatUrl = payload.chatUrl;
-      state.closeVisible = payload.closeVisible;
+      state.close = payload.close;
       state.purpose = payload.purpose;
     },
     resetConfig(state) {

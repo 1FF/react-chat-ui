@@ -11,3 +11,4 @@ export const GO_THROUGH_QUIZ_KEY = 'hasToGoThroughQuiz';
 export const EXISTING_PRODUCT_LINK_KEY = 'existingProductLink';
 export const CID = 'cid';
 export const STORING_CHECKER_INTERVAL = 1000;
+export const SCROLL_STOP_CLASS = 'scroll-stop';

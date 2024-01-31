@@ -14,8 +14,14 @@ const defaultOptions: ChatbotOptions = {
   email: true,
 };
 
+const supportOptions: ChatbotOptions = {
+  ...defaultOptions,
+  cta: false,
+};
+
 const chatbotPurpose: Record<string, ChatbotOptions> = {
   default: defaultOptions,
+  support: supportOptions,
 };
 
 export default chatbotPurpose;

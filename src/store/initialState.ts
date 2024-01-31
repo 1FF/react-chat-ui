@@ -25,7 +25,10 @@ export const config: ConfigState = {
   enableDevTools: false,
   isPluginMode: false,
   purpose: 'default',
-  closeVisible: false,
+  close: {
+    href: undefined,
+    visible: false,
+  },
 };
 
 export const chat: ChatState = {

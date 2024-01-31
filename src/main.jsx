@@ -5,16 +5,24 @@ import { PersistGate } from 'redux-persist/integration/react';
 import './assets/css/index.css';
 import { AppBase } from './components/AppBase';
 import { persistor, store } from './store';
+import { SCROLL_STOP_CLASS } from './config/env';
 
 export { intent } from './services/intentions';
 
+let initiated = false;
+
 export const ReactBotClient = (config) => {
+
+  !document.body.classList.contains(SCROLL_STOP_CLASS) && document.body.classList.add(SCROLL_STOP_CLASS);
+  if (initiated) return;
+  initiated = true;
+  
   ReactDOM
     .createRoot(config.root)
     .render(
-      <Provider store={ store }>
-        <PersistGate persistor={ persistor }>
-          <AppBase config={ config.initialConfig } />
+      <Provider store={store}>
+        <PersistGate persistor={persistor}>
+          <AppBase config={config.initialConfig} />
         </PersistGate>
       </Provider>
     );

@@ -10,7 +10,7 @@ type DispatchFunc = () => AppDispatch;
 export const useAppDispatch: DispatchFunc = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
-const getPurpose = (purpose: keyof typeof chatbotPurpose): ChatbotOptions => {
+export const getPurpose = (purpose: keyof typeof chatbotPurpose): ChatbotOptions => {
   return chatbotPurpose[purpose];
 }
 
@@ -28,13 +28,14 @@ export const useWindowSize = () => {
 };
 
 export const useHeadControls = () => {
-  const { themeId: theme, closeVisible, purpose } = useAppSelector(getConfig);
+  const { themeId: theme, purpose, close } = useAppSelector(getConfig);
   const { cid, systemType, marketing } = useAppSelector(getMeta);
   const extendedOptions = getPurpose(purpose);
 
   return {
     theme,
-    closeVisible: closeVisible && extendedOptions.close,
+    closeVisible: close.visible && extendedOptions.close,
+    closeLink: close.href,
     cid,
     systemType,
     marketing
@@ -59,7 +60,7 @@ export const useFootControls = () => {
     current,
     emailError,
     error,
-    isCtaVisible: isCtaVisible && extendedOptions.cta,
+    isCtaVisible: isCtaVisible,
     isEmailFormVisible: isEmailFormVisible && extendedOptions.email,
     isLoading,
     isPaymentButtonVisible: isPaymentButtonVisible && extendedOptions.payment,

@@ -12,7 +12,7 @@ export const colors = {
   ...baseThemeColors,
 };
 
-export const chat = (id: string) => ({
+export const chat = (id: string, purpose = 'default') => ({
   meta: {
     cid: localStorage.getItem('__cid') || id,
     systemType: 'test',
@@ -64,7 +64,7 @@ export const chat = (id: string) => ({
         },
       ]
     },
-    purpose: 'default',
+    purpose,
     chatUrl: 'https://yourketo.ngrok.io',
     themeId: 'light',
     translations: {
@@ -92,7 +92,10 @@ export const chat = (id: string) => ({
       error: 'Oops something went wrong.',
       tm505: 'Please enter valid email address',
     },
-    closeVisible: true
+    close: {
+      href: 'https://usa.yourketo.diet',
+      visible: true,
+    }
   },
 });
 
