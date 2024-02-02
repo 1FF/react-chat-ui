@@ -1,7 +1,6 @@
 import { faker } from '@faker-js/faker';
-import { chat, Roles } from './config';
+import { chat, Roles } from '../src/config';
 
-export { paymentData } from './config';
 export const initialConfig = chat('23c7cdcf-4d90-4ea1-aab0-c73f8426dc1d');
 export const streamMock = [
   { type: 'text', text: '', id: '', time: new Date().getTime() },
@@ -113,7 +112,8 @@ const contentMock = [
       { sequence: 1, value: 'Okay', text: 'option 1' },
       { sequence: 2, value: 'Goodbye', text: 'option 2' }],
     sequence: 2,
-  }];
+  }
+];
 
 export const serverHistoryMock = [
   { id: faker.string.uuid(), role: Roles.assistant, content: contentMock },

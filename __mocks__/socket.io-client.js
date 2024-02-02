@@ -7,7 +7,7 @@ function emit(event, ...args) {
   EVENTS[event].forEach(func => func(...args));
 }
 
-const socket = {
+export const socket = {
   on(event, func) {
     if (EVENTS[event]) {
       return EVENTS[event].push(func);

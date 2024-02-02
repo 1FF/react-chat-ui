@@ -1,26 +1,23 @@
 /* eslint-env jest */
 import { act } from 'react-dom/test-utils';
-import { serverSocket, cleanup, io } from 'socket.io-client';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { serverSocket, io } from 'socket.io-client';
+import { fireEvent, screen } from '@testing-library/react';
 import { faker } from '@faker-js/faker';
 
-import AppBase from '../../../src/components/AppBase/index';
 import { Events } from '../../../src/config';
 import { formatDateByLocale } from '../../../src/utils';
-import renderWithProviders from '../../../src/utils/storeMockWrapper';
 import { LINK_CLICKED_KEY, STORING_CHECKER_INTERVAL } from '../../../src/config/env';
 import { intent } from '../../../src/main';
 import initialState from '../../../src/store/initialState';
-import { initialConfig, serverHistoryMock, serverHistoryMockWithEmailIntent, serverHistoryMockWithLink, serverHistoryMockWithPaymentIntent, streamMocks} from '../../../src/chatMocks';
-
-const actualWindow = window.location;
+import { initialConfig, serverHistoryMock, serverHistoryMockWithEmailIntent, serverHistoryMockWithLink, serverHistoryMockWithPaymentIntent, streamMocks} from '../../../__fixtures__/chat';
+import { localSetup, localTearDown } from '../../../__mocks__/storeSetup';
 
 let root;
-const spies = [];
 const region = faker.location.country();
+const spies = [];
 
 describe('AppBase, chat-history event and execute properly', () => {
-  beforeEach(async () => { await localSetup(); });
+  beforeEach(async () => { root = await localSetup(); });
   afterEach(localTearDown);
 
   test('on chat-history event state is shown and saved properly', async () => {
@@ -148,7 +145,7 @@ describe('AppBase, chat-history event and execute properly', () => {
 });
 
 describe('AppBase, streaming events execute properly', () => {
-  beforeEach(async () => { await localSetup(); });
+  beforeEach(async () => { root = await localSetup(); });
   afterEach(localTearDown);
   test('message receival through streamStart streamData streamEnd work for text', () => {
     // Act
@@ -218,7 +215,7 @@ describe('Close button closes chat', () => {
       writable: true,
       enumerable: true,
     });
-    await localSetup();
+    root = await localSetup();
   });
 
   afterEach(localTearDown);
@@ -260,24 +257,4 @@ function dispatchStreaming(chunks) {
   serverSocket.emit(Events.streamStart, chunks[0]);
   chunks.slice(1, -1).forEach(chunk => serverSocket.emit(Events.streamData, chunk));
   serverSocket.emit(Events.streamEnd, [...chunks].pop());
-}
-
-async function localSetup() {
-  localStorage.setItem('__pd', JSON.stringify(initialConfig.meta.pd));
-  jest.useFakeTimers();
-  spies.push(jest.spyOn(intent.core, 'emit'));
-  const intentOnSpy = jest.spyOn(intent.core, 'on');
-  spies.push(intentOnSpy);
-  intentOnSpy.mockReturnValue(() => true);
-  await waitFor(() => {
-    root = renderWithProviders(<div id="chatbot-container"><AppBase config={initialConfig} /></div>);
-  });
-}
-
-function localTearDown() {
-  localStorage.clear();
-  spies.forEach(spy => { spy.mockClear(); spy.mockRestore(); });
-  cleanup();
-  jest.useRealTimers();
-  window.location = actualWindow;
 }

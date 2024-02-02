@@ -12,7 +12,7 @@ export const StreamBase = () => {
   const lastRecord = useAppSelector(state => state.chat.historyData[historyIds[0]]);
   const { base, second, date } = streamBase({ theme });
   const { base: baseRow } = streamRow({ theme });
-  const time = formatDateByLocale(lastRecord?.content[0].time || new Date().getTime());
+  const time = formatDateByLocale(lastRecord?.content[0]?.time || new Date().getTime());
 
   return (
     <div className={base()}>

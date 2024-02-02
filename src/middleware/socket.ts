@@ -29,7 +29,7 @@ const chatMiddleware: Middleware = store => next => action => {
   };
 
   const dispatchRetry = () => {
-    store.dispatch(showResendIcon({ itemId: chat.historyIds.pop() }));
+    store.dispatch(showResendIcon({ itemId: [...chat.historyIds].pop() }));
     onError();
   };
 
