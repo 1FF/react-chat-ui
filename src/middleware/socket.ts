@@ -7,7 +7,7 @@ import {
   setOutgoing, setConnected,
   resetIsLoading, setClosed, resetError, resetOutgoing,
   hideResendIcon, resendMessage, showResendIcon,
-  setIsStreaming, fillAssistantHistoryData,
+  setIsStreaming, fillAssistantHistoryData, resetHistory,
 } from '../store/slices/chat';
 import { getQueryParam } from '../utils';
 import { setResponseFormVisibility } from '../store/slices/intentions';
@@ -158,7 +158,9 @@ const chatMiddleware: Middleware = store => next => action => {
       return
     }
 
+    store.dispatch(resetHistory());
     store.dispatch(setExistingHistory(config.aiProfile.initialMessage));
+    store.dispatch(setResponseFormVisibility([...config.aiProfile.initialMessage].pop().content));
     config.aiProfile.initialMessage.forEach((message: SocketHistoryRecord) =>
       handleMessageSending({
         role: Roles.assistant,
