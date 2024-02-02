@@ -25,7 +25,6 @@ const configSlice = createSlice({
     },
     setExistingHistory(state, { payload }: PayloadAction<Array<SocketHistoryRecord>>) {
       return produce(state, (draft) => {
-
         // server has LESS data than frontend -> update the status to unsent
         if (state.historyIds.length > payload.length) {
           const unsentMessages = state.historyIds.filter(id => !payload.find(record => record.id === id));
@@ -144,6 +143,10 @@ const configSlice = createSlice({
     },
     setIsStreaming(state, { payload }: PayloadAction<boolean>) {
       state.isStreaming = payload;
+    },
+    resetHistory(state) {
+      state.historyIds = initialState.historyIds;
+      state.historyData = initialState.historyData;
     }
   },
 });
@@ -159,7 +162,8 @@ export const {
   setTypingTimeoutExpired, setError, resetError,
   setConnected, setClosed, hideResendIcon, showResendIcon,
   resendMessage, setIsStreaming,
-  fillAssistantHistoryData, fillUserHistoryData
+  fillAssistantHistoryData, fillUserHistoryData,
+  resetHistory
 } = configSlice.actions;
 
 export default configSlice.reducer;
