@@ -93,8 +93,7 @@ const configSlice = createSlice({
 
         if (belongsTo) {
           // this is due to keyboard interaction we send messages after timeout
-          const userMessageRecord = draft.historyData[belongsTo];
-          userMessageRecord.content.push(content);
+          draft.historyData[belongsTo].content.push(content);
           return;
         }
 

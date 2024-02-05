@@ -102,7 +102,7 @@ export const streamMocks = {
   }],
 };
 
-const contentMock = [
+export const contentMock = [
   { type: 'text', time: 1700119723000, text: 'hello', role: Roles.assistant, sequence: 1 },
   {
     type: 'buttons',
