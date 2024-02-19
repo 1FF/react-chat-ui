@@ -26,7 +26,7 @@ describe('AppBase, chat-history event and execute properly', () => {
   test('on chat-history event state is shown and saved properly', async () => {
     const items = await screen.findAllByText(initialConfig.app.aiProfile.welcome);
     const name = await screen.findAllByText(initialConfig.app.aiProfile.name);
-    const expectedDate = formatDateByLocale(serverHistoryMock[0].content[0].time);
+    const expectedDate = formatDateByLocale(initialConfig.app.aiProfile.initialMessage[0].time);
 
     // Act
     act(mockServerHistoryEmit);

@@ -25,8 +25,8 @@ const configSlice = createSlice({
     },
     setExistingHistory(state, { payload }: PayloadAction<Array<SocketHistoryRecord>>) {
       return produce(state, (draft) => {
-        // server has LESS data than frontend -> update the status to unsent
-        if (state.historyIds.length > payload.length) {
+        // server has LESS or EQUAL data than frontend -> update the status to unsent
+        if (state.historyIds.length >= payload.length) {
           const unsentMessages = state.historyIds.filter(id => !payload.find(record => record.id === id));
           unsentMessages.forEach(id => (
             draft.historyData[id].content = draft.historyData[id].content.map(record => ({ ...record, sent: false, resend: true }))));
