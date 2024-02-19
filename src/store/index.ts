@@ -4,12 +4,9 @@ import storage from 'redux-persist/lib/storage';
 import chatMiddleware from '../middleware/socket';
 import chatReducer from './slices/chat';
 import configReducer from './slices/config';
-import disableReactDevTools from './../utils/reactDevTools';
 import intentionsMiddleware from '../middleware/intentions';
 import intentionsReducer from './slices/intentions';
 import metaReducer from './slices/meta';
-
-disableReactDevTools();
 
 const persistConfig = {
   key: 'root',

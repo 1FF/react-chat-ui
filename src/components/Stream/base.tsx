@@ -2,7 +2,7 @@ import { useAppSelector } from '../../hooks';
 import { getConfig } from '../../store/slices/config';
 import { formatDateByLocale, uuidV4 } from '../../utils';
 import { StreamHead } from './head';
-import { StreamBubble } from './bubble';
+import { MemoizedStreamBubble } from './bubble';
 import { streamBase, streamRow } from './variants';
 
 export const StreamBase = () => {
@@ -24,7 +24,7 @@ export const StreamBase = () => {
             key={uuidV4()} className={baseRow()}
             data-e2e="history-item"
           >
-            <StreamBubble itemId={id} />
+            <MemoizedStreamBubble itemId={id} />
           </div>
         ))}
       </div>

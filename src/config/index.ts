@@ -50,6 +50,11 @@ export const chat = (id: string) => ({
               type: 'image',
               image: { url: 'https://static.boredpanda.com/blog/wp-content/uploads/2016/08/wet-dogs-before-after-bath-fb6__700-png.jpg' },
               sequence: 1,
+            },
+            {
+              type: 'video',
+              video: { url: 'https://www.youtube.com/embed/ZwKhufmMxko' },
+              sequence: 1,
             }
           ]
         },

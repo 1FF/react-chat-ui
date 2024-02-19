@@ -2,12 +2,14 @@ import { useAppSelector } from '../../hooks';
 import { getConfig } from '../../store/slices/config';
 import { Roles } from '../../config/enums';
 import { User } from '../Stream';
-import Assistant from './assistant';
+import { MemoizedAssistant } from './assistant';
 import { streamBubble as variant } from './variants';
-import { UserMessageContent } from '../../interfaces';
 import { uuidV4 } from '../../utils';
+import React from 'react';
+import { UserMessageContent } from 'src/interfaces';
 
-export const StreamBubble = ({ itemId }: { itemId: string }) => {
+
+const StreamBubble = ({ itemId }: { itemId: string }) => {
   const { themeId: theme } = useAppSelector(getConfig);
   const record = useAppSelector(state => state.chat.historyData[itemId]);
 
@@ -15,7 +17,7 @@ export const StreamBubble = ({ itemId }: { itemId: string }) => {
     <div className={variant({ theme, type: record.role }).base()}>
       {record.role === Roles.assistant
         ? (
-          <Assistant
+          <MemoizedAssistant
             message={record}
             itemId={itemId}
           />
@@ -27,4 +29,5 @@ export const StreamBubble = ({ itemId }: { itemId: string }) => {
   ));
 };
 
-export default StreamBubble;
+export const MemoizedStreamBubble = React.memo(StreamBubble);
+export default MemoizedStreamBubble;

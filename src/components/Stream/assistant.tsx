@@ -1,4 +1,5 @@
 import Markdown from 'react-markdown';
+import React from 'react';
 import { useAppSelector } from '../../hooks';
 import { getConfig } from '../../store/slices/config';
 import { getChat, sortBySequence } from '../../store/slices/chat';
@@ -9,8 +10,9 @@ import MarkdownLink from '../Markdown/link';
 import { Definition } from '../../config/enums';
 import { uuidV4 } from '../../utils';
 import { AssistantProps } from '../../interfaces/component';
+import { Iframe } from '../Video';
 
-export const Assistant = ({ message, itemId }: AssistantProps) => {
+const Assistant = ({ message, itemId }: AssistantProps) => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { isStreaming } = useAppSelector(getChat);
   const { pd } = useAppSelector(getMeta);
@@ -51,11 +53,7 @@ export const Assistant = ({ message, itemId }: AssistantProps) => {
 
         if (it.type === Definition.video) {
           return (
-            <iframe
-              className="w-full tw--h-80 tw--py-4" key={uuidV4()}
-              title={it[it.type]?.title || 'Missing title'} src={it[it.type]?.url + '?enablejsapi=1&rel=0'}
-              allow="fullscreen"
-            />
+            <Iframe title={it[it.type]?.title || 'video'} url={it[it.type]?.url || 'https://www.youtube.com/embed/g4B8Dhl4pxY'} />
           );
         }
 
@@ -78,4 +76,6 @@ export const Assistant = ({ message, itemId }: AssistantProps) => {
   );
 };
 
-export default Assistant;
+export const MemoizedAssistant = React.memo(Assistant);
+
+export default MemoizedAssistant;
