@@ -10,7 +10,19 @@ import autoprefixer from 'autoprefixer';
 import tailwindConfig from './tailwind.config';
 
 export default defineConfig({
-  plugins: [react(), eslint(), nodePolyfills({ include: ['events'] }), cssInjectedByJsPlugin({ styleId: 'react-tw-ai-client' }),],
+  plugins: [react(), eslint(), nodePolyfills({ include: ['events'] }),
+  cssInjectedByJsPlugin({
+    injectCode: (cssCode, options) => `try {
+      if(typeof document != 'undefined') {
+        const elementStyle = document.createElement('style');
+        elementStyle.id = 'react-tw-ai-client';
+        elementStyle.appendChild(document.createTextNode(${cssCode}));
+        document.body.appendChild(elementStyle);
+      }
+    } catch(e) {
+      console.error('vite-plugin-css-injected-by-js', e);
+    }`
+  })],
   resolve: {
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json'],
     alias: {
