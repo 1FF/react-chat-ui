@@ -1,6 +1,6 @@
 import produce from 'immer';
 import { createSlice, PayloadAction, Draft } from '@reduxjs/toolkit';
-import { AssistantHistoryDataFiller, PredefinedMessagePayload, UserHistoryDataFiller, SocketHistoryRecord, AssistantRecord } from '../../interfaces';
+import { AssistantHistoryDataFiller, PredefinedMessagePayload, UserHistoryDataFiller, SocketHistoryRecord, AssistantRecord, AssistantHistoryInitialMessage } from '../../interfaces';
 import { ChatState } from '../../interfaces/store';
 import { chat as initialState } from '../initialState'
 import { getQueryParam } from '../../utils';
@@ -104,6 +104,10 @@ const configSlice = createSlice({
         }
       });
     },
+    fillInitialMessage(state, { payload }: PayloadAction<AssistantHistoryInitialMessage>) {
+      state.historyIds.push(payload.id);
+      state.historyData[payload.id] = { id: payload.id, role: Roles.assistant, time: new Date().getTime(), content: payload.content };
+    },
     setIsLoading(state) {
       state.isLoading = true;
     },
@@ -163,7 +167,7 @@ export const {
   setConnected, setClosed, hideResendIcon, showResendIcon,
   resendMessage, setIsStreaming,
   fillAssistantHistoryData, fillUserHistoryData,
-  resetHistory
+  resetHistory, fillInitialMessage
 } = configSlice.actions;
 
 export default configSlice.reducer;

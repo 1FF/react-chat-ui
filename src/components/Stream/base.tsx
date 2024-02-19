@@ -9,10 +9,10 @@ export const StreamBase = () => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { aiProfile } = useAppSelector(getConfig);
   const historyIds = useAppSelector(state => state.chat.historyIds || []);
-  const lastRecord = useAppSelector(state => state.chat.historyData[historyIds[0]]);
+  const firstMessage = useAppSelector(state => state.chat.historyData[historyIds[0]]);
   const { base, second, date } = streamBase({ theme });
   const { base: baseRow } = streamRow({ theme });
-  const time = formatDateByLocale(lastRecord?.content[0].time || new Date().getTime());
+  const time = formatDateByLocale(firstMessage?.time || new Date().getTime());
 
   return (
     <div className={base()}>

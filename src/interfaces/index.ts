@@ -125,6 +125,12 @@ export interface AssistantHistoryDataFiller {
   sequence?: number;
 }
 
+export interface AssistantHistoryInitialMessage {
+  id: string;
+  content: Array<AssistantRecord>;
+  sequence?: number;
+}
+
 export interface ClientMessage {
   role: Roles.assistant | Roles.user;
   term: string;

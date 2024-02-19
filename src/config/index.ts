@@ -67,6 +67,14 @@ export const chat = (id: string) => ({
             { "type": "buttons", "sequence": 1, "buttons": [{ "value": "Yes", "sequence": 1, "text": "Yes" }, { "value": "No", "sequence": 2, "text": "No" }] }
           ]
         },
+        {
+          id: uuidV4(),
+          role: Roles.assistant,
+          time: new Date().getTime(),
+          content: [
+            { "type": "text", "text": "Do you want to lose weight?", "sequence": 2 },
+          ]
+        },
       ]
     },
     purpose: 'default',

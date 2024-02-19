@@ -10,7 +10,8 @@ export interface ChatState {
   },
   historyData: Record<string, {
     id: string,
-    role: Roles.assistant | Roles.user;
+    role: Roles.assistant | Roles.user,
+    time?: number,
     content: Array<MessageProperties>
   }>;
   historyIds: Array<string>,

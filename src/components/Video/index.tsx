@@ -27,7 +27,6 @@ export const Iframe = React.memo(function Iframe({ url, title }: { url: string, 
       ?
       <iframe
         className="w-full tw--h-80 tw--py-4"
-        key={uuidV4()}
         title={title || 'Missing title'}
         src={url + '?enablejsapi=1&rel=0'}
         allow="fullscreen"
@@ -35,7 +34,6 @@ export const Iframe = React.memo(function Iframe({ url, title }: { url: string, 
       :
       <div className="w-full tw--h-80 tw--py-4 tw--justify-center tw--flex tw--items-center tw--pointer-events-auto"
         onClick={handleVideoClick}
-        key={uuidV4()}
         style={{ backgroundImage: `url(https://img.youtube.com/vi/${videoCode}/hqdefault.jpg)` }}>
         <button className="tw--items-center tw--justify-center tw--w-16 tw--h-16 tw--rounded-full tw--cursor-pointer tw--pointer-events-auto tw--flex tw--bg-gradient-to-b tw--from-[#FF0000] tw--to-[#F25640]">
           <svg className="tw--pointer-events-none" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">

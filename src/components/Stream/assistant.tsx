@@ -53,7 +53,7 @@ const Assistant = ({ message, itemId }: AssistantProps) => {
 
         if (it.type === Definition.video) {
           return (
-            <Iframe title={it[it.type]?.title || 'video'} url={it[it.type]?.url || 'https://www.youtube.com/embed/g4B8Dhl4pxY'} />
+            <Iframe key={uuidV4()} title={it[it.type]?.title || 'video'} url={it[it.type]?.url || 'https://www.youtube.com/embed/g4B8Dhl4pxY'} />
           );
         }
 

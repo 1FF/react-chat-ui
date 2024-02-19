@@ -7,7 +7,7 @@ import {
   setOutgoing, setConnected,
   resetIsLoading, setClosed, resetError, resetOutgoing,
   hideResendIcon, resendMessage, showResendIcon,
-  setIsStreaming, fillAssistantHistoryData, resetHistory,
+  setIsStreaming, fillAssistantHistoryData, resetHistory, fillInitialMessage,
 } from '../store/slices/chat';
 import { getQueryParam } from '../utils';
 import { setResponseFormVisibility } from '../store/slices/intentions';
@@ -15,7 +15,7 @@ import { setConfig } from '../store/slices/config';
 import { setRegion } from '../store/slices/meta';
 import { CHAT_FINISHED_TIMESTAMP } from '../config/env';
 import { Roles } from '../config/enums';
-import { AssistantRecord, UserMessageContent, ClientMessage, SocketHistoryRecord } from '../interfaces'
+import { AssistantRecord, UserMessageContent, ClientMessage, SocketHistoryRecord, AssistantHistoryInitialMessage } from '../interfaces'
 
 let socket: Socket;
 
@@ -141,6 +141,7 @@ const chatMiddleware: Middleware = store => next => action => {
   socket.on(Events.chatHistory, ({ history: servedHistory, errors, region }
     : { history: Array<SocketHistoryRecord>, errors: string[], region: string }) => {
     store.dispatch(resetIsLoading());
+    store.dispatch(setIsStreaming(false));
     store.dispatch(setRegion(region));
     const { config, meta } = store.getState();
 
@@ -159,17 +160,32 @@ const chatMiddleware: Middleware = store => next => action => {
     }
 
     store.dispatch(resetHistory());
-    store.dispatch(setExistingHistory(config.aiProfile.initialMessage));
-    store.dispatch(setResponseFormVisibility([...config.aiProfile.initialMessage].pop().content));
-    config.aiProfile.initialMessage.forEach((message: SocketHistoryRecord) =>
-      handleMessageSending({
-        role: Roles.assistant,
-        term: getQueryParam(window.location.search, 'utm_chat') || '',
-        user_id: meta.cid,
-        message: JSON.stringify(message.content),
-        messageId: message.id,
-        region: meta.region,
-      }));
+    store.dispatch(setIsLoading());
+    let interval = 0;
+    config.aiProfile.initialMessage.forEach((element: AssistantHistoryInitialMessage, index: number, arr: Array<SocketHistoryRecord>) => {
+
+      interval += 1000;
+
+      setTimeout(() => {
+        store.dispatch(fillInitialMessage(element));
+
+        if (arr.length === index + 1) {
+          store.dispatch(setResponseFormVisibility([...config.aiProfile.initialMessage].pop().content));
+          config.aiProfile.initialMessage.forEach((message: SocketHistoryRecord) =>
+            handleMessageSending({
+              role: Roles.assistant,
+              term: getQueryParam(window.location.search, 'utm_chat') || '',
+              user_id: meta.cid,
+              message: JSON.stringify(message.content),
+              messageId: message.id,
+              region: meta.region,
+            }));
+          store.dispatch(resetIsLoading());
+        }
+
+      }, interval);
+
+    });
   });
 
   socket.on(Events.streamStart, (data: AssistantRecord & { id: string }) => {
