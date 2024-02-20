@@ -12,13 +12,13 @@ export const basic = /*tw*/ tv({
     theme: {
       light: {
         base: '',
-        input: 'tw--bg-light-lumina tw--text-light-zephyr-100 tw--font-semibold',
+        input: 'tw--bg-light-lumina tw--text-light-zephyr-100 tw--font-semibold focus:!tw--bg-light-lumina',
         loader: '',
         spin: 'tw--border-light-zephyr-200 tw--border-t-light-zephyr-600 tw--border-l-light-zephyr-600',
       },
       dark: {
         base: '',
-        input: 'tw--bg-dark-lumina tw--text-dark-zephyr-100 tw--font-bold',
+        input: 'tw--bg-dark-lumina tw--text-dark-zephyr-100 tw--font-bold focus:!tw--bg-dark-lumina',
         loader: '',
         spin: 'w--border-dark-zephyr-200 tw--border-t-dark-zephyr-600 tw--border-l-dark-zephyr-600',
       },
