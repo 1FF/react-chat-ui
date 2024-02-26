@@ -1,7 +1,7 @@
-import ReactBotClient from '@/main';
-import { intent } from '@/services/intentions';
-import { chat as getChatConfig, paymentData } from '@/config';
 import { faker } from '@faker-js/faker';
+import ReactBotClient from './src/main';
+import { intent } from './src/services/intentions';
+import { chat as getChatConfig, paymentData } from './src/config';
 
 // example entry point for the plugin
 document.addEventListener('DOMContentLoaded', () => {

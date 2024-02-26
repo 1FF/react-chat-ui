@@ -12,6 +12,10 @@
   letter-spacing: 2px;
 }
 
+p {
+  display: inline;
+}
+
 @layer utilities {
   .tw--translate-z-0 * {
     transform: translateZ(0);
