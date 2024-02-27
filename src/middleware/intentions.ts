@@ -2,9 +2,19 @@ import { Middleware } from '@reduxjs/toolkit';
 import { AllEvents, Roles } from '../config/enums';
 import { track } from '../services/tracking';
 import intent from '../services/intentions';
-import { setIsEmailLoading, setEmailSuccess, setIsEmailFormVisible, setEmailError, setLink } from '../store/slices/intentions';
+import {
+  setIsEmailLoading, setEmailSuccess,
+  // setIsEmailFormVisible, //TODO from chat support
+  setEmailError,
+  // setLink  //TODO from chat support
+} from '../store/slices/intentions';
 import { setPd, setMarketing } from '../store/slices/meta';
-import { addPredefinedAssistantMessage, fillUserHistoryData, setOutgoing } from '../store/slices/chat';
+import {
+  addPredefinedAssistantMessage,
+  // appendAssistantMessage,// TODO from branch chat support
+  fillUserHistoryData,
+  setOutgoing
+} from '../store/slices/chat';
 import { STORING_CHECKER_INTERVAL } from '../config/env';
 import { RootState } from '../store';
 import { PaymentDataSetter, PaymentDataSetterProps } from '../interfaces';
@@ -18,7 +28,7 @@ export const intentionsMiddleware: Middleware = store => next => {
     if (!meta.pd) return {} as PaymentDataSetterProps;
     data.billingFrequencyTmsg = data.billingOptionType === 'one-time'
       ? meta.pd.oneTimer
-      : meta.pd.subscriberBillingFrequency.replace('{1}', data.frequencyInMonths);
+      : meta.pd.subscriberBillingFrequency?.replace('{1}', data.frequencyInMonths);
 
     return data;
   };
@@ -39,7 +49,6 @@ export const intentionsMiddleware: Middleware = store => next => {
 
     // DEV: setEmailSuccess this status is for us to know if mail is validated in the endpoint
     store.dispatch(setEmailSuccess(true));
-    store.dispatch(setIsEmailFormVisible(false));
     track({
       eventType: AllEvents.emailEntered,
       systemType: meta.systemType,
@@ -94,17 +103,18 @@ export const intentionsMiddleware: Middleware = store => next => {
   dataIntervalChecker('__pd', store, setPd, setPaymentDataTranslationAccordingly);
 
   return action => {
-    if (setLink.match(action) && action.payload.isVisible) {
-      const { meta, intentions } = store.getState();
+    // TODO check if when link is shown event is being tracked
+    // if (setLink.match(action) && action.payload.isVisible) {
+    //   const { meta, intentions } = store.getState();
 
-      track({
-        eventType: AllEvents.linkProvided,
-        systemType: meta.systemType,
-        utmParams: meta.marketing.lastUtmParams,
-        customerUuid: meta.cid,
-        email: intentions.email.current
-      });
-    }
+    //   track({
+    //     eventType: AllEvents.linkProvided,
+    //     systemType: meta.systemType,
+    //     utmParams: meta.marketing.lastUtmParams,
+    //     customerUuid: meta.cid,
+    //     email: intentions.email.current
+    //   });
+    // }
     next(action);
   };
 };

@@ -16,6 +16,14 @@ p {
   display: inline;
 }
 
+.scroll-stop {
+  overflow: hidden;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+}
+
 @layer utilities {
   .tw--translate-z-0 * {
     transform: translateZ(0);

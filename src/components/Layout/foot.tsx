@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import intent from '../../services/intentions';
-import { useAppDispatch, useFootControls } from '../../hooks';
+import { useAppDispatch } from '../../hooks';
 import { ResponseForm, EmailForm } from '../Form/';
 import { setIsPaymentButtonVisible, setIsPaymentSuccessful, setLink, setPaymentFormVisibility, setPaymentIntentError } from '../../store/slices/intentions';
 import { PaymentButton, Link } from '../Payment';
@@ -10,16 +10,34 @@ import { track } from '../../services/tracking';
 import { Ellipsis } from '../../components/Stream/ellipsis';
 import { LINK_CLICKED_KEY } from '../../config/env';
 import { AllEvents } from '../../config/enums';
+import { useFootProps } from 'src/hooks/foot';
 
 export const LayoutFoot = () => {
   const dispatch = useAppDispatch();
-  const footState = useFootControls();
+  const footState = useFootProps();
   const ctaAfterPayButton = useRef<HTMLAnchorElement | null>(null);
   const [disabled, setDisabled] = useState(false);
 
   const setIsPaymentContainerVisible = (isVisible: boolean): void => {
     dispatch(setPaymentFormVisibility(isVisible));
   };
+
+  // useEffect(() => {
+  //   if (isEmailFormVisible) {
+  //     track({
+  //       eventType: customEvents.emailField,
+  //       systemType,
+  //       utmParams: marketing.lastUtmParams,
+  //       customerUuid: cid,
+  //       email: currentEmail
+  //     });
+  //   }
+
+  //   if (isPaymentButtonVisible) {
+  //     dispatch(updateLastAssistantMessage(`${pd.displayPlanPrice} ${pd.billingFrequencyTmsg}`));
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [isEmailFormVisible, isPaymentButtonVisible]);
 
   const onClosePaymentForm = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.currentTarget.disabled = true;
@@ -32,9 +50,15 @@ export const LayoutFoot = () => {
     dispatch(addPredefinedAssistantMessage({ content: footState.translations.tm1226 }));
     dispatch(setIsPaymentSuccessful(true));
     dispatch(setIsPaymentButtonVisible(false));
-    dispatch(setLink({ href: '/', isVisible: true, text: footState.translations.ctaTextContent }));
+    // dispatch(setLink({ href: '/', isVisible: true, text: footState.translations.ctaTextContent }));
     setIsPaymentContainerVisible(false);
-
+    // track({
+    //   eventType: customEvents.linkProvided,
+    //   systemType,
+    //   utmParams: marketing.lastUtmParams,
+    //   customerUuid: cid,
+    //   email: currentEmail
+    // });
     setTimeout(() => {
       if (ctaAfterPayButton.current) {
         ctaAfterPayButton.current.click();
@@ -58,7 +82,7 @@ export const LayoutFoot = () => {
       systemType: footState.systemType,
       utmParams: footState.marketing.lastUtmParams,
       customerUuid: footState.cid,
-      email: footState.current
+      email: footState.currentEmail
     });
     dispatch(setClosed());
   };

@@ -7,6 +7,7 @@ import {  track } from '../../services/tracking';
 import { setClosed } from '../../store/slices/chat';
 import { layoutHead as variant } from './variants';
 import { AllEvents } from '../../config/enums';
+import { CLOSE_AFTER_TIMEOUT } from '../../config/env';
 
 export const LayoutHead = () => {
   const dispatch = useAppDispatch();
@@ -23,7 +24,7 @@ export const LayoutHead = () => {
     });
     setTimeout(() => {
       dispatch(setClosed());
-    }, 500);
+    }, CLOSE_AFTER_TIMEOUT);
   };
 
   return (

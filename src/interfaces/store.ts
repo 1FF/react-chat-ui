@@ -1,5 +1,6 @@
 import { AssistantMessageTypeUnion, MessageProperties } from ".";
 import { Roles, Theme } from "../config/enums";
+import { SpecialUrls } from '../interfaces/component';
 
 export interface ChatState {
   outgoing: {
@@ -26,20 +27,25 @@ export interface ChatState {
 
 export interface ConfigState {
   aiProfile: {
-    name: string,
-    role: string,
-    imgSrc: string,
-    welcome: string,
+    name: string;
+    role: string;
+    imgSrc: string;
+    welcome: string;
     // initialMessage: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you. [yes|no|continue]',
-    initialMessage: Array<AssistantMessageTypeUnion>
-  },
-  purpose: string,
-  chatUrl: string,
-  themeId: Theme.light | Theme.dark,
-  translations: any,
-  closeVisible: boolean,
-  enableDevTools: boolean,
-  isPluginMode: boolean,
+    initialMessage: Array<AssistantMessageTypeUnion>;
+  };
+  close: {
+    href: null;
+    visible: boolean;
+  };
+  purpose: string;
+  chatUrl: string;
+  themeId: Theme.light | Theme.dark;
+  translations: any;
+  closeVisible: boolean;
+  enableDevTools: boolean;
+  isPluginMode: boolean;
+  specialUrls: SpecialUrls;
 }
 
 export interface MetaState { systemType: string, eid: string, cid: string, region: string, marketing: any, pd: any }
@@ -49,13 +55,13 @@ export interface IntentionsState {
     current: string,
     success: boolean,
     error: boolean,
-    isFormVisible: boolean,
+    // isFormVisible: boolean,
     isLoading: boolean,
   },
   response: {
-    value: string,
+    // value: string,
     isFormVisible: boolean,
-    isLoading: boolean,
+    // isLoading: boolean,
     error: boolean,
   },
   payment: {

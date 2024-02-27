@@ -2,25 +2,38 @@ import { Middleware } from '@reduxjs/toolkit';
 import { Socket, io } from 'socket.io-client';
 import { config as socketConfig, Events } from '../config';
 import {
-  setExistingHistory, setIsLoading,
-  setTypingTimeoutExpired, setError,
-  setOutgoing, setConnected,
-  resetIsLoading, setClosed, resetError, resetOutgoing,
-  hideResendIcon, resendMessage, showResendIcon,
-  setIsStreaming, fillAssistantHistoryData, resetHistory, fillInitialMessage,
+  setExistingHistory,
+  setIsLoading,
+  setTypingTimeoutExpired,
+  setError,
+  setOutgoing,
+  setConnected,
+  resetIsLoading,
+  setClosed,
+  resetError,
+  resetOutgoing,
+  hideResendIcon,
+  resendMessage,
+  showResendIcon,
+  setIsStreaming,
+  fillAssistantHistoryData,
+  resetHistory,
+  fillInitialMessage,
+  // appendUserMessage,
+  // appendAssistantMessage,
 } from '../store/slices/chat';
 import { getQueryParam } from '../utils';
-import { setResponseFormVisibility } from '../store/slices/intentions';
+import { setIsPaymentButtonVisible } from '../store/slices/intentions';
 import { setConfig } from '../store/slices/config';
 import { setRegion } from '../store/slices/meta';
-import { CHAT_FINISHED_TIMESTAMP } from '../config/env';
+import { CHAT_FINISHED_TIMESTAMP, DEFAULT_CLOSE_HREF, SCROLL_STOP_CLASS } from '../config/env';
 import { Roles } from '../config/enums';
 import { AssistantRecord, UserMessageContent, ClientMessage, SocketHistoryRecord, AssistantHistoryInitialMessage } from '../interfaces'
 
 let socket: Socket;
 
 const chatMiddleware: Middleware = store => next => action => {
-  const { meta, chat } = store.getState();
+  const { meta, chat, config, intentions } = store.getState();
 
   const onError = () => {
     const { config } = store.getState();
@@ -58,7 +71,7 @@ const chatMiddleware: Middleware = store => next => action => {
       store.dispatch(setError(config.translations.error));
     };
 
-    if (socket && socket.connected && data.message.trim() !== '') {
+    if (socket?.connected && data.message.trim() !== '') {
       socket.volatile.emit(
         Events.chat,
         {
@@ -89,17 +102,19 @@ const chatMiddleware: Middleware = store => next => action => {
 
   if (setClosed.match(action)) {
     const chatBotContainer = document.querySelector('#chatbot-container');
+    
     if (document.body && chatBotContainer) {
       chatBotContainer.innerHTML = '';
-      document.body.classList.remove('scroll-stop');
+      document.body.classList.remove(SCROLL_STOP_CLASS);
     }
-    const currentLocation = new URL(window.location.href);
-    currentLocation.search = '';
+    
     localStorage.setItem(CHAT_FINISHED_TIMESTAMP, new Date().getTime().toString());
-    window.location.href = currentLocation.toString();
+
     if (socket) {
       socket.close();
     }
+
+    window.location.href = config.close.href || DEFAULT_CLOSE_HREF;
   }
 
   if (setTypingTimeoutExpired.match(action) && action.payload) {
@@ -152,10 +167,11 @@ const chatMiddleware: Middleware = store => next => action => {
 
     if (servedHistory.length) {
       store.dispatch(setExistingHistory(servedHistory));
-      const last = [...servedHistory].pop();
-      if (last && Array.isArray(last.content)) {
-        store.dispatch(setResponseFormVisibility(last.content));
-      }
+      // TODO data must be filtered for any special messages frontend / backend
+      // const last = [...servedHistory].pop();
+      // if (last && Array.isArray(last.content)) {
+      //   store.dispatch(setResponseFormVisibility(last.content));
+      // }
       return
     }
 
@@ -170,7 +186,7 @@ const chatMiddleware: Middleware = store => next => action => {
         store.dispatch(fillInitialMessage(element));
 
         if (arr.length === index + 1) {
-          store.dispatch(setResponseFormVisibility([...config.aiProfile.initialMessage].pop().content));
+          // store.dispatch(setResponseFormVisibility([...config.aiProfile.initialMessage].pop().content));
           config.aiProfile.initialMessage.forEach((message: SocketHistoryRecord) =>
             handleMessageSending({
               role: Roles.assistant,
@@ -201,8 +217,9 @@ const chatMiddleware: Middleware = store => next => action => {
 
     store.dispatch(fillAssistantHistoryData(assistantData));
 
-    const { chat } = store.getState();
-    store.dispatch(setResponseFormVisibility(chat.historyData[data.id].content));
+    // TODO logic must be moved to footprops
+    // const { chat } = store.getState();
+    // store.dispatch(setResponseFormVisibility(chat.historyData[data.id].content));
 
     if (data.errors?.length && !chat.error) {
       store.dispatch(setError(data.errors[0]));

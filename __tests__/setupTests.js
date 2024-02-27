@@ -15,9 +15,11 @@ window._virtualConsole.addListener('jsdomError', error => {
     originalListener(error);
   }
 });
+global.spies = [];
 
 afterEach(() => {
   jest.clearAllMocks();
   jest.restoreAllMocks();
   localStorage.clear();
+  global.spies.forEach(spy => spy.mockRestore());
 });

@@ -1,3 +1,4 @@
+import { SPECIAL_MERCHANT, SPECIAL_SUPPORT_TICKET } from './env';
 import { colors as baseThemeColors } from './themes/base';
 import { Definition, Roles } from './enums';
 import { AssistantRecord } from '../interfaces/index';
@@ -12,7 +13,7 @@ export const colors = {
   ...baseThemeColors,
 };
 
-export const chat = (id: string) => ({
+export const chat = (id: string, purpose = 'default') => ({
   meta: {
     cid: localStorage.getItem('__cid') || id,
     systemType: 'test',
@@ -77,7 +78,7 @@ export const chat = (id: string) => ({
         },
       ]
     },
-    purpose: 'default',
+    purpose,
     chatUrl: 'https://yourketo.ngrok.io',
     themeId: 'light',
     translations: {
@@ -87,6 +88,7 @@ export const chat = (id: string) => ({
       tm716: 'Entered email already exists, choose below to proceed',
       tm530: 'Take the quiz',
       tm1224: 'Payment in progress...',
+      tm1226: 'Payment succeeded!',
       paymentHeaderTxt1: '<span class="font-bold block text-tau">SECURITY</span> verified',
       paymentHeaderTxt2: 'secured payments',
       loaderTexts: [
@@ -104,9 +106,18 @@ export const chat = (id: string) => ({
       mealButton: 'Create your meal plan',
       error: 'Oops something went wrong.',
       tm505: 'Please enter valid email address',
+      supportButton: 'backEndVars.supportButton',
+      merchantButton: 'backEndVars.merchantButton',
     },
-    closeVisible: true
+    close: {
+      href: 'https://usa.yourketo.diet',
+      visible: true,
+    }
   },
+  specialUrls: {
+    [SPECIAL_MERCHANT]: '/',
+    [SPECIAL_SUPPORT_TICKET]: '/'
+  }
 });
 
 export const paymentData = {

@@ -30,7 +30,7 @@ export const EmailForm = () => {
       if (!inputElement.current) { return }
       inputElement.current.focus();
     }, 500);
-  }, []);
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const currentValue = e.target.value.trim();
