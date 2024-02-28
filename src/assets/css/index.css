@@ -16,6 +16,14 @@ p {
   display: inline;
 }
 
+.mt-8 {
+  margin-top: 2rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
 @layer utilities {
   .tw--translate-z-0 * {
     transform: translateZ(0);

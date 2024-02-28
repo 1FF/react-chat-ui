@@ -7,10 +7,10 @@ export const basic = /* tw*/ tv({
   variants: {
     theme: {
       light: {
-        base: 'tw--bg-light-glaze tw--text-white',
+        base: 'tw--inline-block tw--bg-light-glaze tw--text-white',
       },
       dark: {
-        base: 'tw--bg-dark-glazeBg tw--text-dark-glazeText',
+        base: 'tw--inline-block tw--bg-dark-glazeBg tw--text-dark-glazeText',
       },
     },
   },
