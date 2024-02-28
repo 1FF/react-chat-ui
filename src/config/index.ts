@@ -1,6 +1,6 @@
 import { AssistantRecord } from '../interfaces/index';
-import { uuidV4 } from '../utils';
-import { Definition, Roles } from './enums';
+import { getQueryParam, uuidV4 } from '../utils';
+import { Definition, QueryParams, Roles } from './enums';
 import { colors as baseThemeColors } from './themes/base';
 export { Events, Roles } from './enums';
 export { config } from './socket';
@@ -23,8 +23,8 @@ export const chat = (id: string) => ({
       billingFrequencyTmsg: '',
     },
     marketing: {
-      utmParams: { utm_chat: 'db-sales-nopresetquestions' },
-      lastUtmParams: { utm_chat: 'db-sales-nopresetquestions' },
+      utmParams: { utm_chat: getQueryParam(QueryParams.chat) },
+      lastUtmParams: { utm_chat: getQueryParam(QueryParams.chat) },
       screen: {
         width: 2084,
         height: 1608,

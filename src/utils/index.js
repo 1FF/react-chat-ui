@@ -2,14 +2,13 @@
 /**
  * Retrieves certain query parameter from a URL.
  *
- * @example getQueryParam(window.location.search, 'utm_chat')
- * @param {string} url
+ * @example getQueryParam('utm_chat')
  * @param {string} param
  */
-export const getQueryParam = (url, param) => {
-  const urlParams = new URLSearchParams(url);
+export const getQueryParam = (param) => {
+  const urlParams = new URLSearchParams(window.location.search);
 
-  return urlParams.get(param);
+  return urlParams.get(param) || '';
 };
 
 const formatDateByLocaleOptions = {
