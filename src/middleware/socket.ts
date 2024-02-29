@@ -128,7 +128,7 @@ const chatMiddleware: Middleware = store => next => action => {
 
   store.dispatch(setIsLoading());
 
-  // @ts-ignore;
+  // @ts-expect-error this is working currently
   socket = io.connect(action.payload.chatUrl, { query: 'cid=' + meta.cid, ...socketConfig });
 
   socket.on(Events.connect, () => {

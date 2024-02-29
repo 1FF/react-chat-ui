@@ -1,3 +1,4 @@
+import React from 'react';
 import { useAppSelector } from '../../hooks';
 import { getConfig } from '../../store/slices/config';
 import { Roles } from '../../config/enums';
@@ -5,7 +6,6 @@ import { User } from '../Stream';
 import { MemoizedAssistant } from './assistant';
 import { streamBubble as variant } from './variants';
 import { uuidV4 } from '../../utils';
-import React from 'react';
 import { UserMessageContent } from 'src/interfaces';
 
 

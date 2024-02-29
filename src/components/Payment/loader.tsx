@@ -1,24 +1,28 @@
 import { useAppSelector } from '../../hooks';
 import { getConfig } from '../../store/slices/config';
 import { loader as variants } from './variants';
+interface PaymentLoaderProps {
+  texts?: Array<string>;
+  title?: string;
+}
 
-export const PaymentLoader = ({ texts = [], title = '' }) => {
+export const PaymentLoader = ({ texts = [], title = '' }: PaymentLoaderProps) => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { wrapper, inner, dots, dotsIn, icon, progressCheckmark, panelTitle, spinningTexts, filmContainer, film } = variants({ theme });
   return (
     <div
-      className={ wrapper() }
+      className={wrapper()}
     >
-      <div className={ inner() }>
-        <div className={ dots() }>
+      <div className={inner()}>
+        <div className={dots()}>
           <span
-            className={ dotsIn() }
+            className={dotsIn()}
           />
         </div>
       </div>
 
-      <div className={ progressCheckmark() }>
-        <span className={ icon() }>
+      <div className={progressCheckmark()}>
+        <span className={icon()}>
           <svg
             width="24" height="24"
             fill="none"
@@ -34,16 +38,16 @@ export const PaymentLoader = ({ texts = [], title = '' }) => {
             />
           </svg>
         </span>
-        <p className={ panelTitle() }>{ title }</p>
+        <p className={panelTitle()}>{title}</p>
       </div>
 
-      <div className={ filmContainer() }>
-        <div className={ film() }>
-          { texts.map((txt) => (
-            <div className={ spinningTexts() } key={ txt }>
-              { txt }
+      <div className={filmContainer()}>
+        <div className={film()}>
+          {texts.map((txt) => (
+            <div className={spinningTexts()} key={txt}>
+              {txt}
             </div>
-          )) }
+          ))}
         </div>
       </div>
     </div>

@@ -5,12 +5,12 @@ enum Definition {
   video = 'video',
   image = 'image',
   email = 'email',
-};
+}
 
 enum ScreenOrientation {
   horizontal = 'horizontal',
   vertical = 'vertical',
-};
+}
 
 enum AllEvents {
   addToCart = 'AddToCart',
@@ -42,7 +42,7 @@ enum AllEvents {
   priceSeen = 'PriceSeen',
   buttonClick = 'ButtonClick',
   closeClicked = 'CloseClicked',
-};
+}
 
 enum Intentions {
   email = 'email_intent',
@@ -50,12 +50,12 @@ enum Intentions {
   emailError = 'email_validation_error',
   emailSuccess = 'email_validation_success',
   destroy = 'payment_intent_destroy'
-};
+}
 
 enum Roles {
   user = 'user',
   assistant = 'assistant',
-};
+}
 
 enum Events {
   chat = 'chat',
@@ -67,7 +67,7 @@ enum Events {
   streamData = 'stream-data',
   streamEnd = 'stream-end',
   streamError = 'stream-error',
-};
+}
 
 enum Theme {
   light = 'light',

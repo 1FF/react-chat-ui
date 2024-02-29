@@ -5,7 +5,7 @@ import { getConfig } from '../../store/slices/config';
 import { streamHead as variant } from './variants';
 import { ScreenOrientation } from '../../config/enums';
 
-export const StreamHead = ({ titleTxt = '' }) => {
+export const StreamHead = ({ titleTxt }: { titleTxt: string }) => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { base, title } = variant({ theme });
 

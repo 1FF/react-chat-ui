@@ -36,7 +36,7 @@ const configSlice = createSlice({
         draft.historyIds = payload.map(({ id }) => id);
         draft.historyData = payload.reduce((prev, current) => ({
           ...prev,
-          [current.id]: fillMissingData(current)
+          [current.id]: current
         }), {});
       });
     },
@@ -136,7 +136,7 @@ const configSlice = createSlice({
     setLastGroupPointer(state, { payload }: PayloadAction<string>) {
       state.lastGroupId = payload;
     },
-    resendMessage(state, { payload }) {
+    resendMessage() {
       // empty - used only to listen in the middleware for changes
     },
     setError(state, { payload }: PayloadAction<string>) {
@@ -171,24 +171,3 @@ export const {
 } = configSlice.actions;
 
 export default configSlice.reducer;
-
-
-// this must be removed after data fields being unified;
-// @ts-ignore;
-const fillMissingData = (currentRecord) => {
-  if (currentRecord.role === Roles.assistant) {
-    return {
-      // @ts-ignore;
-      ...currentRecord, content: currentRecord.content.map(record => {
-        if (record.sequence) {
-          return record
-        }
-        return { ...record, sequence: Math.floor(Math.random() * 11) }
-      })
-    };
-  }
-
-  if (currentRecord.role == Roles.user) {
-    return { ...currentRecord, content: [{ resend: false, sent: true, message: currentRecord.content }] }
-  }
-}

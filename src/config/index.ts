@@ -78,7 +78,7 @@ export const chat = (id: string) => ({
       ]
     },
     purpose: 'default',
-    chatUrl: 'https://yourketo.ngrok.io',
+    chatUrl: 'https://chat-ws.test',
     themeId: 'light',
     translations: {
       emailPlaceholder: 'Please enter your email',

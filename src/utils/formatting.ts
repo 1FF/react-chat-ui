@@ -22,7 +22,7 @@ const constructLink = (link: string): string => {
   let search: string;
 
   if (window.location.search) {
-    let searchParams = new URLSearchParams(window.location.search);
+    const searchParams = new URLSearchParams(window.location.search);
 
     searchParams.append(CHAT_SEEN_KEY, 'true');
     searchParams.append(CID, localStorage.getItem('__cid') || '');

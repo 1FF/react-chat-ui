@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { uuidV4 } from "../../utils";
 
 const extractVideoCode = (videoUrl: string) => {
   const pattern = /embed\/(\w+)/;

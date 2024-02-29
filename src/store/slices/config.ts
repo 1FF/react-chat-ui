@@ -4,8 +4,8 @@ import { ConfigState } from '../../interfaces/store';
 import { Theme } from '../../config/enums';
 
 type ConfigProps = {
-  aiProfile: {};
-  translations: {};
+  aiProfile: Record<string, never>;
+  translations: Record<string, never>;
   themeId: Theme.light | Theme.dark;
   chatUrl: string;
   closeVisible: boolean;
