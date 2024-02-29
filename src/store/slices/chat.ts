@@ -3,10 +3,9 @@ import { createSlice, PayloadAction, Draft } from '@reduxjs/toolkit';
 import { AssistantHistoryDataFiller, PredefinedMessagePayload, UserHistoryDataFiller, SocketHistoryRecord, AssistantRecord, AssistantHistoryInitialMessage } from '../../interfaces';
 import { ChatState } from '../../interfaces/store';
 import { chat as initialState } from '../initialState'
-import { getQueryParam } from '../../utils';
+import { getQueryParam, uuidV4 } from '../../utils';
 import { getUnifiedSequence } from '../../config';
 import { Definition, Roles } from '../../config/enums';
-import { uuidV4 } from '../../utils';
 
 const configSlice = createSlice({
   name: 'chat',

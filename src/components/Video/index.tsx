@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 const extractVideoCode = (videoUrl: string) => {
   const pattern = /embed\/(\w+)/;

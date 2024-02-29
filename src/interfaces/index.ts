@@ -80,7 +80,7 @@ export interface SocketHistoryRecord {
 export interface MessageProperties {
   id?: string;
 
-  //assistant
+  // assistant
   type?: SupportedMessageTypes;
   sequence?: number;
   text?: string;
@@ -90,7 +90,7 @@ export interface MessageProperties {
   email?: string;
   payment?: string;
 
-  //user
+  // user
   groupId?: string;
   sent?: boolean;
   resend?: boolean;

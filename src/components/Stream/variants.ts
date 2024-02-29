@@ -1,6 +1,6 @@
 import { tv } from 'tailwind-variants';
 
-export const streamBase = /*tw*/ tv({
+export const streamBase = /* tw*/ tv({
   slots: {
     base: 'tw--pt-10 tw--w-full tw--h-full tw--pb-5 tw--px-5 tw--overflow-y-scroll tw--flex tw--flex-col-reverse tw--translate-z-0',
     second: 'tw--mt-0 tw--mb-auto',
@@ -18,7 +18,7 @@ export const streamBase = /*tw*/ tv({
   }
 });
 
-export const streamHead = /*tw*/ tv({
+export const streamHead = /* tw*/ tv({
   slots: {
     base: 'tw--flex tw--flex-col tw--items-center tw--w-full tw--mx-auto tw--pt-5 tw--pb-10',
     title: 'tw--pb-[30px] tw--max-w-[400px] tw--text-center tw--mx-[30px] select-none',
@@ -31,7 +31,7 @@ export const streamHead = /*tw*/ tv({
   }
 });
 
-export const streamRow = /*tw*/ tv({
+export const streamRow = /* tw*/ tv({
   slots: {
     base: 'tw--grid tw--break-words',
   },
@@ -53,7 +53,7 @@ export const flickerEffect = /* tw */ tv({
   }
 });
 
-export const streamBubble = /*tw*/ tv({
+export const streamBubble = /* tw*/ tv({
   slots: {
     base: 'tw--relative tw--max-w-[375px] tw--whitespace-pre-wrap tw--rounded-[20px] tw--mb-5 tw--space-y-5',
     action: 'tw--absolute tw--bottom-[-16px] tw--right-[-10px]',

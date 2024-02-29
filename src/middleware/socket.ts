@@ -209,7 +209,7 @@ const chatMiddleware: Middleware = store => next => action => {
     }
   });
 
-  socket.on(Events.streamEnd, (data: AssistantRecord & { id: string }) => {
+  socket.on(Events.streamEnd, () => {
     store.dispatch(setIsStreaming(false));
   });
 

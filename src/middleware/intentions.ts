@@ -33,7 +33,7 @@ export const intentionsMiddleware: Middleware = store => next => {
         id: uuidV4(),
         role: Roles.user,
         sequence:1,
-        content: {sequence:1, message: intentions.email.current, resend: false, sent: true, groupId: '' }
+        content: { sequence:1, message: intentions.email.current, resend: false, sent: true, groupId: '' }
       }));
     store.dispatch(setOutgoing(intentions.email.current));
 

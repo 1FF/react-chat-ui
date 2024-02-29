@@ -1,6 +1,6 @@
 import { tv } from 'tailwind-variants';
 
-export const basic = /*tw*/ tv({
+export const basic = /* tw*/ tv({
   slots: {
     base: 'tw--relative tw--flex tw--items-center',
     input: 'tw--w-full tw--px-[15px] tw--py-[11px] tw--rounded-[20px] focus:tw--outline-none',

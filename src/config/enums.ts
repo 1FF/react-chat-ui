@@ -31,7 +31,7 @@ enum AllEvents {
   transactionChargeback = 'TransactionChargeback',
   transactionRefund = 'TransactionRefund',
 
-  //custom events
+  // custom events
   firstMessage = 'FirstMessage',
   linkProvided = 'LinkProvided',
   linkClicked = 'LinkClicked',

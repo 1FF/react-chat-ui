@@ -8,7 +8,6 @@ import { streamBubble as variant } from './variants';
 import { uuidV4 } from '../../utils';
 import { UserMessageContent } from 'src/interfaces';
 
-
 const StreamBubble = ({ itemId }: { itemId: string }) => {
   const { themeId: theme } = useAppSelector(getConfig);
   const record = useAppSelector(state => state.chat.historyData[itemId]);
