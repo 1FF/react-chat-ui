@@ -48,7 +48,11 @@ export const useFootControls = () => {
   const { isVisible: isCtaVisible, text: ctaText, href: ctaHref } = useAppSelector(getLinkIntentions);
   const { isStreaming, error: streamError, isLoading } = useAppSelector(store => store.chat);
   const { isFormVisible: isEmailFormVisible, current, error: emailError } = useAppSelector(getEmailIntentions);
-  const { isButtonVisible: isPaymentButtonVisible, isFormVisible: isPaymentFormVisible, error: paymentIntentError } = useAppSelector(getPaymentIntentions);
+  const {
+    isButtonVisible: isPaymentButtonVisible,
+    isFormVisible: isPaymentFormVisible,
+    error: paymentIntentError
+  } = useAppSelector(getPaymentIntentions);
   const extendedOptions = getPurpose(purpose);
   const error = emailError || paymentIntentError || streamError;
 

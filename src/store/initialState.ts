@@ -3,12 +3,16 @@ import { Roles, Theme } from '../config/enums';
 import { ChatState, ConfigState, IntentionsState, MetaState } from '../interfaces/store';
 
 export const meta: MetaState = {
-  pd: '',
   cid: '',
   eid: '',
   region: '',
   systemType: '',
-  marketing: {},
+  pd: {},
+  marketing: {
+    screen: {},
+    lastUtmParams: {},
+    utmParams: {}
+  },
 };
 
 export const config: ConfigState = {

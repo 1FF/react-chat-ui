@@ -8,7 +8,18 @@ interface PaymentLoaderProps {
 
 export const PaymentLoader = ({ texts = [], title = '' }: PaymentLoaderProps) => {
   const { themeId: theme } = useAppSelector(getConfig);
-  const { wrapper, inner, dots, dotsIn, icon, progressCheckmark, panelTitle, spinningTexts, filmContainer, film } = variants({ theme });
+  const {
+    wrapper,
+    inner,
+    dots,
+    dotsIn,
+    icon,
+    progressCheckmark,
+    panelTitle,
+    spinningTexts,
+    filmContainer,
+    film
+  } = variants({ theme });
   return (
     <div
       className={wrapper()}

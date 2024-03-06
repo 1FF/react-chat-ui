@@ -53,7 +53,11 @@ const Assistant = ({ message, itemId }: AssistantProps) => {
 
         if (it.type === Definition.video) {
           return (
-            <Iframe key={uuidV4()} title={it[it.type]?.title || 'video'} url={it[it.type]?.url || 'https://www.youtube.com/embed/g4B8Dhl4pxY'} />
+            <Iframe
+              key={uuidV4()}
+              title={it[it.type]?.title || 'video'}
+              url={it[it.type]?.url || 'https://www.youtube.com/embed/g4B8Dhl4pxY'}
+            />
           );
         }
 
@@ -68,9 +72,15 @@ const Assistant = ({ message, itemId }: AssistantProps) => {
           );
         }
 
-        if (it.type === Definition.payment) return `${it[it.type]} ${pd.displayPlanPrice} ${pd.billingFrequencyTmsg}`;
+        if (it.type === Definition.payment) {
+          return `${it[it.type]} ${pd.displayPlanPrice} ${pd.billingFrequencyTmsg}`;
+        }
 
-        if (it.type === Definition.email) return it[it.type];
+        if (it.type === Definition.email) {
+          return it[it.type];
+        }
+
+
       })}
     </>
   );

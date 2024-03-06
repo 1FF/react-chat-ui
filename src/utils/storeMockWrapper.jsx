@@ -20,13 +20,16 @@ function renderWithProviders(
         chat: chatReducer,
         config: configReducer,
       },
-      middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }).concat(chatMiddleware, intentionsMiddleware),
-      preloadedState }),
+      middleware:
+        (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false })
+          .concat(chatMiddleware, intentionsMiddleware),
+      preloadedState
+    }),
     ...renderOptions
   } = {}
 ) {
   // eslint-disable-next-line react/prop-types
-  const Wrapper = ({ children }) => <Provider store={ store }>{ children }</Provider>;
+  const Wrapper = ({ children }) => <Provider store={store}>{children}</Provider>;
 
   return { store, ...render(ui, { wrapper: Wrapper, ...renderOptions }) };
 }

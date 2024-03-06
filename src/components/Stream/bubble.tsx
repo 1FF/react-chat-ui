@@ -22,7 +22,7 @@ const StreamBubble = ({ itemId }: { itemId: string }) => {
           />
         )
         :
-        record.content.map((record: UserMessageContent) => <User key={uuidV4()} record={{ ...record, itemId }} />)
+        [...record.content].map((record: UserMessageContent) => <User key={uuidV4()} record={{ ...record, itemId }} />)
       }
     </div>
   ));

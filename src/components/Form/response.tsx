@@ -35,7 +35,14 @@ export const ResponseForm = () => {
     e.preventDefault();
 
     if (response.trim()) {
-      dispatch(fillUserHistoryData({ role: Roles.user, id: uuidV4(), sequence: 1, content: { sequence: 1, message: response, groupId, resend: false, sent: true } }));
+      dispatch(fillUserHistoryData({
+        role: Roles.user,
+        id: uuidV4(),
+        sequence: 1,
+        content: {
+          sequence: 1, message: response, groupId, resend: false, sent: true
+        }
+      }));
     }
 
     setCurrentResponse('');

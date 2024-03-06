@@ -21,7 +21,8 @@ export const store = configureStore({
     chat: chatReducer,
     intentions: intentionsReducer,
   })),
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }).concat(chatMiddleware, intentionsMiddleware),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false })
+    .concat(chatMiddleware, intentionsMiddleware),
 });
 
 
