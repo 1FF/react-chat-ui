@@ -74,4 +74,4 @@ enum Theme {
   dark = 'dark',
 }
 
-export { Definition, ScreenOrientation, AllEvents, Intentions, Roles, Events, Theme }
+export { AllEvents, Definition, Events, Intentions, Roles, ScreenOrientation, Theme }

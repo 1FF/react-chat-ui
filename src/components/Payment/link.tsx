@@ -1,6 +1,7 @@
 import { forwardRef } from 'react';
-import payment from './variants';
+
 import { LinkProps } from '../../interfaces/component';
+import payment from './variants';
 
 export const Link = forwardRef<HTMLAnchorElement, LinkProps>((props, ref) => {
   const { link } = payment();

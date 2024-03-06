@@ -1,10 +1,11 @@
-import { RootState, AppDispatch } from '../store/index';
+import { useLayoutEffect, useState } from 'react';
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+
 import chatbotPurpose, { ChatbotOptions } from '../config/purpose';
+import { AppDispatch,RootState } from '../store/index';
 import { getConfig } from '../store/slices/config';
 import { getEmailIntentions, getLinkIntentions, getPaymentIntentions, getResponseIntentions } from '../store/slices/intentions';
 import { getMeta } from '../store/slices/meta';
-import { useLayoutEffect, useState } from 'react';
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 
 type DispatchFunc = () => AppDispatch;
 export const useAppDispatch: DispatchFunc = useDispatch;
@@ -46,7 +47,7 @@ export const useFootControls = () => {
   const { cid, systemType, marketing } = useAppSelector(getMeta);
   const { translations, purpose } = useAppSelector(getConfig);
   const { isVisible: isCtaVisible, text: ctaText, href: ctaHref } = useAppSelector(getLinkIntentions);
-  const { isStreaming, error: streamError, isLoading } = useAppSelector(store => store.chat);
+  const { isStreaming, error: streamError, isLoading } = useAppSelector((store) => store.chat);
   const { isFormVisible: isEmailFormVisible, current, error: emailError } = useAppSelector(getEmailIntentions);
   const {
     isButtonVisible: isPaymentButtonVisible,

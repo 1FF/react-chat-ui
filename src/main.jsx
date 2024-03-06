@@ -1,8 +1,9 @@
+import './assets/css/index.css';
+
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
-import './assets/css/index.css';
 import { AppBase } from './components/AppBase';
 import { persistor, store } from './store';
 

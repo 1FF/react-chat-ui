@@ -1,9 +1,10 @@
 import { createSlice, Draft } from '@reduxjs/toolkit';
 import produce from 'immer';
-import { intentions as initialState } from '../initialState';
-import { IntentionsState } from '../../interfaces/store';
+
 import { Definition } from '../../config/enums';
 import { AssistantMessageTypeUnion } from '../../interfaces';
+import { IntentionsState } from '../../interfaces/store';
+import { intentions as initialState } from '../initialState';
 
 const intentionsSlice = createSlice({
   name: 'intentions',

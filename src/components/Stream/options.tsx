@@ -1,12 +1,12 @@
-import { uuidV4 } from '../../utils';
-import { Btn } from '../Button';
-import { Link } from '../Link';
+import { AllEvents, Roles } from '../../config/enums';
 import { useAppDispatch, useAppSelector } from '../../hooks';
+import { OptionsListProps } from '../../interfaces/index';
 import { track } from '../../services/tracking';
 import { fillUserHistoryData, setOutgoing, userMessageFindOne } from '../../store/slices/chat';
 import { getMeta } from '../../store/slices/meta';
-import { AllEvents, Roles } from '../../config/enums';
-import { OptionsListProps } from '../../interfaces/index';
+import { uuidV4 } from '../../utils';
+import { Btn } from '../Button';
+import { Link } from '../Link';
 
 export const OptionList = ({ options = [] }: OptionsListProps) => {
   const dispatch = useAppDispatch();

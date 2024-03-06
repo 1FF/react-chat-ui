@@ -1,6 +1,6 @@
-export { PaymentHead } from './head';
 export { PaymentButton } from './btn';
 export { CloseButton } from './close';
 export { PaymentFooter } from './foot';
-export { PaymentLoader } from './loader';
+export { PaymentHead } from './head';
 export { Link } from './link';
+export { PaymentLoader } from './loader';

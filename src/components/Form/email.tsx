@@ -1,17 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
-import { intent } from '../../services/intentions';
-import { getEmailIntentions, setEmail, setIsEmailLoading } from '../../store/slices/intentions';
-import { getConfig } from '../../store/slices/config';
-import { useAppDispatch, useAppSelector } from '../../hooks';
-import { Input } from '../Input/basic';
-import { IconBtn } from '../Button';
-import { layoutFoot as variant } from '../Layout/variants';
-import { track } from '../../services/tracking';
+
 import { AllEvents } from '../../config/enums';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { intent } from '../../services/intentions';
+import { track } from '../../services/tracking';
+import { getConfig } from '../../store/slices/config';
+import { getEmailIntentions, setEmail, setIsEmailLoading } from '../../store/slices/intentions';
+import { IconBtn } from '../Button';
+import { Input } from '../Input/basic';
+import { layoutFoot as variant } from '../Layout/variants';
 
 export const EmailForm = () => {
   const dispatch = useAppDispatch();
-  const meta = useAppSelector(state => state.meta);
+  const meta = useAppSelector((state) => state.meta);
   const { themeId: theme, translations } = useAppSelector(getConfig);
   const { isLoading } = useAppSelector(getEmailIntentions);
   const { base, input, button } = variant({ theme });

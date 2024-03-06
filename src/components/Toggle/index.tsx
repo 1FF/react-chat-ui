@@ -1,5 +1,6 @@
 import { MouseEventHandler } from 'react';
-import { wrapper, pin } from './variants';
+
+import { pin,wrapper } from './variants';
 
 export const Toggler = ({ onToggle, on = false, title = '' }: { onToggle: MouseEventHandler<HTMLButtonElement>, on: boolean, title: string }) => {
   const { base: outline } = wrapper({ color: on ? 'enabled' : 'disabled' });

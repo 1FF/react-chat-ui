@@ -1,31 +1,31 @@
 import { Middleware } from '@reduxjs/toolkit';
-import { Socket, io } from 'socket.io-client';
+import { io,Socket } from 'socket.io-client';
+
 import { config as socketConfig, Events } from '../config';
-import {
-  setExistingHistory, setIsLoading,
-  setTypingTimeoutExpired, setError,
-  setOutgoing, setConnected,
-  resetIsLoading, setClosed, resetError, resetOutgoing,
-  hideResendIcon, resendMessage, showResendIcon,
-  setIsStreaming, fillAssistantHistoryData, resetHistory, fillInitialMessage,
-} from '../store/slices/chat';
-import { getQueryParam } from '../utils';
-import { setResponseFormVisibility } from '../store/slices/intentions';
-import { setConfig } from '../store/slices/config';
-import { setRegion } from '../store/slices/meta';
-import { CHAT_FINISHED_TIMESTAMP } from '../config/env';
 import { Roles } from '../config/enums';
+import { CHAT_FINISHED_TIMESTAMP } from '../config/env';
 import {
+  AssistantHistoryInitialMessage,
   AssistantRecord,
-  UserMessageContent,
   ClientMessage,
   SocketHistoryRecord,
-  AssistantHistoryInitialMessage
-} from '../interfaces'
+  UserMessageContent } from '../interfaces'
+import {
+fillAssistantHistoryData, fillInitialMessage,
+  hideResendIcon, resendMessage, resetError, resetHistory,   resetIsLoading, resetOutgoing,
+setClosed, setConnected,
+setError,
+  setExistingHistory, setIsLoading,
+  setIsStreaming,   setOutgoing,   setTypingTimeoutExpired, showResendIcon,
+} from '../store/slices/chat';
+import { setConfig } from '../store/slices/config';
+import { setResponseFormVisibility } from '../store/slices/intentions';
+import { setRegion } from '../store/slices/meta';
+import { getQueryParam } from '../utils';
 
 let socket: Socket;
 
-const chatMiddleware: Middleware = store => next => action => {
+const chatMiddleware: Middleware = (store) => (next) => (action) => {
   const { meta, chat } = store.getState();
 
   const onError = () => {
@@ -135,7 +135,7 @@ const chatMiddleware: Middleware = store => next => action => {
   store.dispatch(setIsLoading());
 
   // @ts-expect-error this is working currently
-  socket = io.connect(action.payload.chatUrl, { query: 'cid=' + meta.cid, ...socketConfig });
+  socket = io.connect(action.payload.chatUrl, { query: `cid=${  meta.cid}`, ...socketConfig });
 
   socket.on(Events.connect, () => {
     const { meta } = store.getState();

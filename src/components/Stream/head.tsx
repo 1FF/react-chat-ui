@@ -1,9 +1,8 @@
-import { useAppSelector } from '../../hooks';
-
 import { Profile } from '../../components/Profile';
+import { ScreenOrientation } from '../../config/enums';
+import { useAppSelector } from '../../hooks';
 import { getConfig } from '../../store/slices/config';
 import { streamHead as variant } from './variants';
-import { ScreenOrientation } from '../../config/enums';
 
 export const StreamHead = ({ titleTxt }: { titleTxt: string }) => {
   const { themeId: theme } = useAppSelector(getConfig);

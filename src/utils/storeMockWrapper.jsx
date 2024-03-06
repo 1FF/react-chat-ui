@@ -1,12 +1,13 @@
-import { render } from '@testing-library/react';
 import { configureStore } from '@reduxjs/toolkit';
+import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import metaReducer from '../store/slices/meta';
-import configReducer from '../store/slices/config';
-import chatReducer from '../store/slices/chat';
-import intentionsReducer from '../store/slices/intentions';
-import chatMiddleware from '../middleware/socket';
+
 import intentionsMiddleware from '../middleware/intentions';
+import chatMiddleware from '../middleware/socket';
+import chatReducer from '../store/slices/chat';
+import configReducer from '../store/slices/config';
+import intentionsReducer from '../store/slices/intentions';
+import metaReducer from '../store/slices/meta';
 
 function renderWithProviders(
   ui,

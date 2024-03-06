@@ -1,12 +1,12 @@
 import { MouseEvent } from 'react';
-import { useAppDispatch, useHeadControls } from '../../hooks';
 
-import { Profile } from '../Profile';
-import { IconBtn } from '../Button';
+import { AllEvents } from '../../config/enums';
+import { useAppDispatch, useHeadControls } from '../../hooks';
 import {  track } from '../../services/tracking';
 import { setClosed } from '../../store/slices/chat';
+import { IconBtn } from '../Button';
+import { Profile } from '../Profile';
 import { layoutHead as variant } from './variants';
-import { AllEvents } from '../../config/enums';
 
 export const LayoutHead = () => {
   const dispatch = useAppDispatch();

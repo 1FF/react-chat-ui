@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { meta as initialState } from '../initialState';
+
 import { MetaState } from '../../interfaces/store';
+import { meta as initialState } from '../initialState';
 
 const configSlice = createSlice({
   name: 'meta',

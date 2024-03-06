@@ -1,6 +1,6 @@
-import { ProfileProps } from '../../interfaces/component';
 import { ScreenOrientation } from '../../config/enums';
 import { useAppSelector } from '../../hooks';
+import { ProfileProps } from '../../interfaces/component';
 import { getConfig } from '../../store/slices/config';
 import { profile as variant } from './variants';
 

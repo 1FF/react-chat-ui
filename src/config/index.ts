@@ -1,7 +1,7 @@
-import { colors as baseThemeColors } from './themes/base';
-import { Definition, Roles } from './enums';
 import { AssistantRecord } from '../interfaces/index';
 import { uuidV4 } from '../utils';
+import { Definition, Roles } from './enums';
+import { colors as baseThemeColors } from './themes/base';
 export { Events, Roles } from './enums';
 export { config } from './socket';
 

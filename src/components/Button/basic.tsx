@@ -1,5 +1,5 @@
-import { ButtonProps } from '../../interfaces/component';
 import { useAppSelector } from '../../hooks';
+import { ButtonProps } from '../../interfaces/component';
 import { getConfig } from '../../store/slices/config';
 import { basic as variant } from './variants';
 

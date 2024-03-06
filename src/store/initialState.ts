@@ -1,6 +1,6 @@
-import { uuidV4 } from '../utils';
 import { Roles, Theme } from '../config/enums';
 import { ChatState, ConfigState, IntentionsState, MetaState } from '../interfaces/store';
+import { uuidV4 } from '../utils';
 
 export const meta: MetaState = {
   cid: '',

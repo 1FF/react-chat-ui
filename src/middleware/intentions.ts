@@ -1,23 +1,24 @@
 import { Middleware } from '@reduxjs/toolkit';
+
 import { AllEvents, Roles } from '../config/enums';
-import { track } from '../services/tracking';
+import { STORING_CHECKER_INTERVAL } from '../config/env';
+import { PaymentDataSetterProps } from '../interfaces';
 import intent from '../services/intentions';
-import {
-  setIsEmailLoading,
-  setEmailSuccess,
-  setIsEmailFormVisible,
-  setEmailError,
-  setLink,
-} from '../store/slices/intentions';
-import { setPd, setMarketing } from '../store/slices/meta';
+import { track } from '../services/tracking';
+import { RootState } from '../store';
 import {
   addPredefinedAssistantMessage,
   fillUserHistoryData,
   setOutgoing,
 } from '../store/slices/chat';
-import { STORING_CHECKER_INTERVAL } from '../config/env';
-import { RootState } from '../store';
-import { PaymentDataSetterProps } from '../interfaces';
+import {
+  setEmailError,
+  setEmailSuccess,
+  setIsEmailFormVisible,
+  setIsEmailLoading,
+  setLink,
+} from '../store/slices/intentions';
+import { setMarketing,setPd } from '../store/slices/meta';
 import { uuidV4 } from '../utils';
 
 export const intentionsMiddleware: Middleware = (store) => (next) => {

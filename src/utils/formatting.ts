@@ -27,7 +27,7 @@ const constructLink = (link: string): string => {
     searchParams.append(CHAT_SEEN_KEY, 'true');
     searchParams.append(CID, localStorage.getItem('__cid') || '');
 
-    search = '/?' + searchParams;
+    search = `/?${  searchParams}`;
   } else {
     search = '';
   }

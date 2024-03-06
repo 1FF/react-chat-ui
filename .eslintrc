@@ -9,6 +9,13 @@
     "plugin:react/recommended",
     "prettier"
   ],
+  "plugins": [
+    "@typescript-eslint",
+    "react",
+    "react-hooks",
+    "prettier",
+    "simple-import-sort"
+  ],
   "overrides": [
     {
       "env": {
@@ -32,12 +39,6 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": [
-    "@typescript-eslint",
-    "react",
-    "react-hooks",
-    "prettier"
-  ],
   "rules": {
     "@typescript-eslint/no-unused-vars": "warn",
     "react/react-in-jsx-scope": "off",
@@ -74,5 +75,17 @@
       "error",
       "always"
     ],
+    "react/no-array-index-key": [
+      1
+    ],
+    "arrow-parens": [
+      "error",
+      "always"
+    ],
+    "prefer-template": "error",
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn" 
   }
 }

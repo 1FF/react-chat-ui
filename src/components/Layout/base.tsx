@@ -1,6 +1,5 @@
-import { LayoutBaseProps } from '../../interfaces/component';
 import { useAppSelector, useWindowSize } from '../../hooks';
-
+import { LayoutBaseProps } from '../../interfaces/component';
 import { getConfig } from '../../store/slices/config';
 import { layoutBase as variant } from './variants';
 

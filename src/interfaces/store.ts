@@ -1,5 +1,5 @@
-import { AssistantMessageTypeUnion, MessageProperties } from '.';
 import { Roles, Theme } from '../config/enums';
+import { AssistantMessageTypeUnion, MessageProperties } from '.';
 
 export interface ChatState {
   outgoing: {

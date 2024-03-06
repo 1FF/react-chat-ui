@@ -8,7 +8,7 @@ interface PaymentHeadProps {
 }
 
 export const PaymentHead = ({ config }: PaymentHeadProps) => {
-  const { translations } = useAppSelector(state => state.config);
+  const { translations } = useAppSelector((state) => state.config);
   const { wrapper, left, leftTop, icon, text, bottom, right, price, info } = variants();
 
   return (

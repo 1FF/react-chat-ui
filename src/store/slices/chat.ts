@@ -1,18 +1,19 @@
+import { createSlice, Draft,PayloadAction } from '@reduxjs/toolkit';
 import produce from 'immer';
-import { createSlice, PayloadAction, Draft } from '@reduxjs/toolkit';
-import {
-  AssistantHistoryDataFiller,
-  PredefinedMessagePayload,
-  UserHistoryDataFiller,
-  SocketHistoryRecord,
-  AssistantRecord,
-  AssistantHistoryInitialMessage,
-} from '../../interfaces';
-import { ChatState } from '../../interfaces/store';
-import { chat as initialState } from '../initialState';
-import { getQueryParam, uuidV4 } from '../../utils';
+
 import { getUnifiedSequence } from '../../config';
 import { Definition, Roles } from '../../config/enums';
+import {
+  AssistantHistoryDataFiller,
+  AssistantHistoryInitialMessage,
+  AssistantRecord,
+  PredefinedMessagePayload,
+  SocketHistoryRecord,
+  UserHistoryDataFiller,
+} from '../../interfaces';
+import { ChatState } from '../../interfaces/store';
+import { getQueryParam, uuidV4 } from '../../utils';
+import { chat as initialState } from '../initialState';
 
 const configSlice = createSlice({
   name: 'chat',

@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { config as initialState } from '../../store/initialState';
+
 import { ConfigState } from '../../interfaces/store';
+import { config as initialState } from '../../store/initialState';
 
 const configSlice = createSlice({
   name: 'config',

@@ -1,8 +1,9 @@
 import { forwardRef } from 'react';
+
 import { useAppSelector } from '../../hooks';
+import { BasicInputProps } from '../../interfaces/component';
 import { getConfig } from '../../store/slices/config';
 import { basic as variant } from './variants';
-import { BasicInputProps } from '../../interfaces/component';
 
 export const Input = forwardRef<HTMLInputElement, BasicInputProps>((props, ref) => {
   const {
