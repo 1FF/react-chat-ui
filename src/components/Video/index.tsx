@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { uuidV4 } from "../../utils";
+import React, { useState } from 'react';
 
 const extractVideoCode = (videoUrl: string) => {
   const pattern = /embed\/(\w+)/;
@@ -28,7 +27,7 @@ export const Iframe = React.memo(function Iframe({ url, title }: { url: string, 
       <iframe
         className="w-full tw--h-80 tw--py-4"
         title={title || 'Missing title'}
-        src={url + '?enablejsapi=1&rel=0&origin=' + window.location.origin}
+        src={`${url  }?enablejsapi=1&rel=0&origin=${  window.location.origin}`}
         allow="fullscreen"
       />
       :

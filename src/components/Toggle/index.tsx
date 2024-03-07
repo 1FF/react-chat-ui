@@ -1,8 +1,8 @@
-/* eslint-disable import/prefer-default-export */
-import { bool, func, string } from 'prop-types';
-import { wrapper, pin } from './variants';
+import { MouseEventHandler } from 'react';
 
-export const Toggler = ({ onToggle, on = false, title = '' }: { onToggle: any, on: boolean, title: string }) => {
+import { pin,wrapper } from './variants';
+
+export const Toggler = ({ onToggle, on = false, title = '' }: { onToggle: MouseEventHandler<HTMLButtonElement>, on: boolean, title: string }) => {
   const { base: outline } = wrapper({ color: on ? 'enabled' : 'disabled' });
   const { base: toggle } = pin({ position: on ? 'enabled' : 'disabled' });
   return (
@@ -17,10 +17,4 @@ export const Toggler = ({ onToggle, on = false, title = '' }: { onToggle: any, o
       </button>
     </div>
   );
-};
-
-Toggler.propTypes = {
-  onToggle: func.isRequired,
-  title: string.isRequired,
-  on: bool,
 };

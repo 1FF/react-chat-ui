@@ -11,7 +11,7 @@ import renderWithProviders from '../../../src/utils/storeMockWrapper';
 import { LINK_CLICKED_KEY, STORING_CHECKER_INTERVAL } from '../../../src/config/env';
 import { intent } from '../../../src/main';
 import initialState from '../../../src/store/initialState';
-import { initialConfig, serverHistoryMock, serverHistoryMockWithEmailIntent, serverHistoryMockWithLink, serverHistoryMockWithPaymentIntent, streamMocks} from '../../../src/chatMocks';
+import { initialConfig, serverHistoryMock, serverHistoryMockWithEmailIntent, serverHistoryMockWithLink, serverHistoryMockWithPaymentIntent, streamMocks } from '../../../src/chatMocks';
 
 const actualWindow = window.location;
 

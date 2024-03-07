@@ -1,7 +1,7 @@
-import { colors as baseThemeColors } from './themes/base';
-import { Definition, Roles } from './enums';
 import { AssistantRecord } from '../interfaces/index';
 import { uuidV4 } from '../utils';
+import { Definition, Roles } from './enums';
+import { colors as baseThemeColors } from './themes/base';
 export { Events, Roles } from './enums';
 export { config } from './socket';
 
@@ -44,8 +44,8 @@ export const chat = (id: string) => ({
           role: Roles.assistant,
           time: new Date().getTime(),
           content: [
-            { "type": "text", "text": "See this picture", "sequence": 2 },
-            { "type": "text", "text": "See this picture", "sequence": 2 },
+            { 'type': 'text', 'text': 'See this picture', 'sequence': 2 },
+            { 'type': 'text', 'text': 'See this picture', 'sequence': 2 },
             {
               type: 'image',
               image: { url: 'https://static.boredpanda.com/blog/wp-content/uploads/2016/08/wet-dogs-before-after-bath-fb6__700-png.jpg' },
@@ -63,8 +63,8 @@ export const chat = (id: string) => ({
           role: Roles.assistant,
           time: new Date().getTime(),
           content: [
-            { "type": "text", "text": "Do you want to lose weight?", "sequence": 2 },
-            { "type": "buttons", "sequence": 1, "buttons": [{ "value": "Yes", "sequence": 1, "text": "Yes" }, { "value": "No", "sequence": 2, "text": "No" }] }
+            { 'type': 'text', 'text': 'Do you want to lose weight?', 'sequence': 2 },
+            { 'type': 'buttons', 'sequence': 1, 'buttons': [{ 'value': 'Yes', 'sequence': 1, 'text': 'Yes' }, { 'value': 'No', 'sequence': 2, 'text': 'No' }] }
           ]
         },
         {
@@ -72,13 +72,13 @@ export const chat = (id: string) => ({
           role: Roles.assistant,
           time: new Date().getTime(),
           content: [
-            { "type": "text", "text": "Do you want to lose weight?", "sequence": 2 },
+            { 'type': 'text', 'text': 'Do you want to lose weight?', 'sequence': 2 },
           ]
         },
       ]
     },
     purpose: 'default',
-    chatUrl: 'https://yourketo.ngrok.io',
+    chatUrl: 'https://chat-ws.test',
     themeId: 'light',
     translations: {
       emailPlaceholder: 'Please enter your email',

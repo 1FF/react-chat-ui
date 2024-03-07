@@ -1,22 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { config as initialState } from '../../store/initialState';
-import { ConfigState } from '../../interfaces/store';
-import { Theme } from '../../config/enums';
 
-type ConfigProps = {
-  aiProfile: {};
-  translations: {};
-  themeId: Theme.light | Theme.dark;
-  chatUrl: string;
-  closeVisible: boolean;
-  purpose: string;
-}
+import { ConfigState } from '../../interfaces/store';
+import { config as initialState } from '../../store/initialState';
 
 const configSlice = createSlice({
   name: 'config',
   initialState,
   reducers: {
-    setConfig(state, { payload }: PayloadAction<ConfigProps>) {
+    setConfig(state, { payload }: PayloadAction<ConfigState>) {
       state.aiProfile = { ...initialState.aiProfile, ...payload.aiProfile };
       state.translations = { ...initialState.translations, ...payload.translations };
       state.themeId = payload.themeId;

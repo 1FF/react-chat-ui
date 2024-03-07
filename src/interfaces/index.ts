@@ -55,9 +55,11 @@ export interface OptionsListProps {
   options: Array<BaseOptions> | undefined
 }
 
-export type AssistantMessageTypeUnion = TextMessage | ButtonsMessage | EmailMessage | VideoMessage | ImageMessage | PaymentMessage;
+export type AssistantMessageTypeUnion =
+  TextMessage | ButtonsMessage | EmailMessage | VideoMessage | ImageMessage | PaymentMessage;
 
-export type SupportedMessageTypes = Definition.text | Definition.buttons | Definition.payment | Definition.email | Definition.video | Definition.image;
+export type SupportedMessageTypes =
+  Definition.text | Definition.buttons | Definition.payment | Definition.email | Definition.video | Definition.image;
 
 export interface AssistantRecord {
   type: SupportedMessageTypes,
@@ -80,7 +82,7 @@ export interface SocketHistoryRecord {
 export interface MessageProperties {
   id?: string;
 
-  //assistant
+  // assistant
   type?: SupportedMessageTypes;
   sequence?: number;
   text?: string;
@@ -90,7 +92,7 @@ export interface MessageProperties {
   email?: string;
   payment?: string;
 
-  //user
+  // user
   groupId?: string;
   sent?: boolean;
   resend?: boolean;
@@ -141,7 +143,9 @@ export interface ClientMessage {
 }
 
 export interface PaymentDataSetterProps {
-  billingFrequencyTmsg: string, billingOptionType: 'one-time' | 'subscription', frequencyInMonths: string
+  billingFrequencyTmsg: string;
+  billingOptionType: 'one-time' | 'subscription';
+  frequencyInMonths: string;
 }
 
 export type PaymentDataSetter = (data: PaymentDataSetterProps) => PaymentDataSetterProps;

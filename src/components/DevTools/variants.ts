@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import { tv } from 'tailwind-variants';
 
 export const wrapper = /* tw */ tv({

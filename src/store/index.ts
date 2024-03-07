@@ -1,10 +1,11 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import { persistStore, persistReducer } from 'redux-persist';
+import { persistReducer,persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+
+import intentionsMiddleware from '../middleware/intentions';
 import chatMiddleware from '../middleware/socket';
 import chatReducer from './slices/chat';
 import configReducer from './slices/config';
-import intentionsMiddleware from '../middleware/intentions';
 import intentionsReducer from './slices/intentions';
 import metaReducer from './slices/meta';
 
@@ -21,7 +22,8 @@ export const store = configureStore({
     chat: chatReducer,
     intentions: intentionsReducer,
   })),
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }).concat(chatMiddleware, intentionsMiddleware),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false })
+    .concat(chatMiddleware, intentionsMiddleware),
 });
 
 

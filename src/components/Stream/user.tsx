@@ -1,10 +1,10 @@
-import { useAppSelector, useAppDispatch } from '../../hooks';
-import { getConfig } from '../../store/slices/config';
-import { resendMessage } from '../../store/slices/chat';
 import { IconBtn } from '../../components/Button';
 import { Roles } from '../../config/enums';
-import { streamBubble as variant } from './variants';
+import { useAppDispatch,useAppSelector } from '../../hooks';
 import { UserProps } from '../../interfaces/component';
+import { resendMessage } from '../../store/slices/chat';
+import { getConfig } from '../../store/slices/config';
+import { streamBubble as variant } from './variants';
 
 export const User = ({ record }: UserProps) => {
   const dispatch = useAppDispatch();

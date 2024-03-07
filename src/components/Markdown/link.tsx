@@ -1,14 +1,15 @@
-import { useEffect,MouseEvent } from 'react';
-import { useAppDispatch, useAppSelector } from '../../hooks';
-import formatting from '../../utils/formatting';
+import { MouseEvent,useEffect } from 'react';
+
+import { AllEvents } from '../../config/enums';
 import { LINK_CLICKED_KEY } from '../../config/env';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { MarkdownLinkProps } from '../../interfaces/component';
 import { track } from '../../services/tracking';
 import { setClosed } from '../../store/slices/chat';
-import { getMeta } from '../../store/slices/meta';
-import { setLink } from '../../store/slices/intentions';
 import { getConfig } from '../../store/slices/config';
-import { AllEvents } from '../../config/enums';
-import { MarkdownLinkProps } from '../../interfaces/component';
+import { setLink } from '../../store/slices/intentions';
+import { getMeta } from '../../store/slices/meta';
+import formatting from '../../utils/formatting';
 
 export const MarkdownLink = ({ properties }: MarkdownLinkProps) => {
   const { translations } = useAppSelector(getConfig);

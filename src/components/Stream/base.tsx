@@ -1,15 +1,15 @@
 import { useAppSelector } from '../../hooks';
 import { getConfig } from '../../store/slices/config';
 import { formatDateByLocale, uuidV4 } from '../../utils';
-import { StreamHead } from './head';
 import { MemoizedStreamBubble } from './bubble';
+import { StreamHead } from './head';
 import { streamBase, streamRow } from './variants';
 
 export const StreamBase = () => {
   const { themeId: theme } = useAppSelector(getConfig);
   const { aiProfile } = useAppSelector(getConfig);
-  const historyIds = useAppSelector(state => state.chat.historyIds || []);
-  const firstMessage = useAppSelector(state => state.chat.historyData[historyIds[0]]);
+  const historyIds = useAppSelector((state) => state.chat.historyIds || []);
+  const firstMessage = useAppSelector((state) => state.chat.historyData[historyIds[0]]);
   const { base, second, date } = streamBase({ theme });
   const { base: baseRow } = streamRow({ theme });
   const time = formatDateByLocale(firstMessage?.time || new Date().getTime());

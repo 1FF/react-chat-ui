@@ -1,15 +1,16 @@
 import { useRef, useState } from 'react';
-import intent from '../../services/intentions';
-import { useAppDispatch, useFootControls } from '../../hooks';
-import { ResponseForm, EmailForm } from '../Form/';
-import { setIsPaymentButtonVisible, setIsPaymentSuccessful, setLink, setPaymentFormVisibility, setPaymentIntentError } from '../../store/slices/intentions';
-import { PaymentButton, Link } from '../Payment';
-import { addPredefinedAssistantMessage, setClosed } from '../../store/slices/chat';
+
 import { PaymentScene } from '../../components/Scenes/payment';
-import { track } from '../../services/tracking';
 import { Ellipsis } from '../../components/Stream/ellipsis';
-import { LINK_CLICKED_KEY } from '../../config/env';
 import { AllEvents } from '../../config/enums';
+import { LINK_CLICKED_KEY } from '../../config/env';
+import { useAppDispatch, useFootControls } from '../../hooks';
+import intent from '../../services/intentions';
+import { track } from '../../services/tracking';
+import { addPredefinedAssistantMessage, setClosed } from '../../store/slices/chat';
+import { setIsPaymentButtonVisible, setIsPaymentSuccessful, setLink, setPaymentFormVisibility, setPaymentIntentError } from '../../store/slices/intentions';
+import { EmailForm,ResponseForm } from '../Form/';
+import { Link,PaymentButton } from '../Payment';
 
 export const LayoutFoot = () => {
   const dispatch = useAppDispatch();

@@ -29,7 +29,7 @@ const formatDateByLocaleOptions = {
 export function formatDateByLocale(inputDate, options = formatDateByLocaleOptions) {
   const date = new Date(inputDate);
 
-  const formattedDate = date.toLocaleDateString(undefined, options);
+  const formattedDate = date.toLocaleDateString([], options);
 
   return `${formattedDate}`.toUpperCase();
 }

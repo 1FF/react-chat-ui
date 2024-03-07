@@ -1,13 +1,13 @@
-import { render } from '@testing-library/react';
 import { configureStore } from '@reduxjs/toolkit';
+import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
-// As a basic setup, import your same slice reducers
-import metaReducer from '../store/slices/meta';
-import configReducer from '../store/slices/config';
-import chatReducer from '../store/slices/chat';
-import intentionsReducer from '../store/slices/intentions';
-import chatMiddleware from '../middleware/socket';
+
 import intentionsMiddleware from '../middleware/intentions';
+import chatMiddleware from '../middleware/socket';
+import chatReducer from '../store/slices/chat';
+import configReducer from '../store/slices/config';
+import intentionsReducer from '../store/slices/intentions';
+import metaReducer from '../store/slices/meta';
 
 function renderWithProviders(
   ui,
@@ -21,13 +21,16 @@ function renderWithProviders(
         chat: chatReducer,
         config: configReducer,
       },
-      middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }).concat(chatMiddleware, intentionsMiddleware),
-      preloadedState }),
+      middleware:
+        (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false })
+          .concat(chatMiddleware, intentionsMiddleware),
+      preloadedState
+    }),
     ...renderOptions
   } = {}
 ) {
   // eslint-disable-next-line react/prop-types
-  const Wrapper = ({ children }) => <Provider store={ store }>{ children }</Provider>;
+  const Wrapper = ({ children }) => <Provider store={store}>{children}</Provider>;
 
   return { store, ...render(ui, { wrapper: Wrapper, ...renderOptions }) };
 }

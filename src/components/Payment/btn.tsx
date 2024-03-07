@@ -1,15 +1,16 @@
 import { useEffect } from 'react';
-import { PaymentButtonProps } from '../../interfaces/component';
+
+import { AllEvents } from '../../config/enums';
 import { useAppSelector } from '../../hooks';
+import { PaymentButtonProps } from '../../interfaces/component';
+import { track } from '../../services/tracking';
 import { getConfig } from '../../store/slices/config';
 import { payment as variant } from './variants';
-import { track } from '../../services/tracking';
-import { AllEvents } from '../../config/enums';
 
 export const PaymentButton = ({ text, onClick, e2e, disabled = false }: PaymentButtonProps) => {
   const { themeId: theme } = useAppSelector(getConfig);
-  const meta = useAppSelector(state => state.meta);
-  const currentEmail = useAppSelector(state => state.intentions.email.current);
+  const meta = useAppSelector((state) => state.meta);
+  const currentEmail = useAppSelector((state) => state.intentions.email.current);
   const { btn } = variant({ theme });
 
   useEffect(() => {

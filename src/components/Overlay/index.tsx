@@ -1,5 +1,5 @@
-import { OverlayProps } from '../../interfaces/component';
 import { useAppSelector } from '../../hooks';
+import { OverlayProps } from '../../interfaces/component';
 import { getConfig } from '../../store/slices/config';
 import overlay from './variants';
 

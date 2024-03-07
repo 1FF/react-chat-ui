@@ -1,25 +1,31 @@
 import { Middleware } from '@reduxjs/toolkit';
-import { Socket, io } from 'socket.io-client';
+import { io,Socket } from 'socket.io-client';
+
 import { config as socketConfig, Events } from '../config';
-import {
-  setExistingHistory, setIsLoading,
-  setTypingTimeoutExpired, setError,
-  setOutgoing, setConnected,
-  resetIsLoading, setClosed, resetError, resetOutgoing,
-  hideResendIcon, resendMessage, showResendIcon,
-  setIsStreaming, fillAssistantHistoryData, resetHistory, fillInitialMessage,
-} from '../store/slices/chat';
-import { getQueryParam } from '../utils';
-import { setResponseFormVisibility } from '../store/slices/intentions';
-import { setConfig } from '../store/slices/config';
-import { setRegion } from '../store/slices/meta';
-import { CHAT_FINISHED_TIMESTAMP } from '../config/env';
 import { Roles } from '../config/enums';
-import { AssistantRecord, UserMessageContent, ClientMessage, SocketHistoryRecord, AssistantHistoryInitialMessage } from '../interfaces'
+import { CHAT_FINISHED_TIMESTAMP } from '../config/env';
+import {
+  AssistantHistoryInitialMessage,
+  AssistantRecord,
+  ClientMessage,
+  SocketHistoryRecord,
+  UserMessageContent } from '../interfaces'
+import {
+fillAssistantHistoryData, fillInitialMessage,
+  hideResendIcon, resendMessage, resetError, resetHistory,   resetIsLoading, resetOutgoing,
+setClosed, setConnected,
+setError,
+  setExistingHistory, setIsLoading,
+  setIsStreaming,   setOutgoing,   setTypingTimeoutExpired, showResendIcon,
+} from '../store/slices/chat';
+import { setConfig } from '../store/slices/config';
+import { setResponseFormVisibility } from '../store/slices/intentions';
+import { setRegion } from '../store/slices/meta';
+import { getQueryParam } from '../utils';
 
 let socket: Socket;
 
-const chatMiddleware: Middleware = store => next => action => {
+const chatMiddleware: Middleware = (store) => (next) => (action) => {
   const { meta, chat } = store.getState();
 
   const onError = () => {
@@ -128,8 +134,8 @@ const chatMiddleware: Middleware = store => next => action => {
 
   store.dispatch(setIsLoading());
 
-  // @ts-ignore;
-  socket = io.connect(action.payload.chatUrl, { query: 'cid=' + meta.cid, ...socketConfig });
+  // @ts-expect-error this is working currently
+  socket = io.connect(action.payload.chatUrl, { query: `cid=${  meta.cid}`, ...socketConfig });
 
   socket.on(Events.connect, () => {
     const { meta } = store.getState();
@@ -162,30 +168,30 @@ const chatMiddleware: Middleware = store => next => action => {
     store.dispatch(resetHistory());
     store.dispatch(setIsLoading());
     let interval = 0;
-    config.aiProfile.initialMessage.forEach((element: AssistantHistoryInitialMessage, index: number, arr: Array<SocketHistoryRecord>) => {
+    config.aiProfile.initialMessage
+      .forEach((element: AssistantHistoryInitialMessage, index: number, arr: Array<SocketHistoryRecord>) => {
+        interval += 1000;
 
-      interval += 1000;
+        setTimeout(() => {
+          store.dispatch(fillInitialMessage(element));
 
-      setTimeout(() => {
-        store.dispatch(fillInitialMessage(element));
+          if (arr.length === index + 1) {
+            store.dispatch(setResponseFormVisibility([...config.aiProfile.initialMessage].pop().content));
+            config.aiProfile.initialMessage.forEach((message: SocketHistoryRecord) =>
+              handleMessageSending({
+                role: Roles.assistant,
+                term: getQueryParam(window.location.search, 'utm_chat') || '',
+                user_id: meta.cid,
+                message: JSON.stringify(message.content),
+                messageId: message.id,
+                region: meta.region,
+              }));
+            store.dispatch(resetIsLoading());
+          }
 
-        if (arr.length === index + 1) {
-          store.dispatch(setResponseFormVisibility([...config.aiProfile.initialMessage].pop().content));
-          config.aiProfile.initialMessage.forEach((message: SocketHistoryRecord) =>
-            handleMessageSending({
-              role: Roles.assistant,
-              term: getQueryParam(window.location.search, 'utm_chat') || '',
-              user_id: meta.cid,
-              message: JSON.stringify(message.content),
-              messageId: message.id,
-              region: meta.region,
-            }));
-          store.dispatch(resetIsLoading());
-        }
+        }, interval);
 
-      }, interval);
-
-    });
+      });
   });
 
   socket.on(Events.streamStart, (data: AssistantRecord & { id: string }) => {
@@ -196,8 +202,20 @@ const chatMiddleware: Middleware = store => next => action => {
     store.dispatch(fillAssistantHistoryData({ id: data.id }));
   });
 
-  socket.on(Events.streamData, (data: AssistantRecord & { id: string, errors: Array<string> }) => {
-    const assistantData = { id: data.id, sequence: data.sequence, content: { type: data.type, [data.type]: data[data.type], sequence: data.sequence } };
+  socket.on(Events.streamData, (data: AssistantRecord
+    & {
+      id: string,
+      errors: Array<string>
+    }) => {
+    const assistantData = {
+      id: data.id,
+      sequence: data.sequence,
+      content: {
+        type: data.type,
+        [data.type]: data[data.type],
+        sequence: data.sequence
+      }
+    };
 
     store.dispatch(fillAssistantHistoryData(assistantData));
 
@@ -209,7 +227,7 @@ const chatMiddleware: Middleware = store => next => action => {
     }
   });
 
-  socket.on(Events.streamEnd, (data: AssistantRecord & { id: string }) => {
+  socket.on(Events.streamEnd, () => {
     store.dispatch(setIsStreaming(false));
   });
 
@@ -226,13 +244,17 @@ const chatMiddleware: Middleware = store => next => action => {
 const withTimeout = (onTimeout: () => void, timeout: number = 5000) => {
   let called = false;
   const timer = setTimeout(() => {
-    if (called) return;
+    if (called) {
+      return;
+    }
     called = true;
     onTimeout();
   }, timeout);
 
   return () => {
-    if (called) return;
+    if (called) {
+      return;
+    }
     called = true;
     clearTimeout(timer);
   };

@@ -1,75 +1,89 @@
-import { AssistantMessageTypeUnion, MessageProperties } from ".";
-import { Roles, Theme } from "../config/enums";
+import { Roles, Theme } from '../config/enums';
+import { AssistantMessageTypeUnion, MessageProperties } from '.';
 
 export interface ChatState {
   outgoing: {
-    term: string,
-    user_id: string,
-    role: Roles.user,
-    message: string,
-  },
-  historyData: Record<string, {
-    id: string,
-    role: Roles.assistant | Roles.user,
-    time?: number,
-    content: Array<MessageProperties>
-  }>;
-  historyIds: Array<string>,
-  error: string,
-  isLoading: boolean,
-  typingTimeoutExpired: boolean,
-  lastGroupId: string,
-  connected: boolean,
-  closed: boolean,
-  isStreaming: boolean,
+    term: string;
+    user_id: string;
+    role: Roles.user;
+    message: string;
+  };
+  historyData: Record<
+    string,
+    {
+      id: string;
+      role: Roles.assistant | Roles.user;
+      time?: number;
+      content: Array<MessageProperties>;
+    }
+  >;
+  historyIds: Array<string>;
+  error: string;
+  isLoading: boolean;
+  typingTimeoutExpired: boolean;
+  lastGroupId: string;
+  connected: boolean;
+  closed: boolean;
+  isStreaming: boolean;
 }
 
 export interface ConfigState {
   aiProfile: {
-    name: string,
-    role: string,
-    imgSrc: string,
-    welcome: string,
+    name: string;
+    role: string;
+    imgSrc: string;
+    welcome: string;
     // initialMessage: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you. [yes|no|continue]',
-    initialMessage: Array<AssistantMessageTypeUnion>
-  },
-  purpose: string,
-  chatUrl: string,
-  themeId: Theme.light | Theme.dark,
-  translations: any,
-  closeVisible: boolean,
-  enableDevTools: boolean,
-  isPluginMode: boolean,
+    initialMessage: Array<AssistantMessageTypeUnion>;
+  };
+  purpose: string;
+  chatUrl: string;
+  themeId: Theme.light | Theme.dark;
+  translations: { [key: string]: string &{ loaderMessages: Array<string>} };
+  closeVisible: boolean;
+  enableDevTools: boolean;
+  isPluginMode: boolean;
 }
 
-export interface MetaState { systemType: string, eid: string, cid: string, region: string, marketing: any, pd: any }
+export interface MetaState {
+  systemType: string;
+  eid: string;
+  cid: string;
+  region: string;
+  marketing: {
+    screen: { [key: string]: string };
+    lastUtmParams: { [key: string]: string };
+    utmParams: { [key: string]: string };
+  };
+  pd: { [key: string]: string };
+}
 
 export interface IntentionsState {
   email: {
-    current: string,
-    success: boolean,
-    error: boolean,
-    isFormVisible: boolean,
-    isLoading: boolean,
-  },
+    current: string;
+    success: boolean;
+    error: boolean;
+    isFormVisible: boolean;
+    isLoading: boolean;
+  };
   response: {
-    value: string,
-    isFormVisible: boolean,
-    isLoading: boolean,
-    error: boolean,
-  },
+    value: string;
+    isFormVisible: boolean;
+    isLoading: boolean;
+    error: boolean;
+  };
   payment: {
-    isButtonVisible: boolean,
-    isFormVisible: boolean,
-    isSuccessful: boolean,
-    error: boolean
-  },
+    isButtonVisible: boolean;
+    isFormVisible: boolean;
+    isSuccessful: boolean;
+    error: boolean;
+  };
   messaging: {
-    isVisible: boolean
-  },
+    isVisible: boolean;
+  };
   link: {
-    isVisible: boolean,
-    href: string,
-    text: string
-  }
+    isVisible: boolean;
+    href: string;
+    text: string;
+  };
 }
