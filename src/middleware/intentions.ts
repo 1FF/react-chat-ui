@@ -87,29 +87,13 @@ export const intentionsMiddleware: Middleware = (store) => (next) => {
     store.dispatch(setIsEmailLoading(false));
 
     if (response.status === 409) {
-      store.dispatch(
-        addPredefinedAssistantMessage({
-          content: tm716,
-          buttons: [
-            {
-              sequence: 1,
-              id: 'opt-1',
-              text: tm526,
-              value: 'link',
-              link: response.data.buttonLink,
-              noStream: true,
-            },
-            {
-              sequence: 2,
-              id: 'opt-2',
-              text: tm715,
-              value: 'button',
-              link: '',
-              noStream: true,
-            },
-          ],
-        })
-      );
+      store.dispatch(addPredefinedAssistantMessage({
+        content: tm716,
+        buttons: [
+          { sequence: 1, id: 'opt-1', text: tm526, value: tm526, link: response.data.buttonLink, noStream: true },
+          { sequence: 2, id: 'opt-2', text: tm715, value: tm715, link: '', noStream: true }
+        ]
+      }));
 
       track({
         eventType: AllEvents.emailExist,

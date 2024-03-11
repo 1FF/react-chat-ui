@@ -21,7 +21,7 @@ export const PaymentScene = ({ onClose }: { onClose: (e: MouseEvent<HTMLButtonEl
             <PaymentLoader texts={translations.loaderTexts} title={translations.tm1224} />
           </Overlay>
           <CloseButton onClick={onClose} />
-          <div id="primer-form-container" className="tw--w-full h-full">
+          <div id="primer-form-container" className="primer-theme tw--w-full h-full">
             <PaymentHead config={{ price: displayPlanPrice, period: billingFrequencyTmsg }} />
           </div>
           <PaymentFooter />
