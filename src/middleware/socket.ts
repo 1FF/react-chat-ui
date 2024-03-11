@@ -3,25 +3,41 @@ import { io, Socket } from 'socket.io-client';
 
 import { config as socketConfig, Events } from '../config';
 import { QueryParams, Roles } from '../config/enums';
-import { CHAT_FINISHED_TIMESTAMP } from '../config/env';
-import { AssistantHistoryInitialMessage,AssistantRecord, ClientMessage, SocketHistoryRecord, UserMessageContent } from '../interfaces'
+import { CHAT_FINISHED_TIMESTAMP, DEFAULT_CLOSE_HREF, SCROLL_STOP_CLASS } from '../config/env';
 import {
-fillAssistantHistoryData, fillInitialMessage,
-  hideResendIcon, resendMessage, resetError, resetHistory,   resetIsLoading, resetOutgoing,
-setClosed, setConnected,
-setError,
-  setExistingHistory, setIsLoading,
-  setIsStreaming,   setOutgoing,   setTypingTimeoutExpired, showResendIcon,
+  AssistantHistoryInitialMessage,
+  AssistantRecord,
+  ClientMessage,
+  SocketHistoryRecord,
+  UserMessageContent
+} from '../interfaces'
+import {
+  fillAssistantHistoryData,
+  fillInitialMessage,
+  hideResendIcon,
+  resendMessage,
+  resetError,
+  resetHistory,
+  resetIsLoading,
+  resetOutgoing,
+  setClosed,
+  setConnected,
+  setError,
+  setExistingHistory,
+  setIsLoading,
+  setIsStreaming,
+  setOutgoing,
+  setTypingTimeoutExpired,
+  showResendIcon,
 } from '../store/slices/chat';
 import { setConfig } from '../store/slices/config';
-import { setResponseFormVisibility } from '../store/slices/intentions';
 import { setRegion } from '../store/slices/meta';
 import { getQueryParam } from '../utils';
 
 let socket: Socket;
 
 const chatMiddleware: Middleware = (store) => (next) => (action) => {
-  const { meta, chat } = store.getState();
+  const { meta, chat, config } = store.getState();
 
   const onError = () => {
     const { config } = store.getState();
@@ -59,7 +75,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
       store.dispatch(setError(config.translations.error));
     };
 
-    if (socket && socket.connected && data.message.trim() !== '') {
+    if (socket?.connected && data.message.trim() !== '') {
       socket.volatile.emit(
         Events.chat,
         {
@@ -90,17 +106,19 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
 
   if (setClosed.match(action)) {
     const chatBotContainer = document.querySelector('#chatbot-container');
+
     if (document.body && chatBotContainer) {
       chatBotContainer.innerHTML = '';
-      document.body.classList.remove('scroll-stop');
+      document.body.classList.remove(SCROLL_STOP_CLASS);
     }
-    const currentLocation = new URL(window.location.href);
-    currentLocation.search = '';
+
     localStorage.setItem(CHAT_FINISHED_TIMESTAMP, new Date().getTime().toString());
-    window.location.href = currentLocation.toString();
+
     if (socket) {
       socket.close();
     }
+
+    window.location.href = config.close.href || DEFAULT_CLOSE_HREF;
   }
 
   if (setTypingTimeoutExpired.match(action) && action.payload) {
@@ -130,7 +148,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
   store.dispatch(setIsLoading());
 
   // @ts-expect-error this is working currently
-  socket = io.connect(action.payload.chatUrl, { query: `cid=${  meta.cid}`, ...socketConfig });
+  socket = io.connect(action.payload.chatUrl, { query: `cid=${meta.cid}`, ...socketConfig });
 
   socket.on(Events.connect, () => {
     const { meta } = store.getState();
@@ -141,6 +159,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
 
   socket.on(Events.chatHistory, ({ history: servedHistory, errors, region }
     : { history: Array<SocketHistoryRecord>, errors: string[], region: string }) => {
+
     store.dispatch(resetIsLoading());
     store.dispatch(setIsStreaming(false));
     store.dispatch(setRegion(region));
@@ -153,10 +172,6 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
 
     if (servedHistory.length) {
       store.dispatch(setExistingHistory(servedHistory));
-      const last = [...servedHistory].pop();
-      if (last && Array.isArray(last.content)) {
-        store.dispatch(setResponseFormVisibility(last.content));
-      }
       return
     }
 
@@ -171,7 +186,6 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
           store.dispatch(fillInitialMessage(element));
 
           if (arr.length === index + 1) {
-            store.dispatch(setResponseFormVisibility([...config.aiProfile.initialMessage].pop().content));
             config.aiProfile.initialMessage.forEach((message: SocketHistoryRecord) =>
               handleMessageSending({
                 role: Roles.assistant,
@@ -189,12 +203,12 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
       });
   });
 
-  socket.on(Events.streamStart, (data: AssistantRecord & { id: string }) => {
+  socket.on(Events.streamStart, ({ id }: { id: string }) => {
     store.dispatch(setIsStreaming(true));
     store.dispatch(resetIsLoading());
     store.dispatch(resetOutgoing());
     store.dispatch(resetError());
-    store.dispatch(fillAssistantHistoryData({ id: data.id }));
+    store.dispatch(fillAssistantHistoryData({ id }));
   });
 
   socket.on(Events.streamData, (data: AssistantRecord
@@ -202,7 +216,8 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
       id: string,
       errors: Array<string>
     }) => {
-    const assistantData = {
+
+    store.dispatch(fillAssistantHistoryData({
       id: data.id,
       sequence: data.sequence,
       content: {
@@ -210,12 +225,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
         [data.type]: data[data.type],
         sequence: data.sequence
       }
-    };
-
-    store.dispatch(fillAssistantHistoryData(assistantData));
-
-    const { chat } = store.getState();
-    store.dispatch(setResponseFormVisibility(chat.historyData[data.id].content));
+    }));
 
     if (data.errors?.length && !chat.error) {
       store.dispatch(setError(data.errors[0]));

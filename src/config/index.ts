@@ -1,6 +1,7 @@
 import { AssistantRecord } from '../interfaces/index';
 import { getQueryParam, uuidV4 } from '../utils';
 import { Definition, QueryParams, Roles } from './enums';
+import { SPECIAL_MERCHANT, SPECIAL_SUPPORT_TICKET } from './env';
 import { colors as baseThemeColors } from './themes/base';
 export { Events, Roles } from './enums';
 export { config } from './socket';
@@ -12,7 +13,48 @@ export const colors = {
   ...baseThemeColors,
 };
 
-export const chat = (id: string) => ({
+export const initialMessage = [
+  {
+    id: uuidV4(),
+    role: Roles.assistant,
+    time: new Date().getTime(),
+    content: [
+      { 'type': 'text', 'text': 'See this picture', 'sequence': 2 },
+      { 'type': 'text', 'text': 'See this picture', 'sequence': 2 },
+      { 'type': 'text', 'text': 'My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best search engine for privacy").', 'sequence': 2 },
+      {
+        type: 'image',
+        image: { url: 'https://static.boredpanda.com/blog/wp-content/uploads/2016/08/wet-dogs-before-after-bath-fb6__700-png.jpg' },
+        sequence: 1,
+      },
+      {
+        type: 'video',
+        video: { url: 'https://www.youtube.com/embed/ZwKhufmMxko' },
+        sequence: 1,
+      }
+    ]
+  },
+  {
+    id: uuidV4(),
+    role: Roles.assistant,
+    time: new Date().getTime(),
+    content: [
+      { 'type': 'text', 'text': 'Do you want to lose weight?', 'sequence': 2 },
+      { 'type': 'buttons', 'sequence': 1, 'buttons': [{ 'value': 'Yes', 'sequence': 1, 'text': 'Yes' }, { 'value': 'No', 'sequence': 2, 'text': 'No' }] }
+    ]
+  },
+  {
+    id: uuidV4(),
+    role: Roles.assistant,
+    time: new Date().getTime(),
+    content: [
+      { 'type': 'text', 'text': 'Do you want to lose weight?', 'sequence': 2 },
+    ]
+  },
+];
+interface InitiationConfig { id: string, purpose?: string, close: { href?: string, visible?: boolean } }
+
+export const chat = ({ id, purpose, close }: InitiationConfig) => ({
   meta: {
     cid: localStorage.getItem('__cid') || id,
     systemType: 'test',
@@ -38,47 +80,10 @@ export const chat = (id: string) => ({
       role: 'AI-powered nutritionist',
       imgSrc: 'https://storage.1forfit.com/4oZrkOwbOQcSIGJopBG5qsf0CmBbVDKDqflzEkXq.jpg',
       welcome: 'Welcome to our live support. We\'re here to understand your requirements and suggest the best Keto diet suited for you.',
-      initialMessage: [
-        {
-          id: uuidV4(),
-          role: Roles.assistant,
-          time: new Date().getTime(),
-          content: [
-            { 'type': 'text', 'text': 'See this picture', 'sequence': 2 },
-            { 'type': 'text', 'text': 'See this picture', 'sequence': 2 },
-            {
-              type: 'image',
-              image: { url: 'https://static.boredpanda.com/blog/wp-content/uploads/2016/08/wet-dogs-before-after-bath-fb6__700-png.jpg' },
-              sequence: 1,
-            },
-            {
-              type: 'video',
-              video: { url: 'https://www.youtube.com/embed/ZwKhufmMxko' },
-              sequence: 1,
-            }
-          ]
-        },
-        {
-          id: uuidV4(),
-          role: Roles.assistant,
-          time: new Date().getTime(),
-          content: [
-            { 'type': 'text', 'text': 'Do you want to lose weight?', 'sequence': 2 },
-            { 'type': 'buttons', 'sequence': 1, 'buttons': [{ 'value': 'Yes', 'sequence': 1, 'text': 'Yes' }, { 'value': 'No', 'sequence': 2, 'text': 'No' }] }
-          ]
-        },
-        {
-          id: uuidV4(),
-          role: Roles.assistant,
-          time: new Date().getTime(),
-          content: [
-            { 'type': 'text', 'text': 'Do you want to lose weight?', 'sequence': 2 },
-          ]
-        },
-      ]
+      initialMessage
     },
-    purpose: 'default',
     chatUrl: 'https://chat-ws.test',
+    purpose: purpose || 'default',
     themeId: 'light',
     translations: {
       emailPlaceholder: 'Please enter your email',
@@ -87,6 +92,7 @@ export const chat = (id: string) => ({
       tm716: 'Entered email already exists, choose below to proceed',
       tm530: 'Take the quiz',
       tm1224: 'Payment in progress...',
+      tm1226: 'Payment succeeded!',
       paymentHeaderTxt1: '<span class="font-bold block text-tau">SECURITY</span> verified',
       paymentHeaderTxt2: 'secured payments',
       loaderTexts: [
@@ -104,9 +110,18 @@ export const chat = (id: string) => ({
       mealButton: 'Create your meal plan',
       error: 'Oops something went wrong.',
       tm505: 'Please enter valid email address',
+      supportButton: 'backEndVars.supportButton',
+      merchantButton: 'backEndVars.merchantButton',
     },
-    closeVisible: true
+    close: {
+      href: close.href || '/',
+      visible: close.visible || false,
+    }
   },
+  specialUrls: {
+    [SPECIAL_MERCHANT]: '/',
+    [SPECIAL_SUPPORT_TICKET]: '/'
+  }
 });
 
 export const paymentData = {

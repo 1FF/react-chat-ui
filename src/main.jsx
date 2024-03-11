@@ -5,11 +5,19 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
 import { AppBase } from './components/AppBase';
+import { SCROLL_STOP_CLASS } from './config/env';
 import { persistor, store } from './store';
 
 export { intent } from './services/intentions';
 
+let initiated = false;
+
 export const ReactBotClient = (config) => {
+  if (initiated) {
+    return;
+  }
+  initiated = true;
+
   ReactDOM
     .createRoot(config.root)
     .render(
@@ -19,6 +27,8 @@ export const ReactBotClient = (config) => {
         </PersistGate>
       </Provider>
     );
+
+  document.body.classList.add(SCROLL_STOP_CLASS);
 };
 
 export default ReactBotClient;

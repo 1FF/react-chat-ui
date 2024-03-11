@@ -9,7 +9,11 @@ export interface MarkdownLinkProps {
   properties: { href?: string | undefined, }
 }
 
-export interface AppProps { config: { app: ConfigState, meta: MetaState } }
+export interface SpecialUrls {
+  [key: string]: string
+}
+
+export interface AppProps { config: { app: ConfigState, meta: MetaState, specialUrls: SpecialUrls } }
 
 export interface ButtonProps extends BasicVariants {
   text?: string

@@ -10,7 +10,7 @@ export default {
     '^.+\\.(ts|tsx)$': 'ts-jest',
     '^.+\\.(js|jsx)$': 'babel-jest',
   },
-  testPathIgnorePatterns: ['/node_modules/', '/build/', '<rootDir>/__tests__/setupTests.js'],
+  testPathIgnorePatterns: ['/node_modules/', '/build/', '<rootDir>/__tests__/setupTests.js', '<rootDir>/__tests__/helpers.jsx'],
   setupFilesAfterEnv: ['<rootDir>/__tests__/setupTests.js'],
   moduleNameMapper: {
     '\\.(css|less)$': '<rootDir>/__mocks__/styleMock.js',

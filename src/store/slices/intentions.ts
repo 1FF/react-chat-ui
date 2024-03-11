@@ -1,8 +1,5 @@
-import { createSlice, Draft } from '@reduxjs/toolkit';
-import produce from 'immer';
+import { createSlice } from '@reduxjs/toolkit';
 
-import { Definition } from '../../config/enums';
-import { AssistantMessageTypeUnion } from '../../interfaces';
 import { IntentionsState } from '../../interfaces/store';
 import { intentions as initialState } from '../initialState';
 
@@ -22,9 +19,6 @@ const intentionsSlice = createSlice({
     setIsEmailLoading(state, { payload }) {
       state.email.isLoading = payload;
     },
-    setIsEmailFormVisible(state, { payload }) {
-      state.email.isFormVisible = payload;
-    },
     setIsPaymentButtonVisible(state, { payload }) {
       state.payment.isButtonVisible = payload;
     },
@@ -38,58 +32,26 @@ const intentionsSlice = createSlice({
       state.payment.error = payload;
     },
     setLink(state, { payload }) {
-      state.link = { ...state.link, ...payload };
-    },
-    setResponse(state, { payload }) {
-      state.response.value = payload;
-    },
-    setResponseFormVisibility(state, { payload }) {
-      return produce(state, (draft: Draft<IntentionsState>) => {
-        draft.response.isFormVisible = !payload.some(
-          (el: AssistantMessageTypeUnion) =>
-            [Definition.buttons, Definition.payment, Definition.email].includes(
-              el.type
-            )
-        );
-        draft.email.isFormVisible = payload.some(
-          (el: AssistantMessageTypeUnion) =>
-            Definition.email in el && el.type === Definition.email
-        );
-        draft.payment.isButtonVisible = payload.some(
-          (el: AssistantMessageTypeUnion) =>
-            Definition.payment in el && el.type === Definition.payment
-        );
-      });
-    },
-    setResponseLoadingStatus(state, { payload }) {
-      state.response.isLoading = payload;
+      state.link = payload;
     },
   },
 });
 
-export const getEmailIntentions = (state: { intentions: IntentionsState }) =>
-  state.intentions.email;
-export const getPaymentIntentions = (state: { intentions: IntentionsState }) =>
-  state.intentions.payment;
-export const getLinkIntentions = (state: { intentions: IntentionsState }) =>
-  state.intentions.link;
-export const getResponseIntentions = (state: { intentions: IntentionsState }) =>
-  state.intentions.response;
+export const getEmailIntentions = (state: { intentions: IntentionsState }) => state.intentions.email;
+export const getPaymentIntentions = (state: { intentions: IntentionsState }) => state.intentions.payment;
+export const getPaymentSuccess = (state: { intentions: IntentionsState }) => state.intentions.payment.isSuccessful;
+export const getLinkIntentions = (state: { intentions: IntentionsState }) => state.intentions.link;
 
 export const {
-  setEmail,
   setEmailSuccess,
   setIsPaymentSuccessful,
   setPaymentFormVisibility,
   setEmailError,
   setIsEmailLoading,
-  setIsEmailFormVisible,
   setIsPaymentButtonVisible,
-  setLink,
-  setResponse,
-  setResponseFormVisibility,
-  setResponseLoadingStatus,
   setPaymentIntentError,
+  setEmail,
+  setLink
 } = intentionsSlice.actions;
 
 export default intentionsSlice.reducer;
