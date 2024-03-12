@@ -79,10 +79,11 @@ describe('Close button closes chat', () => {
   test('chat.closed is true after close button is clicked an href is being used correctly when set', async () => {
     // Arrange
     jest.useFakeTimers();
+    const closeConfig = { visible: true, href: '/test' };
     act(() => {
       root = renderWithProviders(
         <div id="chatbot-container">
-          <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true, href: '/test' } })} />
+          <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: closeConfig })} />
         </div>
       );
       root.store.dispatch(setConnected(true));
@@ -117,6 +118,7 @@ describe('Close button closes chat', () => {
     expect(document.body.classList).not.toContain(SCROLL_STOP_CLASS);
     expect(ioCloseSpy).toHaveBeenCalled();
     expect(window.location.href).toBe(config.close.href);
+    expect(window.location.href).toBe(closeConfig.href);
     jest.useRealTimers();
   });
 });

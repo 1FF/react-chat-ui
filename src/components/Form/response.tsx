@@ -8,6 +8,7 @@ import { fillUserHistoryData, getChat, setLastGroupPointer, setTypingTimeoutExpi
 import { getConfig } from '../../store/slices/config';
 import { uuidV4 } from '../../utils';
 import { layoutFoot as variant } from '../Layout/variants';
+import { TYPING_TIMEOUT } from '../../config/env';
 
 export const ResponseForm = () => {
   const dispatch = useAppDispatch();
@@ -55,7 +56,7 @@ export const ResponseForm = () => {
     const currentId = setTimeout(() => {
       dispatch(setTypingTimeoutExpired(true));
       dispatch(setLastGroupPointer(uuidV4()));
-    }, 3000);
+    }, TYPING_TIMEOUT);
     setTimerId(currentId);
   };
 
@@ -68,6 +69,7 @@ export const ResponseForm = () => {
         <Input
           disabled={!connected}
           isLoading={isLoading}
+          e2e="message-input"
           name="response"
           onChange={handleInputChange}
           placeholder="Write your message here..."

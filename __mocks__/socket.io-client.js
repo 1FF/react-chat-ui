@@ -18,7 +18,7 @@ function emit(event, ...args) {
   EVENTS[event].forEach(func => func(...args));
 }
 
-const socket = {
+export const socket = {
   connected: true,
   on(event, func) {
     if (EVENTS[event]) {

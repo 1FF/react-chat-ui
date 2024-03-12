@@ -73,7 +73,7 @@ export const useFootProps = () => {
   if (isLastAssistantMsg && message && message?.special) {
     return {
       ...staticProps,
-      ctaText: translations.merchantButton,
+      ctaText: specialUrls[message.special].includes('merchant') ? translations.merchantButton : translations.supportButton,
       ctaHref: specialUrls[message.special],
     };
   }

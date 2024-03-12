@@ -3,7 +3,7 @@ import { io, Socket } from 'socket.io-client';
 
 import { config as socketConfig, Events } from '../config';
 import { QueryParams, Roles } from '../config/enums';
-import { CHAT_FINISHED_TIMESTAMP, DEFAULT_CLOSE_HREF, SCROLL_STOP_CLASS } from '../config/env';
+import { CHAT_FINISHED_TIMESTAMP, DEFAULT_CLOSE_HREF, SCROLL_STOP_CLASS, SUPPORT_PURPOSE } from '../config/env';
 import {
   AssistantHistoryInitialMessage,
   AssistantRecord,
@@ -107,7 +107,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
   if (setClosed.match(action)) {
     const chatBotContainer = document.querySelector('#chatbot-container');
 
-    if (document.body && chatBotContainer) {
+    if (document.body && chatBotContainer && config.purpose !== SUPPORT_PURPOSE) {
       chatBotContainer.innerHTML = '';
       document.body.classList.remove(SCROLL_STOP_CLASS);
     }

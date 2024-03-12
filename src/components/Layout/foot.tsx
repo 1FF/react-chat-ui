@@ -84,7 +84,7 @@ export const LayoutFoot = () => {
 
   return (
     <div className="tw--space-y-[11px] tw--pb-[11px]" data-e2e="chat-foot">
-      {footState.error && <div className="tw--pl-[35px] tw--text-[#ff0043] tw--font-medium">{footState.error}</div>}
+      {footState.error && <div data-e2e="error-message" className="tw--pl-[35px] tw--text-[#ff0043] tw--font-medium">{footState.error}</div>}
       {footState.isPaymentFormVisible && <PaymentScene onClose={onClosePaymentForm} />}
       {footState.isLoading && <Ellipsis />}
       {footState.ctaHref
