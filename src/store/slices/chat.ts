@@ -2,7 +2,7 @@ import { createSlice, Draft,PayloadAction } from '@reduxjs/toolkit';
 import produce from 'immer';
 
 import { getUnifiedSequence } from '../../config';
-import { Definition, Roles } from '../../config/enums';
+import { Definition, QueryParams, Roles } from '../../config/enums';
 import {
   AssistantHistoryDataFiller,
   AssistantHistoryInitialMessage,
@@ -21,7 +21,7 @@ const configSlice = createSlice({
   reducers: {
     setOutgoing(state, { payload }: PayloadAction<string>) {
       state.outgoing = {
-        term: getQueryParam(window.location.search, 'utm_chat') || '',
+        term: getQueryParam(QueryParams.chat),
         user_id: localStorage.getItem('__cid') || '',
         role: Roles.user,
         message: payload,

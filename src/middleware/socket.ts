@@ -1,15 +1,10 @@
 import { Middleware } from '@reduxjs/toolkit';
-import { io,Socket } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 
 import { config as socketConfig, Events } from '../config';
-import { Roles } from '../config/enums';
+import { QueryParams, Roles } from '../config/enums';
 import { CHAT_FINISHED_TIMESTAMP } from '../config/env';
-import {
-  AssistantHistoryInitialMessage,
-  AssistantRecord,
-  ClientMessage,
-  SocketHistoryRecord,
-  UserMessageContent } from '../interfaces'
+import { AssistantHistoryInitialMessage,AssistantRecord, ClientMessage, SocketHistoryRecord, UserMessageContent } from '../interfaces'
 import {
 fillAssistantHistoryData, fillInitialMessage,
   hideResendIcon, resendMessage, resetError, resetHistory,   resetIsLoading, resetOutgoing,
@@ -70,7 +65,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
         {
           role: Roles.user,
           message: data.message,
-          term: getQueryParam(window.location.search, 'utm_chat'),
+          term: getQueryParam(QueryParams.chat),
           user_id: meta.cid,
           region: meta.region,
         },
@@ -86,7 +81,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
     handleMessageSending({
       role: Roles.user,
       message: action.payload,
-      term: getQueryParam(window.location.search, 'utm_chat') ?? '',
+      term: getQueryParam(QueryParams.chat),
       user_id: meta.cid,
       region: meta.region,
       messageId: [...chat.historyIds].pop(),
@@ -116,7 +111,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
       handleMessageSending({
         role: Roles.user,
         message: lastMessage,
-        term: getQueryParam(window.location.search, 'utm_chat') || '',
+        term: getQueryParam(QueryParams.chat),
         user_id: meta.cid,
         region: meta.region,
         messageId
@@ -140,7 +135,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
   socket.on(Events.connect, () => {
     const { meta } = store.getState();
     socket.sendBuffer = [];
-    socket.emit(Events.chatHistory, { user_id: meta.cid, region: meta.region });
+    socket.emit(Events.chatHistory, { user_id: meta.cid, region: meta.region, term: getQueryParam(QueryParams.chat) });
     store.dispatch(setConnected(true));
   });
 
@@ -180,7 +175,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
             config.aiProfile.initialMessage.forEach((message: SocketHistoryRecord) =>
               handleMessageSending({
                 role: Roles.assistant,
-                term: getQueryParam(window.location.search, 'utm_chat') || '',
+                term: getQueryParam(QueryParams.chat),
                 user_id: meta.cid,
                 message: JSON.stringify(message.content),
                 messageId: message.id,

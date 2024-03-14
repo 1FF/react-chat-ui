@@ -12,6 +12,10 @@ enum ScreenOrientation {
   vertical = 'vertical',
 }
 
+enum QueryParams {
+  chat = 'utm_chat'
+}
+
 enum AllEvents {
   addToCart = 'AddToCart',
   contact = 'Contact',
@@ -74,4 +78,4 @@ enum Theme {
   dark = 'dark',
 }
 
-export { AllEvents, Definition, Events, Intentions, Roles, ScreenOrientation, Theme }
+export { AllEvents, Definition, Events, Intentions, QueryParams,Roles, ScreenOrientation, Theme }
