@@ -1,4 +1,5 @@
 import { Roles, Theme } from '../config/enums';
+import { SpecialUrls } from '../interfaces/component';
 import { AssistantMessageTypeUnion, MessageProperties } from '.';
 
 export interface ChatState {
@@ -33,16 +34,19 @@ export interface ConfigState {
     role: string;
     imgSrc: string;
     welcome: string;
-    // initialMessage: 'Hi, {I am Meal Mentor}. I will help you to find the right meal plan for you. [yes|no|continue]',
     initialMessage: Array<AssistantMessageTypeUnion>;
+  };
+  close: {
+    href: null | string;
+    visible: boolean;
   };
   purpose: string;
   chatUrl: string;
   themeId: Theme.light | Theme.dark;
-  translations: { [key: string]: string &{ loaderMessages: Array<string>} };
-  closeVisible: boolean;
+  translations: { [key: string]: string & { loaderMessages: Array<string> } };
   enableDevTools: boolean;
   isPluginMode: boolean;
+  specialUrls: SpecialUrls;
 }
 
 export interface MetaState {
@@ -60,18 +64,18 @@ export interface MetaState {
 
 export interface IntentionsState {
   email: {
-    current: string;
-    success: boolean;
-    error: boolean;
-    isFormVisible: boolean;
-    isLoading: boolean;
-  };
+    current: string,
+    success: boolean,
+    error: boolean,
+    // isFormVisible: boolean,
+    isLoading: boolean,
+  },
   response: {
-    value: string;
-    isFormVisible: boolean;
-    isLoading: boolean;
-    error: boolean;
-  };
+    // value: string,
+    isFormVisible: boolean,
+    // isLoading: boolean,
+    error: boolean,
+  },
   payment: {
     isButtonVisible: boolean;
     isFormVisible: boolean;
@@ -81,9 +85,5 @@ export interface IntentionsState {
   messaging: {
     isVisible: boolean;
   };
-  link: {
-    isVisible: boolean;
-    href: string;
-    text: string;
-  };
+  link: string
 }

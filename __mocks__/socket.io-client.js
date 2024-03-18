@@ -1,13 +1,25 @@
+import { Events } from '../src/config';
+
 /* eslint-env jest */
 let EVENTS = {};
 function emit(event, ...args) {
+
+  // to catch the events being sent to the server chat events
+  if (event === Events.chat) {
+    // mock server acknowledgment
+    args[1]();
+  }
+
+  // to catch the events being sent to the server chat-history request
   if (args[0]?.user_id) {
     return;
   }
+
   EVENTS[event].forEach(func => func(...args));
 }
 
-const socket = {
+export const socket = {
+  connected: true,
   on(event, func) {
     if (EVENTS[event]) {
       return EVENTS[event].push(func);

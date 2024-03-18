@@ -91,7 +91,8 @@ export interface MessageProperties {
   buttons?: Array<ButtonOptions>;
   email?: string;
   payment?: string;
-
+  special?: string;
+  
   // user
   groupId?: string;
   sent?: boolean;

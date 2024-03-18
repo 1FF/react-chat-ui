@@ -23,13 +23,17 @@ export const config: ConfigState = {
     welcome: '',
     initialMessage: [],
   },
+  close: {
+    href: null,
+    visible: false,
+  },
   translations: {},
   themeId: Theme.light,
   chatUrl: '',
   enableDevTools: false,
   isPluginMode: false,
   purpose: 'default',
-  closeVisible: false,
+  specialUrls: {},
 };
 
 export const chat: ChatState = {
@@ -37,9 +41,8 @@ export const chat: ChatState = {
     term: '',
     user_id: '',
     role: Roles.user,
-    message: ''
+    message: '',
   },
-  // queue: [],
   historyData: {},
   historyIds: [],
   error: '',
@@ -56,29 +59,22 @@ export const intentions: IntentionsState = {
     current: '',
     success: false,
     error: false,
-    isFormVisible: false,
     isLoading: false,
   },
   response: {
-    value: '',
     isFormVisible: false,
-    isLoading: false,
     error: false,
   },
   payment: {
     isButtonVisible: false,
     isFormVisible: false,
     isSuccessful: false,
-    error: false
+    error: false,
   },
   messaging: {
-    isVisible: false
-  },
-  link: {
     isVisible: false,
-    href: '',
-    text: ''
-  }
+  },
+  link: ''
 };
 
 export default { meta, config, intentions, chat };

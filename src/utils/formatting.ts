@@ -8,7 +8,7 @@ import { CHAT_SEEN_KEY, CID } from '../config/env';
  * //output: https://usa.example.com/?utm_chat=salesmen-keto-redirect&chatSeen=true&cid=12311231a2
  * @returns {string} The extracted link with optional query parameters or `false` if no link is found.
  */
-const constructLink = (link: string): string => {
+export const constructLink = (link: string): string => {
   const hasQueryParams = (url: string) => {
     // Regular expression pattern to match query parameters
     const pattern = /[?&]([^=#]+)=([^&#]*)/g;
@@ -38,6 +38,3 @@ const constructLink = (link: string): string => {
 
   return link + search;
 };
-
-
-export default { constructLink };

@@ -9,22 +9,20 @@ import { RootState } from '../store';
 import {
   addPredefinedAssistantMessage,
   fillUserHistoryData,
-  setOutgoing,
+  setOutgoing
 } from '../store/slices/chat';
 import {
   setEmailError,
   setEmailSuccess,
-  setIsEmailFormVisible,
   setIsEmailLoading,
   setLink,
 } from '../store/slices/intentions';
-import { setMarketing,setPd } from '../store/slices/meta';
+import { setMarketing, setPd } from '../store/slices/meta';
 import { uuidV4 } from '../utils';
 
 export const intentionsMiddleware: Middleware = (store) => (next) => {
-  const setPaymentDataTranslationAccordingly = (
-    data: PaymentDataSetterProps | string
-  ): PaymentDataSetterProps => {
+
+  const setPaymentDataTranslationAccordingly = (data: PaymentDataSetterProps | string): PaymentDataSetterProps => {
     const { meta } = store.getState();
     const transformedData = {} as PaymentDataSetterProps;
 
@@ -36,7 +34,7 @@ export const intentionsMiddleware: Middleware = (store) => (next) => {
       data.billingFrequencyTmsg =
         data.billingOptionType === 'one-time'
           ? meta.pd.oneTimer
-          : meta.pd.subscriberBillingFrequency.replace(
+          : meta.pd.subscriberBillingFrequency?.replace(
             '{1}',
             data.frequencyInMonths
           );
@@ -68,9 +66,8 @@ export const intentionsMiddleware: Middleware = (store) => (next) => {
     );
     store.dispatch(setOutgoing(intentions.email.current));
 
-    // DEV: setEmailSuccess this status is for us to know if mail is validated in the endpoint
+    // DEV NOTE: setEmailSuccess this status is for us to know if mail is validated in the endpoint
     store.dispatch(setEmailSuccess(true));
-    store.dispatch(setIsEmailFormVisible(false));
     track({
       eventType: AllEvents.emailEntered,
       systemType: meta.systemType,
@@ -102,9 +99,6 @@ export const intentionsMiddleware: Middleware = (store) => (next) => {
         customerUuid: meta.cid,
         email: intentions.email.current,
       });
-
-      // DEV NOTE: this must be persisted so on refresh the message with options is still part of the history;
-      // localStorage.setItem(ALREADY_REGISTERED_KEY, 'true');
       return;
     }
 
@@ -130,7 +124,7 @@ export const intentionsMiddleware: Middleware = (store) => (next) => {
   );
 
   return (action) => {
-    if (setLink.match(action) && action.payload.isVisible) {
+    if (setLink.match(action) && action.payload) {
       const { meta, intentions } = store.getState();
 
       track({
@@ -138,7 +132,7 @@ export const intentionsMiddleware: Middleware = (store) => (next) => {
         systemType: meta.systemType,
         utmParams: meta.marketing.lastUtmParams,
         customerUuid: meta.cid,
-        email: intentions.email.current,
+        email: intentions.email.current
       });
     }
     next(action);

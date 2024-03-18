@@ -30,10 +30,7 @@ const Assistant = ({ message, itemId }: AssistantProps) => {
               key={uuidV4()}
               className="tw--flex tw--flex-col tw--space-y-[10px]"
             >
-              <span
-                className={baseFlicker()}
-                data-e2e="stream-assistant-msg"
-              >
+              <span className={baseFlicker()}>
                 <Markdown components={{
                   a(props) { return <MarkdownLink properties={props} />; }
                 }}

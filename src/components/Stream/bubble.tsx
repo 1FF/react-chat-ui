@@ -1,8 +1,8 @@
 import React from 'react';
-import { UserMessageContent } from 'src/interfaces';
 
 import { Roles } from '../../config/enums';
 import { useAppSelector } from '../../hooks';
+import { UserMessageContent } from '../../interfaces';
 import { getConfig } from '../../store/slices/config';
 import { uuidV4 } from '../../utils';
 import { User } from '../Stream';
@@ -14,7 +14,9 @@ const StreamBubble = ({ itemId }: { itemId: string }) => {
   const record = useAppSelector((state) => state.chat.historyData[itemId]);
 
   return (record && (
-    <div className={variant({ theme, type: record.role }).base()}>
+    <div className={variant({ theme, type: record.role }).base()}
+      data-e2e={record.role === Roles.assistant ? 'stream-assistant-msg' : 'user-msg'}
+    >
       {record.role === Roles.assistant
         ? (
           <MemoizedAssistant

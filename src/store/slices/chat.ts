@@ -30,25 +30,18 @@ const configSlice = createSlice({
     resetOutgoing(state) {
       state.outgoing = initialState.outgoing;
     },
-    setExistingHistory(
-      state,
-      { payload }: PayloadAction<Array<SocketHistoryRecord>>
-    ) {
+    setExistingHistory(state, { payload }: PayloadAction<Array<SocketHistoryRecord>>) {
       return produce(state, (draft) => {
         // server has LESS or EQUAL data than frontend -> update the status to unsent
         if (state.historyIds.length >= payload.length) {
-          const unsentMessages = state.historyIds.filter(
-            (id) => !payload.find((record) => record.id === id)
-          );
+          const unsentMessages = state.historyIds.filter((id) => !payload.find((record) => record.id === id));
           unsentMessages.forEach(
             (id) =>
-              (draft.historyData[id].content = draft.historyData[
-                id
-              ].content.map((record) => ({
+              (draft.historyData[id].content = draft.historyData[id].content.map((record) => ({
                 ...record,
                 sent: false,
                 resend: true,
-              })))
+              }))),
           );
           return;
         }
@@ -57,9 +50,9 @@ const configSlice = createSlice({
         draft.historyData = payload.reduce(
           (prev, current) => ({
             ...prev,
-            [current.id]: current,
+            [current.id]: current
           }),
-          {}
+          {},
         );
       });
     },
@@ -75,19 +68,12 @@ const configSlice = createSlice({
           role: Roles.assistant,
           content: [
             { type: Definition.text, text: payload.content, sequence: 1 },
-            {
-              type: Definition.buttons,
-              buttons: payload.buttons || [],
-              sequence: 2,
-            },
+            { type: Definition.buttons, buttons: payload.buttons || [], sequence: 2 },
           ],
         };
       });
     },
-    fillAssistantHistoryData(
-      state,
-      { payload }: PayloadAction<AssistantHistoryDataFiller>
-    ) {
+    fillAssistantHistoryData(state, { payload }: PayloadAction<AssistantHistoryDataFiller>) {
       return produce(state, (draft: Draft<ChatState>) => {
         const id = payload.id;
 
@@ -109,14 +95,13 @@ const configSlice = createSlice({
         };
 
         const hasDuplicatedSequenceAndType = draft.historyData[id].content.some(
-          (record) =>
-            record.sequence === data.sequence && record.type === data.type
+          (record) => record.sequence === data.sequence && record.type === data.type,
         );
 
         if (hasDuplicatedSequenceAndType) {
           draft.historyData[id].content = getUnifiedSequence(
             draft.historyData[id].content as Array<AssistantRecord>,
-            data
+            data,
           );
           return;
         }
@@ -181,16 +166,20 @@ const configSlice = createSlice({
     },
     hideResendIcon(state, { payload }: PayloadAction<{ itemId: string }>) {
       return produce(state, (draft: Draft<ChatState>) => {
-        draft.historyData[payload.itemId].content = draft.historyData[
-          payload.itemId
-        ].content.map((record) => ({ ...record, sent: true, resend: false }));
+        draft.historyData[payload.itemId].content = draft.historyData[payload.itemId].content.map((record) => ({
+          ...record,
+          sent: true,
+          resend: false,
+        }));
       });
     },
     showResendIcon(state, { payload }: PayloadAction<{ itemId: string }>) {
       return produce(state, (draft: Draft<ChatState>) => {
-        draft.historyData[payload.itemId].content = draft.historyData[
-          payload.itemId
-        ].content.map((record) => ({ ...record, sent: false, resend: true }));
+        draft.historyData[payload.itemId].content = draft.historyData[payload.itemId].content.map((record) => ({
+          ...record,
+          sent: false,
+          resend: true,
+        }));
       });
     },
     setLastGroupPointer(state, { payload }: PayloadAction<string>) {
@@ -217,11 +206,8 @@ const configSlice = createSlice({
 
 export const getChat = (state: { chat: ChatState }) => state.chat;
 export const userMessageFindOne = (state: { chat: ChatState }) =>
-  state.chat.historyIds.find(
-    (historyId) => state.chat.historyData[historyId].role === Roles.user
-  );
-export const sortBySequence = (a: AssistantRecord, b: AssistantRecord) =>
-  a.sequence - b.sequence;
+  state.chat.historyIds.find((historyId) => state.chat.historyData[historyId].role === Roles.user);
+export const sortBySequence = (a: AssistantRecord, b: AssistantRecord) => a.sequence - b.sequence;
 
 export const {
   setOutgoing,

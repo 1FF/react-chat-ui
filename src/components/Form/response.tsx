@@ -6,15 +6,14 @@ import { Roles } from '../../config/enums';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { fillUserHistoryData, getChat, setLastGroupPointer, setTypingTimeoutExpired } from '../../store/slices/chat';
 import { getConfig } from '../../store/slices/config';
-import { getResponseIntentions } from '../../store/slices/intentions';
 import { uuidV4 } from '../../utils';
 import { layoutFoot as variant } from '../Layout/variants';
+import { TYPING_TIMEOUT } from '../../config/env';
 
 export const ResponseForm = () => {
   const dispatch = useAppDispatch();
   const { themeId: theme } = useAppSelector(getConfig);
-  const { connected } = useAppSelector(getChat);
-  const { isLoading } = useAppSelector(getResponseIntentions);
+  const { connected, isLoading } = useAppSelector(getChat);
   const { base, input, button } = variant({ theme });
   const [response, setCurrentResponse] = useState<string | ''>('');
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
@@ -57,7 +56,7 @@ export const ResponseForm = () => {
     const currentId = setTimeout(() => {
       dispatch(setTypingTimeoutExpired(true));
       dispatch(setLastGroupPointer(uuidV4()));
-    }, 3000);
+    }, TYPING_TIMEOUT);
     setTimerId(currentId);
   };
 
@@ -70,6 +69,7 @@ export const ResponseForm = () => {
         <Input
           disabled={!connected}
           isLoading={isLoading}
+          e2e="message-input"
           name="response"
           onChange={handleInputChange}
           placeholder="Write your message here..."

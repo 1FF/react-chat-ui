@@ -1,7 +1,8 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-env jest */
 import '@testing-library/jest-dom';
-
+import { faker } from '@faker-js/faker';
+global.faker = faker;
 // this is due to implementation errors from the library;
 const listeners = window._virtualConsole.listeners('jsdomError');
 const originalListener = listeners && listeners[0];
@@ -15,9 +16,11 @@ window._virtualConsole.addListener('jsdomError', error => {
     originalListener(error);
   }
 });
+global.spies = [];
 
 afterEach(() => {
   jest.clearAllMocks();
   jest.restoreAllMocks();
   localStorage.clear();
+  global.spies.forEach(spy => spy.mockRestore());
 });
