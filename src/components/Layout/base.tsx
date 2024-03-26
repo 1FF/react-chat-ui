@@ -5,14 +5,14 @@ import { layoutBase as variant } from './variants';
 
 export const LayoutBase = ({ head, stream, foot }: LayoutBaseProps) => {
   const { themeId: theme, isPluginMode } = useAppSelector(getConfig);
-  const { base, wrapper } = variant({ theme });
+  const { base, wrapper } = variant();
   const data = useWindowSize();
 
   return (
     <div
       data-e2e="base-container"
       style={{ height: `${data[1]}px` }}
-      className={base({ minimized: isPluginMode })}
+      className={base({ minimized: isPluginMode }) + ' ' + theme }
     >
       <div className={wrapper()}>
         {head}

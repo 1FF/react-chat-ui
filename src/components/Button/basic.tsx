@@ -1,11 +1,8 @@
-import { useAppSelector } from '../../hooks';
 import { ButtonProps } from '../../interfaces/component';
-import { getConfig } from '../../store/slices/config';
 import { basic as variant } from './variants';
 
 export const Btn = ({ text = '', onClick, e2e }: ButtonProps) => {
-  const { themeId: theme } = useAppSelector(getConfig);
-  const { base } = variant({ theme });
+  const { base } = variant();
 
   return (
     <button

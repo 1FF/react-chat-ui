@@ -5,8 +5,8 @@ import { getConfig } from '../../store/slices/config';
 import { profile as variant } from './variants';
 
 export const Profile = ({ orientation = ScreenOrientation.horizontal, minimized = false }: ProfileProps) => {
-  const { aiProfile, themeId: theme } = useAppSelector(getConfig);
-  const { base, avatar, info, name, role, imgWrapper } = variant({ theme, orientation, minimized });
+  const { aiProfile } = useAppSelector(getConfig);
+  const { base, avatar, info, name, role, imgWrapper } = variant({ orientation, minimized });
 
   return (
     <div className={base()}>

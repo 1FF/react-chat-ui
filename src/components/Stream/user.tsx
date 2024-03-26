@@ -1,15 +1,13 @@
 import { IconBtn } from '../../components/Button';
 import { Roles } from '../../config/enums';
-import { useAppDispatch,useAppSelector } from '../../hooks';
+import { useAppDispatch } from '../../hooks';
 import { UserProps } from '../../interfaces/component';
 import { resendMessage } from '../../store/slices/chat';
-import { getConfig } from '../../store/slices/config';
 import { streamBubble as variant } from './variants';
 
 export const User = ({ record }: UserProps) => {
   const dispatch = useAppDispatch();
-  const { themeId: theme } = useAppSelector(getConfig);
-  const { action, separator } = variant({ theme, type: Roles.user });
+  const { action, separator } = variant({ type: Roles.user });
 
   const onResend = () => {
     dispatch(resendMessage(record));

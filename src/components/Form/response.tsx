@@ -5,16 +5,14 @@ import { Input } from '../../components/Input';
 import { Roles } from '../../config/enums';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { fillUserHistoryData, getChat, setLastGroupPointer, setTypingTimeoutExpired } from '../../store/slices/chat';
-import { getConfig } from '../../store/slices/config';
 import { uuidV4 } from '../../utils';
 import { layoutFoot as variant } from '../Layout/variants';
 import { TYPING_TIMEOUT } from '../../config/env';
 
 export const ResponseForm = () => {
   const dispatch = useAppDispatch();
-  const { themeId: theme } = useAppSelector(getConfig);
   const { connected, isLoading } = useAppSelector(getChat);
-  const { base, input, button } = variant({ theme });
+  const { base, input, button } = variant();
   const [response, setCurrentResponse] = useState<string | ''>('');
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
   const groupId = useAppSelector((state) => state.chat.lastGroupId);

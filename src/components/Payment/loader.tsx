@@ -1,5 +1,3 @@
-import { useAppSelector } from '../../hooks';
-import { getConfig } from '../../store/slices/config';
 import { loader as variants } from './variants';
 interface PaymentLoaderProps {
   texts?: Array<string>;
@@ -7,7 +5,6 @@ interface PaymentLoaderProps {
 }
 
 export const PaymentLoader = ({ texts = [], title = '' }: PaymentLoaderProps) => {
-  const { themeId: theme } = useAppSelector(getConfig);
   const {
     wrapper,
     inner,
@@ -19,7 +16,7 @@ export const PaymentLoader = ({ texts = [], title = '' }: PaymentLoaderProps) =>
     spinningTexts,
     filmContainer,
     film
-  } = variants({ theme });
+  } = variants();
   return (
     <div
       className={wrapper()}

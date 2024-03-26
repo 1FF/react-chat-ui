@@ -27,7 +27,7 @@ describe('Profile Component', () => {
     const { container } = render(<Profile />);
 
     // Assert
-    expect(profile).toHaveBeenCalledWith({ orientation: 'horizontal', minimized: false, theme: 'light' });
+    expect(profile).toHaveBeenCalledWith({ orientation: 'horizontal', minimized: false});
     expect(container).toBeInTheDocument();
   });
 
@@ -38,7 +38,7 @@ describe('Profile Component', () => {
     const { container } = render(<Profile orientation={ orientation } minimized={ minimized } />);
 
     // Assert
-    expect(profile).toHaveBeenCalledWith({ orientation, minimized, theme: 'light' });
+    expect(profile).toHaveBeenCalledWith({ orientation, minimized });
     expect(container).toBeInTheDocument();
   });
 });

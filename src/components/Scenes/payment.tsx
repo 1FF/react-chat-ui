@@ -7,8 +7,8 @@ import { wrapper } from '../Payment/variants';
 
 export const PaymentScene = ({ onClose }: { onClose: (e: MouseEvent<HTMLButtonElement>) => void }) => {
   const { displayPlanPrice, billingFrequencyTmsg } = useAppSelector((state) => state.meta.pd);
-  const { translations, themeId: theme } = useAppSelector((state) => state.config);
-  const { base } = wrapper({ theme });
+  const { translations } = useAppSelector((state) => state.config);
+  const { base } = wrapper();
 
   return (
     (
@@ -21,7 +21,7 @@ export const PaymentScene = ({ onClose }: { onClose: (e: MouseEvent<HTMLButtonEl
             <PaymentLoader texts={translations.loaderTexts} title={translations.tm1224} />
           </Overlay>
           <CloseButton onClick={onClose} />
-          <div id="primer-form-container" className="primer-theme tw--w-full h-full">
+          <div id="primer-form-container" className="h-full primer-theme tw--w-full">
             <PaymentHead config={{ price: displayPlanPrice, period: billingFrequencyTmsg }} />
           </div>
           <PaymentFooter />
