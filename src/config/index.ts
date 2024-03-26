@@ -107,7 +107,7 @@ export const chat = ({ id, purpose, close }: InitiationConfig) => ({
     },
     close: {
       href: close.href || '/',
-      visible: close.visible || false,
+      visible: close.visible || true,
     }
   },
   specialUrls: {

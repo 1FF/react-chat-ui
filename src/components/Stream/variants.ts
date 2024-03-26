@@ -35,7 +35,7 @@ export const flickerEffect = /* tw */ tv({
 
 export const streamBubble = /* tw*/ tv({
   slots: {
-    base: 'tw--relative tw--max-w-[375px] tw--whitespace-pre-wrap tw--rounded-[20px] tw--mb-5 tw--space-y-5 tw--font-density-different',
+    base: 'tw--relative tw--max-w-[375px] tw--justify-self-start tw--whitespace-pre-wrap tw--rounded-[20px] tw--mb-5 tw--space-y-5 tw--font-density-different',
     action: 'tw--absolute tw--bottom-[-16px] tw--right-[-10px] tw--text-seraph',
     separator: 'tw--px-[15px] tw--py-[11px] tw--rounded-[20px] tw--w-fit tw--ml-auto tw--mr-0'
   },
