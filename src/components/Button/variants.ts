@@ -9,7 +9,7 @@ export const basic = /*tw*/ tv({
 
 export const icon = /*tw*/ tv({
   slots: {
-    base: 'tw--flex-1 tw--text-dots',
+    base: 'tw--text-dots',
   },
   variants: {
     outlined: {
