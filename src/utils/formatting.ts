@@ -27,7 +27,7 @@ export const constructLink = (link: string): string => {
     searchParams.append(CHAT_SEEN_KEY, 'true');
     searchParams.append(CID, localStorage.getItem('__cid') || '');
 
-    search = `/?${  searchParams}`;
+    search = `/?${searchParams}`;
   } else {
     search = '';
   }
@@ -37,4 +37,8 @@ export const constructLink = (link: string): string => {
   }
 
   return link + search;
+};
+
+export const replaceNewRowSymbols = (text: string): string => {
+  return text.replaceAll(/\\r\\n|\\n|\r\n|<br>|<br\/>/g, '\n')
 };

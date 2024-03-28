@@ -11,6 +11,7 @@ import MarkdownLink from '../Markdown/link';
 import { Iframe } from '../Video';
 import OptionList from './options';
 import { flickerEffect } from './variants';
+import { replaceNewRowSymbols } from '../../utils/formatting';
 
 const Assistant = ({ message, itemId }: AssistantProps) => {
   const { isStreaming } = useAppSelector(getChat);
@@ -27,12 +28,16 @@ const Assistant = ({ message, itemId }: AssistantProps) => {
             <div
               key={uuidV4()}
               className="tw--flex tw--flex-col tw--space-y-[10px]"
+              data-e2e="assistant-text"
             >
               <span className={baseFlicker()}>
-                <Markdown components={{
-                  a(props) { return <MarkdownLink properties={props} />; }
-                }}
-                >{it[it.type]}
+                <Markdown
+                  key={uuidV4()}
+                  components={{
+                    a(props) { return <MarkdownLink properties={props} />; },
+                  }}
+                >
+                  {replaceNewRowSymbols(it[it.type] || '')}
                 </Markdown>
               </span>
             </div>
@@ -50,6 +55,7 @@ const Assistant = ({ message, itemId }: AssistantProps) => {
         if (it.type === Definition.video) {
           return (
             <Iframe
+              data-e2e="assistant-iframe"
               key={uuidV4()}
               title={it[it.type]?.title || 'video'}
               url={it[it.type]?.url || 'https://www.youtube.com/embed/g4B8Dhl4pxY'}
@@ -61,6 +67,7 @@ const Assistant = ({ message, itemId }: AssistantProps) => {
           return (
             <img
               key={uuidV4()}
+              data-e2e="assistant-img"
               className="w-full tw--h-auto tw--py-4"
               src={it[it.type]?.url}
               alt={it[it.type]?.alt || 'chat-image'}

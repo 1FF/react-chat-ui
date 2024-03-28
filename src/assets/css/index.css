@@ -12,10 +12,6 @@
   letter-spacing: 2px;
 }
 
-p {
-  display: inline;
-}
-
 .mt-8 {
   margin-top: 2rem;
 }
@@ -30,6 +26,11 @@ p {
   left: 0;
   right: 0;
   top: 0;
+}
+
+span > p:last-child {
+  display: inline;
+  position: relative;
 }
 
 @layer utilities {
@@ -98,4 +99,51 @@ p {
   --card: 0 12px 24px 0 rgba(0, 0, 0, 0.12), 0 4px 8px 0 rgba(0, 0, 0, 0.1);
   --loading-dots: -24px 0 rgba(255, 255, 255, 0.5), 24px 0 rgba(255, 255, 255, 0.5);
   --density-different: 400;
+}
+
+ul,
+ol {
+  list-style: auto;
+  list-style-position: inside;
+  display: flex;
+  flex-direction: column;
+}
+
+ul {
+  list-style-position: inside;
+  list-style-type: disc;
+}
+
+li {
+  padding: 0;
+  position: relative;
+}
+
+li:last-child {
+  width: fit-content;
+}
+
+li + li {
+  margin-top: 0;
+}
+
+span:not(.after\:tw--hidden) ol:last-child li:last-child:after,
+span:not(.after\:tw--hidden) ul:last-child li:last-child:after,
+span:not(.after\:tw--hidden) p:last-child:after {
+  content: "";
+  width: 0.25rem;
+  height: 1rem;
+  display: inline-block;
+  background: black;
+  position: absolute;
+  left: auto;
+  bottom: 4px;
+
+  @apply tw--animate-blink;
+}
+
+span:not(.after\:tw--hidden):has(ol li):after,
+span:not(.after\:tw--hidden):has(ul li):after,
+span:not(.after\:tw--hidden):has(p:last-child):after {
+  display: none;
 }
