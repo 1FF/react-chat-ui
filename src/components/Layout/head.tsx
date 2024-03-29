@@ -3,7 +3,7 @@ import { MouseEvent } from 'react';
 import { AllEvents } from '../../config/enums';
 import { CLOSE_AFTER_TIMEOUT } from '../../config/env';
 import { useAppDispatch, useHeadControls } from '../../hooks';
-import {  track } from '../../services/tracking';
+import { track } from '../../services/tracking';
 import { setClosed } from '../../store/slices/chat';
 import { IconBtn } from '../Button';
 import { Profile } from '../Profile';
