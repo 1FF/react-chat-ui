@@ -76,7 +76,7 @@ export const chat = ({ id, purpose, close }: InitiationConfig) => ({
     },
     chatUrl: 'https://chat-ws.test',
     purpose: purpose || 'default',
-    themeId: 'light',
+    themeId: 'dark',
     translations: {
       emailPlaceholder: 'Please enter your email',
       tm526: 'Continue to my plan',
