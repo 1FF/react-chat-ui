@@ -134,7 +134,7 @@ span:not(.after\:tw--hidden) p:last-child:after {
   width: 0.25rem;
   height: 1rem;
   display: inline-block;
-  background: black;
+  background: var(--zephyr-100);
   position: absolute;
   left: auto;
   bottom: 4px;
