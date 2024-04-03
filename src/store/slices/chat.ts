@@ -1,4 +1,4 @@
-import { createSlice, Draft,PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
 import produce from 'immer';
 
 import { getUnifiedSequence } from '../../config';
@@ -37,11 +37,11 @@ const configSlice = createSlice({
           const unsentMessages = state.historyIds.filter((id) => !payload.find((record) => record.id === id));
           unsentMessages.forEach(
             (id) =>
-              (draft.historyData[id].content = draft.historyData[id].content.map((record) => ({
-                ...record,
-                sent: false,
-                resend: true,
-              }))),
+            (draft.historyData[id].content = draft.historyData[id].content.map((record) => ({
+              ...record,
+              sent: false,
+              resend: true,
+            }))),
           );
           return;
         }

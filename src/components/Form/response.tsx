@@ -38,7 +38,7 @@ export const ResponseForm = () => {
         id: uuidV4(),
         sequence: 1,
         content: {
-          sequence: 1, message: response, groupId, resend: false, sent: true
+          sequence: 1, text: response, groupId, resend: false, sent: true
         }
       }));
     }

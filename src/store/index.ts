@@ -1,5 +1,10 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import { persistReducer,persistStore } from 'redux-persist';
+import { persistReducer, persistStore } from 'redux-persist';
+import {
+  createStateSyncMiddleware,
+  initMessageListener,
+} from "redux-state-sync";
+import { PERSIST, PURGE } from 'redux-persist/lib/constants';
 import storage from 'redux-persist/lib/storage';
 
 import intentionsMiddleware from '../middleware/intentions';
@@ -23,9 +28,9 @@ export const store = configureStore({
     intentions: intentionsReducer,
   })),
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false })
-    .concat(chatMiddleware, intentionsMiddleware),
+    .concat(chatMiddleware, intentionsMiddleware, createStateSyncMiddleware({ blacklist: [PERSIST, PURGE], })),
 });
-
+initMessageListener(store);
 
 export type AppDispatch = typeof store.dispatch
 export type RootState = ReturnType<typeof store.getState>

@@ -26,13 +26,14 @@ import {
   setExistingHistory,
   setIsLoading,
   setIsStreaming,
+  setLastGroupPointer,
   setOutgoing,
   setTypingTimeoutExpired,
   showResendIcon,
 } from '../store/slices/chat';
 import { setConfig } from '../store/slices/config';
 import { setRegion } from '../store/slices/meta';
-import { getQueryParam } from '../utils';
+import { getQueryParam, uuidV4 } from '../utils';
 
 let socket: Socket;
 
@@ -64,25 +65,27 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
     dispatchRetry();
   };
 
-  const handleMessageResending = (data: { itemId: string, message: string }) => {
-    store.dispatch(hideResendIcon(data));
+  const handleMessageResending = ({ itemId }: { itemId: string }) => {
+    store.dispatch(hideResendIcon({ itemId }));
     store.dispatch(setIsLoading());
 
     const onResendError = () => {
       const { config } = store.getState();
-      store.dispatch(showResendIcon(data));
+      store.dispatch(showResendIcon({ itemId }));
       store.dispatch(resetIsLoading());
       store.dispatch(setError(config.translations.error));
     };
 
-    if (socket?.connected && data.message.trim() !== '') {
+    const message = chat.historyData[itemId].content.map((item: { text: string }) => item.text).join(['\n']);
+    if (socket?.connected && message.trim() !== '') {
       socket.volatile.emit(
         Events.chat,
         {
           role: Roles.user,
-          message: data.message,
+          message,
           term: getQueryParam(QueryParams.chat),
           user_id: meta.cid,
+          messageId: itemId,
           region: meta.region,
         },
         withTimeout(onResendError)
@@ -93,7 +96,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
     }
   };
 
-  if (setOutgoing.match(action)) {
+  if (setOutgoing.match(action) && !('$isSync' in action)) {
     handleMessageSending({
       role: Roles.user,
       message: action.payload,
@@ -121,11 +124,12 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
     window.location.href = config.close.href || DEFAULT_CLOSE_HREF;
   }
 
-  if (setTypingTimeoutExpired.match(action) && action.payload) {
+  if (setTypingTimeoutExpired.match(action) && action.payload && !('$isSync' in action)) {
     const messageId = [...chat.historyIds].pop();
-    const lastMessage = chat.historyData[messageId].content.map(({ message }: { message: UserMessageContent }) => message).join('\n');
-
-    if (lastMessage.trim() !== '') {
+    const currentMessage = chat.historyData[messageId]
+    const lastMessage = chat.historyData[messageId].content.map(({ text }: { text: UserMessageContent }) => text).join('\n');
+    
+    if (currentMessage.role === Roles.user && lastMessage.trim() !== '') {
       handleMessageSending({
         role: Roles.user,
         message: lastMessage,
@@ -137,7 +141,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
     }
   }
 
-  if (resendMessage.match(action)) {
+  if (resendMessage.match(action) && !('$isSync' in action)) {
     handleMessageResending(action.payload);
   }
 
@@ -155,6 +159,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
     socket.sendBuffer = [];
     socket.emit(Events.chatHistory, { user_id: meta.cid, region: meta.region, term: getQueryParam(QueryParams.chat) });
     store.dispatch(setConnected(true));
+    store.dispatch(setLastGroupPointer(uuidV4()));
   });
 
   socket.on(Events.chatHistory, ({ history: servedHistory, errors, region }
@@ -183,6 +188,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
         interval += 1000;
 
         setTimeout(() => {
+
           store.dispatch(fillInitialMessage(element));
 
           if (arr.length === index + 1) {
@@ -196,8 +202,8 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
                 region: meta.region,
               }));
             store.dispatch(resetIsLoading());
-          }
 
+          }
         }, interval);
 
       });
