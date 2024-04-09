@@ -1,8 +1,8 @@
 import { IconProps } from '../../interfaces/component';
 import { icon as variant } from './variants';
 
-export const IconBtn = ({ children, outlined = false, onClick, e2e = null, disabled = false }: IconProps) => {
-  const { base } = variant({ outlined });
+export const IconBtn = ({ children, color = 'main', outlined = false, onClick, e2e = null, disabled = false, }: IconProps) => {
+  const { base } = variant({ outlined, color });
 
   return (
     <button

@@ -31,6 +31,7 @@ export interface VideoMessage {
 
 interface ImageProps {
   url: string;
+  title: string
   alt: string | null
 }
 export interface ImageMessage {

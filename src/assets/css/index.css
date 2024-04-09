@@ -60,8 +60,7 @@ span > p:last-child {
   --neon: #019aff;
   --pale-dots: #cacadb;
   --iota-dots: #21bb5a;
-  --overlay: rgba(15, 14, 30, 0.2);
-  --beta: #f6f8fa;
+  --overlay: rgba(255, 255, 255, 0.6);
   --ze: 43, 49, 57;
   --zephyr-100: rgb(var(--ze));
   --zephyr-200: rgba(var(--ze), 0.1);
@@ -90,7 +89,6 @@ span > p:last-child {
   --pale-dots: #ffffff;
   --iota-dots: #21bb5a;
   --overlay: rgba(15, 14, 30, 0.9);
-  --beta: #25223;
   --ze: 255, 255, 255;
   --zephyr-100: rgb(var(--ze));
   --zephyr-200: rgba(var(--ze), 0.1);

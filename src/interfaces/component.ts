@@ -1,4 +1,4 @@
-import { ChangeEvent, HTMLInputTypeAttribute, KeyboardEvent,MouseEvent, ReactNode } from 'react'
+import { ChangeEvent, HTMLInputTypeAttribute, KeyboardEvent, MouseEvent, ReactNode } from 'react'
 
 import { BasicVariants } from '../components/Button/variants'
 import { ScreenOrientation } from '../config/enums'
@@ -25,6 +25,7 @@ export interface IconProps extends BasicVariants {
   children: ReactNode,
   outlined?: boolean,
   onClick: (event: MouseEvent<HTMLButtonElement>) => void,
+  color?: 'main' | 'secondary',
   e2e?: null | string,
   disabled?: boolean
 }

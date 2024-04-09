@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { ConfigState } from '../../interfaces/store';
+import { ConfigState, MediaModalProps } from '../../interfaces/store';
 import { config as initialState } from '../../store/initialState';
 
 const configSlice = createSlice({
@@ -45,6 +45,12 @@ const configSlice = createSlice({
     setTranslations(state, { payload }) {
       state.translations = { ...state.translations, ...payload };
     },
+    setMediaModal(state, { payload: { isVisible, code, title, image } }: PayloadAction<MediaModalProps>) {
+      state.mediaModal = { isVisible, code, title, image };
+    },
+    resetMediaModal(state) {
+      state.mediaModal = initialState.mediaModal;
+    },
   },
 });
 
@@ -62,5 +68,7 @@ export const {
   setTranslations,
   setPurpose,
   setSpecialUrls,
+  setMediaModal,
+  resetMediaModal
 } = configSlice.actions;
 export default configSlice.reducer;

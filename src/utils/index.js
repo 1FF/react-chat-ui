@@ -44,3 +44,15 @@ export function uuidV4() {
   uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
   return uuid.map((x) => x.toString(16)).join('');
 }
+
+export const extractVideoCode = (url) => {
+  const regex = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))((\w|-){11})(?:\S+)?$/gm;
+  const matches = regex.exec(url)
+  let videoId;
+
+  if (matches) {
+    videoId = matches[1];
+  }
+
+  return videoId || '';
+}

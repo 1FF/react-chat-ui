@@ -47,6 +47,14 @@ export interface ConfigState {
   enableDevTools: boolean;
   isPluginMode: boolean;
   specialUrls: SpecialUrls;
+  mediaModal: MediaModalProps;
+}
+
+export interface MediaModalProps {
+  isVisible: boolean;
+  code: string;
+  image: string;
+  title?: string;
 }
 
 export interface MetaState {
