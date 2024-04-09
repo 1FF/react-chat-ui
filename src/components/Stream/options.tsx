@@ -19,7 +19,7 @@ export const OptionList = ({ options = [] }: OptionsListProps) => {
       sequence: 1,
       role: Roles.user,
       content: {
-        sequence: 1, message: val, resend: false, sent: true, groupId: ''
+        sequence: 1, text: val, resend: false, sent: true, groupId: ''
       }
     }));
     dispatch(setOutgoing(val));
@@ -40,7 +40,7 @@ export const OptionList = ({ options = [] }: OptionsListProps) => {
       role: Roles.user,
       content: {
         sequence: 1,
-        message: val,
+        text: val,
         resend: false,
         sent: true,
         groupId: ''

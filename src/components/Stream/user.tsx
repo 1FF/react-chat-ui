@@ -16,7 +16,7 @@ export const User = ({ record }: UserProps) => {
   return (
     <div className={separator()}>
       <span>
-        {record.message}
+        {record.text}
       </span>
       {(record.resend && !record.sent) && (
         <div className={action()}>

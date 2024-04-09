@@ -9,7 +9,7 @@ import { useAppSelector } from '.';
 export const useFootProps = () => {
   const { cid, systemType, marketing, pd } = useAppSelector(getMeta);
   const { translations, purpose, specialUrls } = useAppSelector(getConfig);
-  const { isLoading, isStreaming } = useAppSelector(getChat);
+  const { isLoading, isStreaming, historyData, historyIds } = useAppSelector(getChat);
   const { error: streamError } = useAppSelector((store) => store.chat);
   const storedLink = useAppSelector((store) => store.intentions.link);
   const { error: emailError, current: currentEmail } = useAppSelector(getEmailIntentions);
@@ -36,7 +36,6 @@ export const useFootProps = () => {
     ctaText: '',
     ctaHref: '',
   };
-  const { historyData, historyIds } = useAppSelector(getChat);
   const lastMsgId = [...historyIds].pop();
   const lastMsg = lastMsgId && historyData[lastMsgId];
   const isLastAssistantMsg = lastMsg && lastMsg.role === Roles.assistant;
@@ -78,7 +77,7 @@ export const useFootProps = () => {
     };
   }
 
-  if (link && purpose === SUPPORT_PURPOSE) {
+  if (link && purpose === SUPPORT_PURPOSE && noButtonChoices) {
     return {
       ...staticProps,
       isResponseFormVisible: true,

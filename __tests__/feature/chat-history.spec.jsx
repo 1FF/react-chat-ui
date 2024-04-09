@@ -1,6 +1,7 @@
 /* eslint-env jest */
 import { fireEvent } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
+import { io } from 'socket.io-client';
 
 import { uuidV4 } from '../../src/utils';
 import { intent } from '../../src/main';
@@ -10,7 +11,6 @@ import renderWithProviders from '../../src/utils/storeMockWrapper';
 import { setConnected } from '../../src/store/slices/chat';
 import { serverSocket } from '../../__mocks__/socket.io-client';
 import { Events, Roles, chat as getInitialConfig, initialMessage } from '../../src/config';
-import { io } from 'socket.io-client';
 import { Intentions } from '../../src/config/enums';
 
 const textProbe = () => ({ 'type': 'text', 'text': faker.lorem.text(), 'sequence': 2 });

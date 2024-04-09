@@ -92,7 +92,7 @@ export interface MessageProperties {
   email?: string;
   payment?: string;
   special?: string;
-  
+
   // user
   groupId?: string;
   sent?: boolean;
@@ -106,7 +106,7 @@ export type PredefinedMessagePayload = {
 }
 
 export type UserMessageContent = {
-  groupId: string, sent: boolean, resend: boolean, message: string, sequence: number
+  groupId: string, sent: boolean, resend: boolean, text: string, sequence: number
 }
 
 export interface UserHistoryData {

@@ -57,7 +57,7 @@ export const intentionsMiddleware: Middleware = (store) => (next) => {
         sequence: 1,
         content: {
           sequence: 1,
-          message: intentions.email.current,
+          text: intentions.email.current,
           resend: false,
           sent: true,
           groupId: '',
@@ -135,6 +135,7 @@ export const intentionsMiddleware: Middleware = (store) => (next) => {
         email: intentions.email.current
       });
     }
+
     next(action);
   };
 };
