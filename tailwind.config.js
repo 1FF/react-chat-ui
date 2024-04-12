@@ -36,7 +36,7 @@ export default {
       'zephyr-800': 'var(--zephyr-800)',
     },
     boxShadow: {
-      card: '0 12px 24px 0 rgba(43, 49, 57, 0.06), 0 4px 8px 0 rgba(43, 55, 70, 0.04)',
+      card: '0 12px 24px 0 rgba(var(--ze) 0.06), 0 4px 8px 0 rgba(var(--ze), 0.04)',
       'loading-dots': '-24px 0 rgba(201, 201, 201, 0.5), 24px 0 rgba(201, 201, 201, 0.5)',
     },
     keyframes: {

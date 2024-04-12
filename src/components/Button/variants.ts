@@ -9,13 +9,17 @@ export const basic = /*tw*/ tv({
 
 export const icon = /*tw*/ tv({
   slots: {
-    base: 'tw--text-dots',
+    base: '',
   },
   variants: {
     outlined: {
       true: 'tw--p-0.5 tw--bg-white tw--rounded-full tw--shadow',
       false: 'tw--bg-[transparent]',
     },
+    color: {
+      main: 'tw--text-dots',
+      secondary: 'tw--text-zeta tw--self-start',
+    }
   },
 });
 

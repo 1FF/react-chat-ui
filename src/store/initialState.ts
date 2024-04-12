@@ -34,6 +34,12 @@ export const config: ConfigState = {
   isPluginMode: false,
   purpose: 'default',
   specialUrls: {},
+  mediaModal: {
+    isVisible: false,
+    code: '',
+    image: '',
+    title: '',
+  }
 };
 
 export const chat: ChatState = {

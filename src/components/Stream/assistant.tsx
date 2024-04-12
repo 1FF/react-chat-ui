@@ -6,9 +6,9 @@ import { useAppSelector } from '../../hooks';
 import { AssistantProps } from '../../interfaces/component';
 import { getChat, sortBySequence } from '../../store/slices/chat';
 import { getMeta } from '../../store/slices/meta';
-import { uuidV4 } from '../../utils';
+import { extractVideoCode, uuidV4 } from '../../utils';
 import MarkdownLink from '../Markdown/link';
-import { Iframe } from '../Video';
+import { Media } from '../Media';
 import OptionList from './options';
 import { flickerEffect } from './variants';
 import { replaceNewRowSymbols } from '../../utils/formatting';
@@ -54,23 +54,26 @@ const Assistant = ({ message, itemId }: AssistantProps) => {
 
         if (it.type === Definition.video) {
           return (
-            <Iframe
-              data-e2e="assistant-iframe"
+            <Media
+              e2e="assistant-iframe"
               key={uuidV4()}
-              title={it[it.type]?.title || 'video'}
-              url={it[it.type]?.url || 'https://www.youtube.com/embed/g4B8Dhl4pxY'}
+              title={it[it.type]?.title||''}
+              background={`url(https://img.youtube.com/vi/${extractVideoCode(it[it.type]?.url)}/hqdefault.jpg)`}
+              url={extractVideoCode(it[it.type]?.url || 'https://www.youtube.com/embed/g4B8Dhl4pxY')}
+              type={Definition.video}
             />
           );
         }
 
         if (it.type === Definition.image) {
           return (
-            <img
+            <Media
               key={uuidV4()}
-              data-e2e="assistant-img"
-              className="w-full tw--h-auto tw--py-4"
-              src={it[it.type]?.url}
-              alt={it[it.type]?.alt || 'chat-image'}
+              e2e="assistant-img"
+              image={it[it.type]?.url || ''}
+              background={'url("' + it[it.type]?.url + '")'}
+              type={Definition.image}
+              title={it[it.type]?.title}
             />
           );
         }
