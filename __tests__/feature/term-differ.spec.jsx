@@ -36,6 +36,7 @@ describe('Multiple terms are being saved', () => {
   const term = 'default'
   const href = `https://example.com/?utm_chat=${term}}`;
   const search = `?utm_chat=${term}`;
+  const threadId = uuidV4();
 
   beforeEach(async () => {
     const mockLocation = {
@@ -52,6 +53,7 @@ describe('Multiple terms are being saved', () => {
     serverData.errors = [];
     serverData.region = faker.location.country();
     serverData.term = term;
+    serverData.threadId = threadId;
   })
   afterEach(localTearDown);
 
@@ -91,6 +93,6 @@ describe('Multiple terms are being saved', () => {
     // Assert
     const { chat } = root.store.getState();
     expect(chat.record[previousTerm].historyIds).toBeDefined();
-    expect(chat.record[term].historyIds).toBeDefined();
+    expect(chat.record[threadId].historyIds).toBeDefined();
   });
 });

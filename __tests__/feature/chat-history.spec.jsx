@@ -39,6 +39,7 @@ describe('Chat-history event works and visualizes items accordingly', () => {
   const term = 'default'
   const href = `https://example.com/?utm_chat=${term}}`;
   const search = `?utm_chat=${term}`;
+  const threadId = uuidV4();
 
   beforeEach(async () => {
     const mockLocation = {
@@ -55,6 +56,7 @@ describe('Chat-history event works and visualizes items accordingly', () => {
     serverData.errors = [];
     serverData.region = faker.location.country();
     serverData.term = term;
+    serverData.threadId = threadId;
   })
   afterEach(localTearDown);
 
@@ -113,7 +115,7 @@ describe('Chat-history event works and visualizes items accordingly', () => {
     expect(emailFormElement).toBeNull();
 
     const { meta, config, chat } = root.store.getState();
-    expect(historyElements.length).toEqual(chat.record[term].historyIds.length);
+    expect(historyElements.length).toEqual(chat.record[threadId].historyIds.length);
     expect(meta.region).toStrictEqual(serverData.region);
     expect(config.aiProfile).toStrictEqual(chatConfig.app.aiProfile);
     expect(config.translations).toStrictEqual(chatConfig.app.translations);

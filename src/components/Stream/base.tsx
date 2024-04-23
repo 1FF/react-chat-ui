@@ -8,7 +8,7 @@ import { streamBase, streamRow } from './variants';
 
 export const StreamBase = () => {
   const { aiProfile } = useAppSelector(getConfig);
-  const historyIds = useAppSelector(getHistoryIds);
+  const historyIds = useAppSelector(getHistoryIds) || [];
   const firstMessageTime = useAppSelector(getFirstMessageTime);
   const { base, second, date } = streamBase();
   const { base: baseRow } = streamRow();

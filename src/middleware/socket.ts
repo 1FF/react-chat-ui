@@ -30,7 +30,7 @@ import {
   setTypingTimeoutExpired,
   showResendIcon,
   syncMessageStatus,
-  updateHistoryByTerm,
+  updateHistoryByThread,
 } from '../store/slices/chat';
 import { setConfig } from '../store/slices/config';
 import { setRegion } from '../store/slices/meta';
@@ -43,7 +43,6 @@ const chatMiddleware: Middleware = (store) => (next) => (action: Action & { $isS
   const thread = chat.thread[getQueryParam()];
 
   const onError = () => {
-    const { config } = store.getState();
     store.dispatch(resetIsLoading());
     store.dispatch(setError(config.translations.error));
   };
@@ -63,7 +62,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action: Action & { $isS
         Events.chat,
         {
           time: new Date().getTime(),
-          threadId: chat.thread[getQueryParam()],
+          threadId: store.getState().chat.thread[getQueryParam()],
           ...data,
         },
         withTimeout(dispatchRetry),
@@ -206,7 +205,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action: Action & { $isS
 
       if (servedHistory.length) {
         store.dispatch(syncMessageStatus({ history: servedHistory, term: servedTerm }));
-        store.dispatch(updateHistoryByTerm({ history: servedHistory, term: servedTerm }));
+        store.dispatch(updateHistoryByThread({ history: servedHistory, threadId: threadId }));
         return;
       }
 
@@ -240,7 +239,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action: Action & { $isS
     },
   );
 
-  socket.on(Events.streamStart, ({ id, term }: { id: string; term: string }) => {
+  socket.on(Events.streamStart, ({ id, term, threadId }: { id: string; term: string; threadId: string }) => {
     store.dispatch(setIsStreaming(true));
     store.dispatch(resetIsLoading());
     store.dispatch(resetOutgoing());
@@ -249,6 +248,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action: Action & { $isS
       fillAssistantHistoryData({
         id,
         term,
+        threadId,
       }),
     );
   });
@@ -259,6 +259,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action: Action & { $isS
       data: AssistantRecord & {
         id: string;
         term: string;
+        threadId: string;
         errors: Array<string>;
       },
     ) => {
@@ -267,6 +268,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action: Action & { $isS
           id: data.id,
           sequence: data.sequence,
           term: data.term,
+          threadId: data.threadId,
           content: {
             type: data.type,
             [data.type]: data[data.type],
@@ -281,7 +283,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action: Action & { $isS
     },
   );
 
-  socket.on(Events.streamEnd, () => {
+  socket.on(Events.streamEnd, ({ id, term, threadId }: { id: string; term: string; threadId: string }) => {
     store.dispatch(setIsStreaming(false));
   });
 

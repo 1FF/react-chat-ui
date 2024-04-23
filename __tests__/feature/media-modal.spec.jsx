@@ -2,30 +2,32 @@
 import { fireEvent } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 
-import { uuidV4 } from '../../src/utils';
-import { localTearDown } from '../helpers';
-import AppBase from '../../src/components/AppBase';
-import renderWithProviders from '../../src/utils/storeMockWrapper';
-import { setConnected } from '../../src/store/slices/chat';
-import { Events, chat as getInitialConfig, initialMessage } from '../../src/config';
 import { serverSocket } from '../../__mocks__/socket.io-client';
+import AppBase from '../../src/components/AppBase';
+import { chat as getInitialConfig, Events, initialMessage } from '../../src/config';
+import { setConnected } from '../../src/store/slices/chat';
+import { uuidV4 } from '../../src/utils';
+import renderWithProviders from '../../src/utils/storeMockWrapper';
+import { localTearDown } from '../helpers';
 
 
 const serverData = {
-  "region": faker.location.country(),
-  "history": [],
-  "errors": [],
+  'region': faker.location.country(),
+  'history': [],
+  'errors': [],
 }
 
 jest.useFakeTimers();
 
 let root;
 describe('Chat-history event works and visualizes items accordingly', () => {
+  
   beforeEach(() => {
     serverData.history = [];
     serverData.errors = [];
     serverData.region = faker.location.country();
   });
+
   afterEach(localTearDown);
 
   test('image and video are visualized in the document', async () => {

@@ -17,6 +17,7 @@ describe('Special messages are hidden and elements depending on them are visuali
   const term = 'default'
   const href = `https://example.com/?utm_chat=${term}}`;
   const search = `?utm_chat=${term}`;
+  const threadId = uuidV4();
 
   beforeEach(async () => {
     const mockLocation = {
@@ -50,7 +51,8 @@ describe('Special messages are hidden and elements depending on them are visuali
         'region': faker.location.country(),
         'history': [],
         'errors': [],
-        term
+        'term': term,
+        'threadId': threadId,
       })
       jest.advanceTimersByTime((initialMessage.length * 1000) * initialMessage.length - 1);
     });
@@ -101,7 +103,8 @@ describe('Special messages are hidden and elements depending on them are visuali
         'region': faker.location.country(),
         'history': [],
         'errors': [],
-        term
+        'term': term,
+        'threadId': threadId,
       })
       jest.advanceTimersByTime((initialMessage.length * 1000) * initialMessage.length - 1);
     });
@@ -153,7 +156,8 @@ describe('Special messages are hidden and elements depending on them are visuali
         'region': faker.location.country(),
         'history': [],
         'errors': [],
-        term
+        'term': term,
+        'threadId': threadId,
       })
       jest.advanceTimersByTime((initialMessage.length * 1000) * initialMessage.length - 1);
     });
@@ -205,7 +209,8 @@ describe('Special messages are hidden and elements depending on them are visuali
         'region': faker.location.country(),
         'history': [],
         'errors': [],
-        term
+        'term': term,
+        'threadId': threadId,
       })
       jest.advanceTimersByTime((initialMessage.length * 1000) * initialMessage.length - 1);
     });

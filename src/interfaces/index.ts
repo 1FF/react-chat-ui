@@ -152,6 +152,7 @@ export interface AssistantHistoryDataFiller {
   content?: AssistantRecord;
   sequence?: number;
   term: string;
+  threadId: string;
 }
 
 export interface AssistantHistoryInitialMessage {

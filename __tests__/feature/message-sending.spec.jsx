@@ -12,19 +12,20 @@ import renderWithProviders from '../../src/utils/storeMockWrapper';
 import { localTearDown } from '../helpers';
 
 const serverData = {
-  'region': faker.location.country(),
-  'history': [],
-  'errors': [],
-}
+  region: faker.location.country(),
+  history: [],
+  errors: [],
+};
 
 jest.useFakeTimers();
 
 let root;
 
 describe('Chat-history event works and visualizes items accordingly', () => {
-  const term = 'default'
+  const term = 'default';
   const href = `https://example.com/?utm_chat=${term}}`;
   const search = `?utm_chat=${term}`;
+  const threadId = uuidV4();
 
   beforeEach(async () => {
     const mockLocation = {
@@ -42,6 +43,7 @@ describe('Chat-history event works and visualizes items accordingly', () => {
     serverData.errors = [];
     serverData.region = faker.location.country();
     serverData.term = term;
+    serverData.threadId = threadId;
   });
 
   afterEach(localTearDown);
@@ -53,15 +55,22 @@ describe('Chat-history event works and visualizes items accordingly', () => {
     act(() => {
       root = renderWithProviders(
         <div id="chatbot-container">
-          <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true }, configuredMessage: textOnly })} />
-        </div>
+          <AppBase
+            config={getInitialConfig({
+              id: uuidV4(),
+              purpose: '',
+              close: { visible: true },
+              configuredMessage: textOnly,
+            })}
+          />
+        </div>,
       );
     });
 
     // Act
     act(() => {
       serverSocket.emit(Events.chatHistory, serverData);
-      jest.advanceTimersByTime((initialMessage.length * 1000) * initialMessage.length - 1);
+      jest.advanceTimersByTime(initialMessage.length * 1000 * initialMessage.length - 1);
     });
 
     const userFormElement = root.container.querySelector('[data-e2e="user-form"]');
@@ -76,7 +85,7 @@ describe('Chat-history event works and visualizes items accordingly', () => {
 
     // Assert
     const { chat } = root.store.getState();
-    const lastMessage = chat.record[term].historyData[[...chat.record[term].historyIds].pop()];
+    const lastMessage = chat.record[threadId].historyData[[...chat.record[threadId].historyIds].pop()];
     expect(lastMessage.role).toBe(Roles.user);
     expect(chat.typingTimeoutExpired).toBe(true);
     expect(chat.lastGroupId).not.toBe(previousGroupId);
@@ -95,15 +104,22 @@ describe('Chat-history event works and visualizes items accordingly', () => {
     act(() => {
       root = renderWithProviders(
         <div id="chatbot-container">
-          <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true }, configuredMessage: textOnly })} />
-        </div>
+          <AppBase
+            config={getInitialConfig({
+              id: uuidV4(),
+              purpose: '',
+              close: { visible: true },
+              configuredMessage: textOnly,
+            })}
+          />
+        </div>,
       );
     });
 
     // Act
     act(() => {
       serverSocket.emit(Events.chatHistory, serverData);
-      jest.advanceTimersByTime((initialMessage.length * 1000) * initialMessage.length - 1);
+      jest.advanceTimersByTime(initialMessage.length * 1000 * initialMessage.length - 1);
     });
 
     const userFormElement = root.container.querySelector('[data-e2e="user-form"]');
@@ -121,7 +137,7 @@ describe('Chat-history event works and visualizes items accordingly', () => {
 
     // Assert
     const { chat } = root.store.getState();
-    const lastMessage = chat.record[term].historyData[[...chat.record[term].historyIds].pop()];
+    const lastMessage = chat.record[threadId].historyData[[...chat.record[threadId].historyIds].pop()];
     expect(lastMessage.role).toBe(Roles.user);
     expect(chat.typingTimeoutExpired).toBe(true);
     expect(chat.lastGroupId).not.toBe(previousGroupId);

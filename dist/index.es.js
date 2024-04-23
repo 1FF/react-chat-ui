@@ -430,10 +430,10 @@ tn.write = function(e, t, r, o, s, l) {
     if (i >>>= 0, f >>>= 0, p >>>= 0, w >>>= 0, this === n)
       return 0;
     let v = w - p, B = f - i;
-    const te = Math.min(v, B), K = this.slice(p, w), re = n.slice(i, f);
-    for (let H = 0; H < te; ++H)
-      if (K[H] !== re[H]) {
-        v = K[H], B = re[H];
+    const re = Math.min(v, B), K = this.slice(p, w), ne = n.slice(i, f);
+    for (let H = 0; H < re; ++H)
+      if (K[H] !== ne[H]) {
+        v = K[H], B = ne[H];
         break;
       }
     return v < B ? -1 : B < v ? 1 : 0;
@@ -463,27 +463,27 @@ tn.write = function(e, t, r, o, s, l) {
         return -1;
       w = 2, v /= 2, B /= 2, i /= 2;
     }
-    function te(re, H) {
-      return w === 1 ? re[H] : re.readUInt16BE(H * w);
+    function re(ne, H) {
+      return w === 1 ? ne[H] : ne.readUInt16BE(H * w);
     }
     let K;
     if (p) {
-      let re = -1;
+      let ne = -1;
       for (K = i; K < v; K++)
-        if (te(c, K) === te(n, re === -1 ? 0 : K - re)) {
-          if (re === -1 && (re = K), K - re + 1 === B)
-            return re * w;
+        if (re(c, K) === re(n, ne === -1 ? 0 : K - ne)) {
+          if (ne === -1 && (ne = K), K - ne + 1 === B)
+            return ne * w;
         } else
-          re !== -1 && (K -= K - re), re = -1;
+          ne !== -1 && (K -= K - ne), ne = -1;
     } else
       for (i + B > v && (i = v - B), K = i; K >= 0; K--) {
-        let re = !0;
+        let ne = !0;
         for (let H = 0; H < B; H++)
-          if (te(c, K + H) !== te(n, H)) {
-            re = !1;
+          if (re(c, K + H) !== re(n, H)) {
+            ne = !1;
             break;
           }
-        if (re)
+        if (ne)
           return K;
       }
     return -1;
@@ -578,19 +578,19 @@ tn.write = function(e, t, r, o, s, l) {
       const w = c[p];
       let v = null, B = w > 239 ? 4 : w > 223 ? 3 : w > 191 ? 2 : 1;
       if (p + B <= i) {
-        let te, K, re, H;
+        let re, K, ne, H;
         switch (B) {
           case 1:
             w < 128 && (v = w);
             break;
           case 2:
-            te = c[p + 1], (te & 192) === 128 && (H = (w & 31) << 6 | te & 63, H > 127 && (v = H));
+            re = c[p + 1], (re & 192) === 128 && (H = (w & 31) << 6 | re & 63, H > 127 && (v = H));
             break;
           case 3:
-            te = c[p + 1], K = c[p + 2], (te & 192) === 128 && (K & 192) === 128 && (H = (w & 15) << 12 | (te & 63) << 6 | K & 63, H > 2047 && (H < 55296 || H > 57343) && (v = H));
+            re = c[p + 1], K = c[p + 2], (re & 192) === 128 && (K & 192) === 128 && (H = (w & 15) << 12 | (re & 63) << 6 | K & 63, H > 2047 && (H < 55296 || H > 57343) && (v = H));
             break;
           case 4:
-            te = c[p + 1], K = c[p + 2], re = c[p + 3], (te & 192) === 128 && (K & 192) === 128 && (re & 192) === 128 && (H = (w & 15) << 18 | (te & 63) << 12 | (K & 63) << 6 | re & 63, H > 65535 && H < 1114112 && (v = H));
+            re = c[p + 1], K = c[p + 2], ne = c[p + 3], (re & 192) === 128 && (K & 192) === 128 && (ne & 192) === 128 && (H = (w & 15) << 18 | (re & 63) << 12 | (K & 63) << 6 | ne & 63, H > 65535 && H < 1114112 && (v = H));
         }
       }
       v === null ? (v = 65533, B = 1) : v > 65535 && (v -= 65536, f.push(v >>> 10 & 1023 | 55296), v = 56320 | v & 1023), f.push(v), p += B;
@@ -790,8 +790,8 @@ tn.write = function(e, t, r, o, s, l) {
     return He(this, n, i, BigInt(0), BigInt("0xffffffffffffffff"));
   }), a.prototype.writeIntLE = function(n, i, f, p) {
     if (n = +n, i = i >>> 0, !p) {
-      const te = Math.pow(2, 8 * f - 1);
-      W(this, n, i, f, te - 1, -te);
+      const re = Math.pow(2, 8 * f - 1);
+      W(this, n, i, f, re - 1, -re);
     }
     let w = 0, v = 1, B = 0;
     for (this[i] = n & 255; ++w < f && (v *= 256); )
@@ -799,8 +799,8 @@ tn.write = function(e, t, r, o, s, l) {
     return i + f;
   }, a.prototype.writeIntBE = function(n, i, f, p) {
     if (n = +n, i = i >>> 0, !p) {
-      const te = Math.pow(2, 8 * f - 1);
-      W(this, n, i, f, te - 1, -te);
+      const re = Math.pow(2, 8 * f - 1);
+      W(this, n, i, f, re - 1, -re);
     }
     let w = f - 1, v = 1, B = 0;
     for (this[i + w] = n & 255; --w >= 0 && (v *= 256); )
@@ -1580,7 +1580,7 @@ function hs() {
         p[S] || (A('Component "%s" contains the string ref "%s". Support for string refs will be removed in a future major release. This case cannot be automatically converted to an arrow function. We ask you to manually fix this case by using useRef() or createRef() instead. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-string-ref', T(c.current.type), d.ref), p[S] = !0);
       }
     }
-    function te(d, x) {
+    function re(d, x) {
       {
         var S = function() {
           i || (i = !0, A("%s: `key` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://reactjs.org/link/special-props)", x));
@@ -1602,7 +1602,7 @@ function hs() {
         });
       }
     }
-    var re = function(d, x, S, j, G, J, D) {
+    var ne = function(d, x, S, j, G, J, D) {
       var O = {
         // This tag allows us to uniquely identify this as a React Element
         $$typeof: t,
@@ -1644,9 +1644,9 @@ function hs() {
         }
         if (O || be) {
           var fe = typeof d == "function" ? d.displayName || d.name || "Unknown" : d;
-          O && te(D, fe), be && K(D, fe);
+          O && re(D, fe), be && K(D, fe);
         }
-        return re(d, O, be, G, j, c.current, D);
+        return ne(d, O, be, G, j, c.current, D);
       }
     }
     var xr = L.ReactCurrentOwner, Pn = L.ReactDebugCurrentFrame;
@@ -1918,7 +1918,7 @@ rr(xi, "defaultProps", {
   loading: null
 });
 var ge = /* @__PURE__ */ ((e) => (e.text = "text", e.buttons = "buttons", e.payment = "payment", e.video = "video", e.image = "image", e.email = "email", e))(ge || {}), rn = /* @__PURE__ */ ((e) => (e.horizontal = "horizontal", e.vertical = "vertical", e))(rn || {}), Ei = /* @__PURE__ */ ((e) => (e.chat = "utm_chat", e))(Ei || {}), Se = /* @__PURE__ */ ((e) => (e.addToCart = "AddToCart", e.contact = "Contact", e.initiateCheckout = "InitiateCheckout", e.pageView = "PageView", e.viewContent = "ViewContent", e.purchase = "Purchase", e.subscribe = "Subscribe", e.recurringSubscriptionPayment = "RecurringSubscriptionPayment", e.cancelSubscription = "CancelSubscription", e.purchaseFailed = "PurchaseFailed", e.subscribeFailed = "SubscribeFailed", e.recurringSubscriptionPaymentFailed = "RecurringSubscriptionPaymentFailed", e.customerCreated = "CustomerCreated", e.subscriptionChargeback = "SubscriptionChargeback", e.subscriptionRefund = "SubscriptionRefund", e.transactionChargeback = "TransactionChargeback", e.transactionRefund = "TransactionRefund", e.firstMessage = "FirstMessage", e.linkProvided = "LinkProvided", e.linkClicked = "LinkClicked", e.emailField = "EmailField", e.emailEntered = "EmailEntered", e.emailWrong = "EmailWrong", e.emailExist = "EmailExist", e.priceSeen = "PriceSeen", e.buttonClick = "ButtonClick", e.closeClicked = "CloseClicked", e))(Se || {}), Si = /* @__PURE__ */ ((e) => (e.email = "email_intent", e.payment = "payment_intent", e.emailError = "email_validation_error", e.emailSuccess = "email_validation_success", e.destroy = "payment_intent_destroy", e))(Si || {}), X = /* @__PURE__ */ ((e) => (e.user = "user", e.assistant = "assistant", e))(X || {}), je = /* @__PURE__ */ ((e) => (e.chat = "chat", e.chatHistory = "chat-history", e.connect = "connect", e.error = "error", e.disconnect = "disconnect", e.streamStart = "stream-start", e.streamData = "stream-data", e.streamEnd = "stream-end", e.streamError = "stream-error", e))(je || {}), _i = /* @__PURE__ */ ((e) => (e.light = "light", e.dark = "dark", e))(_i || {});
-const ne = (e = Ei.chat) => new URLSearchParams(window.location.search).get(e) || "", vs = {
+const ee = (e = Ei.chat) => new URLSearchParams(window.location.search).get(e) || "", vs = {
   day: "numeric",
   month: "long",
   year: "numeric",
@@ -5497,7 +5497,7 @@ const Xe = ac, Yi = dr({
   reducers: {
     setOutgoing(e, { payload: t }) {
       e.outgoing = {
-        term: ne(),
+        term: ee(),
         user_id: localStorage.getItem("__cid") || "",
         role: X.user,
         message: t
@@ -5511,11 +5511,11 @@ const Xe = ac, Yi = dr({
         r.record[t] || (r.record[t] = {
           historyIds: [],
           historyData: {}
-        }, r.thread[ne()] = t);
+        }, r.thread[ee()] = t);
       });
     },
     syncMessageStatus(e, { payload: { term: t, history: r } }) {
-      if (t !== ne())
+      if (t !== ee())
         return;
       const o = e.thread[t];
       return Xe(e, (s) => {
@@ -5532,8 +5532,8 @@ const Xe = ac, Yi = dr({
         );
       });
     },
-    updateHistoryByTerm(e, { payload: { history: t, term: r } }) {
-      if (r === ne())
+    updateHistoryByThread(e, { payload: { history: t, term: r } }) {
+      if (r === ee())
         return Xe(e, (o) => {
           const s = t.map(({ id: a }) => a), l = o.thread[r], u = o.record[l].historyIds;
           for (let a = 0; a < s.length; a++) {
@@ -5545,7 +5545,7 @@ const Xe = ac, Yi = dr({
     },
     addPredefinedAssistantMessage(e, { payload: t }) {
       return Xe(e, (r) => {
-        const o = pe(), s = r.thread[ne()];
+        const o = pe(), s = r.thread[ee()];
         r.record[s].historyIds.push(o), r.record[s].historyData[o] = {
           id: o,
           role: X.assistant,
@@ -5597,7 +5597,7 @@ const Xe = ac, Yi = dr({
       });
     },
     fillInitialMessage(e, { payload: { message: t, term: r } }) {
-      const o = ne();
+      const o = ee();
       if (r !== o)
         return;
       const s = e.thread[r];
@@ -5624,7 +5624,7 @@ const Xe = ac, Yi = dr({
       e.closed = !0;
     },
     showResendIcon(e, { payload: t }) {
-      const r = ne();
+      const r = ee();
       return Xe(e, (o) => {
         const s = e.thread[r];
         o.record[s].historyData[t.itemId].content = o.record[s].historyData[t.itemId].content.map((l) => ({
@@ -5638,7 +5638,7 @@ const Xe = ac, Yi = dr({
       e.lastGroupId = t;
     },
     resendMessage(e, { payload: t }) {
-      const r = ne();
+      const r = ee();
       return Xe(e, (o) => {
         const s = e.thread[r];
         o.record[s].historyData[t.itemId].content = o.record[s].historyData[t.itemId].content.map((l) => ({
@@ -5658,25 +5658,23 @@ const Xe = ac, Yi = dr({
       e.isStreaming = t;
     },
     resetHistory(e, { payload: { term: t, thread: r } }) {
-      ne() === t && (e.record[r] = { historyData: {}, historyIds: [] });
+      ee() === t && (e.record[r] = { historyData: {}, historyIds: [] });
     }
   }
-}), Vt = (e) => e.chat.thread[ne()], pn = (e) => e.chat, hn = (e) => {
+}), Vt = (e) => e.chat.thread[ee()], pn = (e) => e.chat, hn = (e) => {
   var t;
   return (t = e.chat.record[Vt(e)]) == null ? void 0 : t.historyIds;
 }, cc = (e) => {
   const t = Vt(e);
-  return hn(e).find(
-    (r) => e.chat.record[t].historyData[r].role === X.user
-  );
+  return (hn(e) || []).find((o) => e.chat.record[t].historyData[o].role === X.user);
 }, uc = (e) => {
   var o, s;
-  const t = Vt(e), r = hn(e);
+  const t = Vt(e), r = hn(e) || [];
   return bs(((s = (o = e.chat.record[t]) == null ? void 0 : o.historyData[r[0]]) == null ? void 0 : s.time) || (/* @__PURE__ */ new Date()).getTime());
 }, lc = (e) => [...e.chat.record[Vt(e)].historyIds].pop(), fc = (e) => (t) => t.chat.record[Vt(t)].historyData[e], dc = (e, t) => e.sequence && t.sequence ? e.sequence - t.sequence : 0, {
   setOutgoing: mn,
   resetOutgoing: pc,
-  updateHistoryByTerm: hc,
+  updateHistoryByThread: hc,
   addPredefinedAssistantMessage: Ji,
   setIsLoading: Xt,
   resetIsLoading: Bt,
@@ -5739,7 +5737,7 @@ const Xe = ac, Yi = dr({
   setLink: to
 } = Qi.actions, Pc = Qi.reducer, Cc = () => {
   var M;
-  const e = ne(), { cid: t, systemType: r, marketing: o, pd: s } = z($t), { translations: l, purpose: u, specialUrls: a } = z(ut), { isLoading: h, isStreaming: b, record: g, thread: y } = z(pn), { error: E } = z((k) => k.chat), I = z((k) => k.intentions.link), { error: R, current: P } = z(eo), {
+  const e = ee(), { cid: t, systemType: r, marketing: o, pd: s } = z($t), { translations: l, purpose: u, specialUrls: a } = z(ut), { isLoading: h, isStreaming: b, record: g, thread: y } = z(pn), { error: E } = z((k) => k.chat), I = z((k) => k.intentions.link), { error: R, current: P } = z(eo), {
     isFormVisible: Z,
     error: L,
     isSuccessful: A
@@ -6140,7 +6138,7 @@ const Nc = () => {
       role: X.user,
       id: pe(),
       sequence: 1,
-      term: ne(),
+      term: ee(),
       content: {
         sequence: 1,
         text: u,
@@ -6433,7 +6431,7 @@ const qc = ({ text: e, href: t, onClick: r }) => {
       id: pe(),
       sequence: a,
       role: X.user,
-      term: ne(),
+      term: ee(),
       content: {
         sequence: 1,
         text: u,
@@ -6451,7 +6449,7 @@ const qc = ({ text: e, href: t, onClick: r }) => {
     t(ur({
       id: pe(),
       sequence: 1,
-      term: ne(),
+      term: ee(),
       role: X.user,
       content: {
         sequence: 1,
@@ -6570,7 +6568,7 @@ const qc = ({ text: e, href: t, onClick: r }) => {
     /* @__PURE__ */ m.jsx(lo, { orientation: rn.vertical })
   ] });
 }, Qc = () => {
-  const { aiProfile: e } = z(ut), t = z(hn), r = z(uc), { base: o, second: s, date: l } = Ba(), { base: u } = Oa();
+  const { aiProfile: e } = z(ut), t = z(hn) || [], r = z(uc), { base: o, second: s, date: l } = Ba(), { base: u } = Oa();
   return /* @__PURE__ */ m.jsx("div", { className: o(), children: /* @__PURE__ */ m.jsxs("div", { className: s(), "data-e2e": "history-container", children: [
     /* @__PURE__ */ m.jsx(Zc, { titleTxt: e.welcome }),
     /* @__PURE__ */ m.jsx("div", { className: l(), "data-e2e": "stream-assistant-msg-date", children: r }),
@@ -6615,7 +6613,7 @@ const qc = ({ text: e, href: t, onClick: r }) => {
     }
   );
 };
-var ee = {};
+var te = {};
 function ru(e) {
   return !!(e && typeof e.then == "function");
 }
@@ -7352,15 +7350,15 @@ const ml = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   enforceOptions: Zu
 }, Symbol.toStringTag, { value: "Module" })), wl = /* @__PURE__ */ ts(ml);
 var bn;
-Object.defineProperty(ee, "__esModule", {
+Object.defineProperty(te, "__esModule", {
   value: !0
 });
-var Io = ee.initMessageListener = ee.initStateWithPrevTab = ee.withReduxStateSync = ee.createReduxStateSync = bn = ee.createStateSyncMiddleware = ee.WINDOW_STATE_SYNC_ID = ee.INIT_MESSAGE_LISTENER = ee.RECEIVE_INIT_STATE = ee.SEND_INIT_STATE = ee.GET_INIT_STATE = void 0;
-ee.generateUuidForAction = Co;
-ee.isActionAllowed = ko;
-ee.isActionSynced = Sl;
-ee.MessageListener = jo;
-var yl = wl, Zr = 0, xn = ee.GET_INIT_STATE = "&_GET_INIT_STATE", En = ee.SEND_INIT_STATE = "&_SEND_INIT_STATE", Sn = ee.RECEIVE_INIT_STATE = "&_RECEIVE_INIT_STATE", gl = ee.INIT_MESSAGE_LISTENER = "&_INIT_MESSAGE_LISTENER", Qr = {
+var Io = te.initMessageListener = te.initStateWithPrevTab = te.withReduxStateSync = te.createReduxStateSync = bn = te.createStateSyncMiddleware = te.WINDOW_STATE_SYNC_ID = te.INIT_MESSAGE_LISTENER = te.RECEIVE_INIT_STATE = te.SEND_INIT_STATE = te.GET_INIT_STATE = void 0;
+te.generateUuidForAction = Co;
+te.isActionAllowed = ko;
+te.isActionSynced = Sl;
+te.MessageListener = jo;
+var yl = wl, Zr = 0, xn = te.GET_INIT_STATE = "&_GET_INIT_STATE", En = te.SEND_INIT_STATE = "&_SEND_INIT_STATE", Sn = te.RECEIVE_INIT_STATE = "&_RECEIVE_INIT_STATE", gl = te.INIT_MESSAGE_LISTENER = "&_INIT_MESSAGE_LISTENER", Qr = {
   channel: "redux_state_sync",
   predicate: null,
   blacklist: [],
@@ -7387,7 +7385,7 @@ function Ze() {
 function To() {
   return "" + Ze() + Ze() + "-" + Ze() + "-" + Ze() + "-" + Ze() + "-" + Ze() + Ze() + Ze();
 }
-var Po = ee.WINDOW_STATE_SYNC_ID = To();
+var Po = te.WINDOW_STATE_SYNC_ID = To();
 function Co(e) {
   var t = e;
   return t.$uuid = To(), t.$wuid = Po, t;
@@ -7413,7 +7411,7 @@ function jo(e) {
     }))));
   }, this.messageChannel = t, this.messageChannel.onmessage = this.handleOnMessage;
 }
-bn = ee.createStateSyncMiddleware = function() {
+bn = te.createStateSyncMiddleware = function() {
   var t = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : Qr, r = ko(t), o = new yl.BroadcastChannel(t.channel, t.broadcastChannelOption), s = t.prepareState || Qr.prepareState, l = null;
   return function(u) {
     var a = u.getState, h = u.dispatch;
@@ -7437,19 +7435,19 @@ bn = ee.createStateSyncMiddleware = function() {
     };
   };
 };
-var _l = ee.createReduxStateSync = function(t) {
+var _l = te.createReduxStateSync = function(t) {
   var r = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : Qr.receiveState;
   return function(o, s) {
     var l = o;
     return s.type === Sn && (l = r(o, s.payload)), t(l, s);
   };
 };
-ee.withReduxStateSync = _l;
-ee.initStateWithPrevTab = function(t) {
+te.withReduxStateSync = _l;
+te.initStateWithPrevTab = function(t) {
   var r = t.dispatch;
   r(vl());
 };
-Io = ee.initMessageListener = function(t) {
+Io = te.initMessageListener = function(t) {
   var r = t.dispatch;
   r(El());
 };
@@ -7534,7 +7532,7 @@ const Ol = (e) => (t) => {
         id: pe(),
         role: X.user,
         sequence: 1,
-        term: ne(),
+        term: ee(),
         content: {
           sequence: 1,
           text: s.email.current,
@@ -7606,7 +7604,7 @@ const Ol = (e) => (t) => {
 };
 let de;
 const Nl = (e) => (t) => (r) => {
-  const { meta: o, chat: s, config: l } = e.getState(), u = s.thread[ne()], a = () => {
+  const { meta: o, chat: s, config: l } = e.getState(), u = s.thread[ee()], a = () => {
     const { config: y } = e.getState();
     e.dispatch(Bt()), e.dispatch(Zt(y.translations.error));
   }, h = () => {
@@ -7617,7 +7615,7 @@ const Nl = (e) => (t) => (r) => {
         je.chat,
         {
           time: (/* @__PURE__ */ new Date()).getTime(),
-          threadId: s.thread[ne()],
+          threadId: s.thread[ee()],
           ...y
         },
         di(h)
@@ -7637,7 +7635,8 @@ const Nl = (e) => (t) => (r) => {
       {
         role: X.user,
         message: I,
-        term: ne(),
+        term: ee(),
+        threadId: s.thread[ee()],
         region: o.region,
         messageId: y,
         userId: o.cid
@@ -7648,7 +7647,7 @@ const Nl = (e) => (t) => (r) => {
   if (mn.match(r) && !r.$isSync && b({
     role: X.user,
     message: r.payload,
-    term: ne(),
+    term: ee(),
     region: o.region,
     userId: o.cid,
     messageId: [...s.record[u].historyIds].pop()
@@ -7662,7 +7661,7 @@ const Nl = (e) => (t) => (r) => {
     E.role === X.user && I.trim() !== "" && b({
       role: X.user,
       message: I,
-      term: ne(),
+      term: ee(),
       region: o.region,
       messageId: y,
       userId: o.cid
@@ -7672,7 +7671,7 @@ const Nl = (e) => (t) => (r) => {
     return t(r);
   e.dispatch(Xt()), de = es.connect(r.payload.chatUrl, { query: `cid=${o.cid}`, ...Ha }), de.on(je.connect, () => {
     const { meta: y } = e.getState();
-    de.sendBuffer = [], de.emit(je.chatHistory, { userId: y.cid, region: y.region, term: ne() }), e.dispatch(Zn(!0)), e.dispatch(Ki(pe()));
+    de.sendBuffer = [], de.emit(je.chatHistory, { userId: y.cid, region: y.region, term: ee() }), e.dispatch(Zn(!0)), e.dispatch(Ki(pe()));
   }), de.on(
     je.chatHistory,
     ({
@@ -7692,15 +7691,15 @@ const Nl = (e) => (t) => (r) => {
         e.dispatch(gc({ history: y, term: R })), e.dispatch(hc({ history: y, term: R }));
         return;
       }
-      !r.$isSync && e.dispatch(mc({ term: ne(), thread: u })), !r.$isSync && e.dispatch(Xt());
+      !r.$isSync && e.dispatch(mc({ term: ee(), thread: u })), !r.$isSync && e.dispatch(Xt());
       let A = 0;
       Z.aiProfile.initialMessage.forEach(
         (he, ce, ie) => {
           A += 1e3, setTimeout(() => {
-            !r.$isSync && e.dispatch(wc({ message: he, term: ne() })), ie.length === ce + 1 && (!r.$isSync && Z.aiProfile.initialMessage.forEach(
+            !r.$isSync && e.dispatch(wc({ message: he, term: ee() })), ie.length === ce + 1 && (!r.$isSync && Z.aiProfile.initialMessage.forEach(
               (ye) => b({
                 role: X.assistant,
-                term: ne(),
+                term: ee(),
                 message: JSON.stringify(ye.content),
                 region: L.region,
                 userId: L.cid,
