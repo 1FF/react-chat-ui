@@ -2,14 +2,14 @@ import React from 'react';
 
 import { Roles } from '../../config/enums';
 import { useAppSelector } from '../../hooks';
-import { UserMessageContent } from '../../interfaces';
+import { getRecordById } from '../../store/slices/chat';
 import { uuidV4 } from '../../utils';
 import { User } from '../Stream';
 import { MemoizedAssistant } from './assistant';
 import { streamBubble as variant } from './variants';
 
 const StreamBubble = ({ itemId }: { itemId: string }) => {
-  const record = useAppSelector((state) => state.chat.historyData[itemId]);
+  const record = useAppSelector(getRecordById(itemId));
 
   return (record && (
     <div className={variant({ type: record.role }).base()}
@@ -23,7 +23,18 @@ const StreamBubble = ({ itemId }: { itemId: string }) => {
           />
         )
         :
-        [...record.content].map((record: UserMessageContent) => <User key={uuidV4()} record={{ ...record, itemId }} />)
+        [...record.content].map((record) =>
+          <User
+            key={uuidV4()}
+            record={{
+              text: record.text || '',
+              sequence: record.sequence || 0,
+              resend: record.resend || false,
+              sent: record.sent || true,
+              groupId: record.groupId || '',
+              itemId: itemId
+            }}
+          />)
       }
     </div>
   ));

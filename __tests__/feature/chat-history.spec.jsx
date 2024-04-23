@@ -3,15 +3,14 @@ import { fireEvent } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import { io } from 'socket.io-client';
 
-import { uuidV4 } from '../../src/utils';
-import { intent } from '../../src/main';
-import { localTearDown } from '../helpers';
-import AppBase from '../../src/components/AppBase';
-import renderWithProviders from '../../src/utils/storeMockWrapper';
-import { setConnected } from '../../src/store/slices/chat';
 import { serverSocket } from '../../__mocks__/socket.io-client';
-import { Events, Roles, chat as getInitialConfig, initialMessage } from '../../src/config';
+import AppBase from '../../src/components/AppBase';
+import { chat as getInitialConfig, Events, initialMessage,Roles } from '../../src/config';
 import { Intentions } from '../../src/config/enums';
+import { intent } from '../../src/main';
+import { uuidV4 } from '../../src/utils';
+import renderWithProviders from '../../src/utils/storeMockWrapper';
+import { localTearDown } from '../helpers';
 
 const textProbe = () => ({ 'type': 'text', 'text': faker.lorem.text(), 'sequence': 2 });
 const contentMock = {
@@ -27,9 +26,9 @@ const contentMock = {
 };
 
 const serverData = {
-  "region": faker.location.country(),
-  "history": [],
-  "errors": [],
+  'region': faker.location.country(),
+  'history': [],
+  'errors': [],
 }
 
 jest.useFakeTimers();
@@ -37,10 +36,25 @@ jest.useFakeTimers();
 let root;
 const chatConfig = getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true } });
 describe('Chat-history event works and visualizes items accordingly', () => {
-  beforeEach(() => {
+  const term = 'default'
+  const href = `https://example.com/?utm_chat=${term}}`;
+  const search = `?utm_chat=${term}`;
+
+  beforeEach(async () => {
+    const mockLocation = {
+      href,
+      search,
+    };
+
+    Object.defineProperty(window, 'location', {
+      value: mockLocation,
+      writable: true,
+      enumerable: true,
+    });
     serverData.history = [];
     serverData.errors = [];
     serverData.region = faker.location.country();
+    serverData.term = term;
   })
   afterEach(localTearDown);
 
@@ -50,12 +64,11 @@ describe('Chat-history event works and visualizes items accordingly', () => {
       root = renderWithProviders(
         <div id="chatbot-container">
           <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: {} })} />
-        </div>
+        </div>,
       );
     });
 
     // Assert
-    const historyElements = root.container.querySelectorAll('[data-e2e="history-item"]');
     const userFormElement = root.container.querySelector('[data-e2e="user-form"]');
     const emailFormElement = root.container.querySelector('[data-e2e="email-form"]');
     expect(root.container.querySelector('[data-e2e="stream-response-loader"]')).toBeVisible();
@@ -64,7 +77,6 @@ describe('Chat-history event works and visualizes items accordingly', () => {
 
     const { chat } = root.store.getState();
     expect(chat.isLoading).toBe(true);
-    expect(historyElements.length).toEqual(chat.historyIds.length);
   });
 
   test('on chat-history event state is shown and saved properly', async () => {
@@ -75,7 +87,6 @@ describe('Chat-history event works and visualizes items accordingly', () => {
           <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true } })} />
         </div>
       );
-      root.store.dispatch(setConnected(true));
     });
 
     serverData.history = [{
@@ -102,7 +113,7 @@ describe('Chat-history event works and visualizes items accordingly', () => {
     expect(emailFormElement).toBeNull();
 
     const { meta, config, chat } = root.store.getState();
-    expect(historyElements.length).toEqual(chat.historyIds.length);
+    expect(historyElements.length).toEqual(chat.record[term].historyIds.length);
     expect(meta.region).toStrictEqual(serverData.region);
     expect(config.aiProfile).toStrictEqual(chatConfig.app.aiProfile);
     expect(config.translations).toStrictEqual(chatConfig.app.translations);
@@ -114,7 +125,6 @@ describe('Chat-history event works and visualizes items accordingly', () => {
       root = renderWithProviders(<div id="chatbot-container">
         <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true } })} />
       </div>);
-      root.store.dispatch(setConnected(true));
     });
 
     // Act
@@ -145,7 +155,6 @@ describe('Chat-history event works and visualizes items accordingly', () => {
       root = renderWithProviders(<div id="chatbot-container">
         <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true } })} />
       </div>);
-      root.store.dispatch(setConnected(true));
     });
 
     // Act
@@ -185,7 +194,6 @@ describe('Chat-history event works and visualizes items accordingly', () => {
       root = renderWithProviders(<div id="chatbot-container">
         <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true } })} />
       </div>);
-      root.store.dispatch(setConnected(true));
     });
 
     // Act
@@ -216,7 +224,6 @@ describe('Chat-history event works and visualizes items accordingly', () => {
       root = renderWithProviders(<div id="chatbot-container">
         <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true } })} />
       </div>);
-      root.store.dispatch(setConnected(true));
     });
 
     // Act
@@ -253,8 +260,8 @@ describe('Chat-history event works and visualizes items accordingly', () => {
           <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true } })} />
         </div>
       );
-      root.store.dispatch(setConnected(true));
     });
+
     serverData.history = [
       {
         id: uuidV4(),
@@ -294,7 +301,6 @@ describe('Chat-history event works and visualizes items accordingly', () => {
           <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true } })} />
         </div>
       );
-      root.store.dispatch(setConnected(true));
     });
 
     // Act
@@ -331,7 +337,6 @@ describe('Chat-history event works and visualizes items accordingly', () => {
           <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true } })} />
         </div>
       );
-      root.store.dispatch(setConnected(true));
     });
 
     // Act

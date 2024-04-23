@@ -3,11 +3,11 @@ import { useEffect, useRef, useState } from 'react';
 import { IconBtn } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { Roles } from '../../config/enums';
+import { TYPING_TIMEOUT } from '../../config/env';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { fillUserHistoryData, getChat, setLastGroupPointer, setTypingTimeoutExpired } from '../../store/slices/chat';
-import { uuidV4 } from '../../utils';
+import { getQueryParam, uuidV4 } from '../../utils';
 import { layoutFoot as variant } from '../Layout/variants';
-import { TYPING_TIMEOUT } from '../../config/env';
 
 export const ResponseForm = () => {
   const dispatch = useAppDispatch();
@@ -37,6 +37,7 @@ export const ResponseForm = () => {
         role: Roles.user,
         id: uuidV4(),
         sequence: 1,
+        term: getQueryParam(),
         content: {
           sequence: 1, text: response, groupId, resend: false, sent: true
         }

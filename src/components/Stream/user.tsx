@@ -10,7 +10,7 @@ export const User = ({ record }: UserProps) => {
   const { action, separator } = variant({ type: Roles.user });
 
   const onResend = () => {
-    dispatch(resendMessage(record));
+    dispatch(resendMessage({ ...record }));
   };
 
   return (

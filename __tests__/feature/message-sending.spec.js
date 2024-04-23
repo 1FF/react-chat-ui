@@ -1,21 +1,20 @@
 /* eslint-env jest */
 import { fireEvent } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
-
-import { uuidV4 } from '../../src/utils';
-import { localTearDown } from '../helpers';
-import AppBase from '../../src/components/AppBase';
-import renderWithProviders from '../../src/utils/storeMockWrapper';
-import { setConnected } from '../../src/store/slices/chat';
-import { serverSocket } from '../../__mocks__/socket.io-client';
-import { Events, Roles, chat as getInitialConfig, initialMessage } from '../../src/config';
 import { io } from 'socket.io-client';
+
+import { serverSocket } from '../../__mocks__/socket.io-client';
+import AppBase from '../../src/components/AppBase';
+import { chat as getInitialConfig, Events, initialMessage, Roles, textInitial, textOnly } from '../../src/config';
 import { TYPING_TIMEOUT } from '../../src/config/env';
+import { uuidV4 } from '../../src/utils';
+import renderWithProviders from '../../src/utils/storeMockWrapper';
+import { localTearDown } from '../helpers';
 
 const serverData = {
-  "region": faker.location.country(),
-  "history": [],
-  "errors": [],
+  'region': faker.location.country(),
+  'history': [],
+  'errors': [],
 }
 
 jest.useFakeTimers();
@@ -23,11 +22,28 @@ jest.useFakeTimers();
 let root;
 
 describe('Chat-history event works and visualizes items accordingly', () => {
-  beforeEach(() => {
+  const term = 'default'
+  const href = `https://example.com/?utm_chat=${term}}`;
+  const search = `?utm_chat=${term}`;
+
+  beforeEach(async () => {
+    const mockLocation = {
+      href,
+      search,
+    };
+
+    Object.defineProperty(window, 'location', {
+      value: mockLocation,
+      writable: true,
+      enumerable: true,
+    });
+
     serverData.history = [];
     serverData.errors = [];
     serverData.region = faker.location.country();
-  })
+    serverData.term = term;
+  });
+
   afterEach(localTearDown);
 
   test(`sends single message successfully when there is no interaction with the field for ${TYPING_TIMEOUT}ms`, () => {
@@ -37,10 +53,9 @@ describe('Chat-history event works and visualizes items accordingly', () => {
     act(() => {
       root = renderWithProviders(
         <div id="chatbot-container">
-          <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true } })} />
+          <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true }, configuredMessage: textOnly })} />
         </div>
       );
-      root.store.dispatch(setConnected(true));
     });
 
     // Act
@@ -61,7 +76,7 @@ describe('Chat-history event works and visualizes items accordingly', () => {
 
     // Assert
     const { chat } = root.store.getState();
-    const lastMessage = chat.historyData[[...chat.historyIds].pop()];
+    const lastMessage = chat.record[term].historyData[[...chat.record[term].historyIds].pop()];
     expect(lastMessage.role).toBe(Roles.user);
     expect(chat.typingTimeoutExpired).toBe(true);
     expect(chat.lastGroupId).not.toBe(previousGroupId);
@@ -80,10 +95,9 @@ describe('Chat-history event works and visualizes items accordingly', () => {
     act(() => {
       root = renderWithProviders(
         <div id="chatbot-container">
-          <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true } })} />
+          <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true }, configuredMessage: textOnly })} />
         </div>
       );
-      root.store.dispatch(setConnected(true));
     });
 
     // Act
@@ -107,7 +121,7 @@ describe('Chat-history event works and visualizes items accordingly', () => {
 
     // Assert
     const { chat } = root.store.getState();
-    const lastMessage = chat.historyData[[...chat.historyIds].pop()];
+    const lastMessage = chat.record[term].historyData[[...chat.record[term].historyIds].pop()];
     expect(lastMessage.role).toBe(Roles.user);
     expect(chat.typingTimeoutExpired).toBe(true);
     expect(chat.lastGroupId).not.toBe(previousGroupId);

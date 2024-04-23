@@ -4,12 +4,14 @@ import { getChat } from '../store/slices/chat';
 import { getConfig } from '../store/slices/config';
 import { getEmailIntentions, getPaymentIntentions } from '../store/slices/intentions';
 import { getMeta } from '../store/slices/meta';
+import { getQueryParam } from '../utils';
 import { useAppSelector } from '.';
 
 export const useFootProps = () => {
+  const term = getQueryParam();
   const { cid, systemType, marketing, pd } = useAppSelector(getMeta);
   const { translations, purpose, specialUrls } = useAppSelector(getConfig);
-  const { isLoading, isStreaming, historyData, historyIds } = useAppSelector(getChat);
+  const { isLoading, isStreaming, record, thread } = useAppSelector(getChat);
   const { error: streamError } = useAppSelector((store) => store.chat);
   const storedLink = useAppSelector((store) => store.intentions.link);
   const { error: emailError, current: currentEmail } = useAppSelector(getEmailIntentions);
@@ -36,8 +38,14 @@ export const useFootProps = () => {
     ctaText: '',
     ctaHref: '',
   };
-  const lastMsgId = [...historyIds].pop();
-  const lastMsg = lastMsgId && historyData[lastMsgId];
+
+  const currentThread = thread[term];
+  if (!currentThread) {
+    return staticProps;
+  }
+
+  const lastMsgId = [...record[currentThread].historyIds].pop();
+  const lastMsg = lastMsgId && record[currentThread].historyData[lastMsgId];
   const isLastAssistantMsg = lastMsg && lastMsg.role === Roles.assistant;
   const link = isLastAssistantMsg && storedLink;
   const noButtonChoices = !(lastMsg && lastMsg?.content.find((m) => m.buttons));
@@ -69,7 +77,7 @@ export const useFootProps = () => {
   }
 
   const message = lastMsg && lastMsg?.content?.find((m) => m.special);
-  if (isLastAssistantMsg && message && message?.special) {
+  if (isLastAssistantMsg && message && message?.special && specialUrls[message.special]) {
     return {
       ...staticProps,
       ctaText: specialUrls[message.special].includes('merchant') ? translations.merchantButton : translations.supportButton,

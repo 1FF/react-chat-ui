@@ -2,23 +2,22 @@ import { Roles, Theme } from '../config/enums';
 import { SpecialUrls } from '../interfaces/component';
 import { AssistantMessageTypeUnion, MessageProperties } from '.';
 
+interface Outgoing {
+  term: string;
+  user_id: string;
+  role: Roles.user;
+  message: string;
+}
+
+export interface ChatRecord {
+  id: string;
+  role: string;
+  time?: number;
+  content: Array<MessageProperties>;
+}
+
 export interface ChatState {
-  outgoing: {
-    term: string;
-    user_id: string;
-    role: Roles.user;
-    message: string;
-  };
-  historyData: Record<
-    string,
-    {
-      id: string;
-      role: Roles.assistant | Roles.user;
-      time?: number;
-      content: Array<MessageProperties>;
-    }
-  >;
-  historyIds: Array<string>;
+  outgoing: Outgoing;
   error: string;
   isLoading: boolean;
   typingTimeoutExpired: boolean;
@@ -26,6 +25,15 @@ export interface ChatState {
   connected: boolean;
   closed: boolean;
   isStreaming: boolean;
+  record: {
+    [key: string]: {
+      historyData: Record<string, ChatRecord>;
+      historyIds: Array<string>;
+    };
+  };
+  thread: {
+    [key: string]: string;
+  };
 }
 
 export interface ConfigState {
@@ -72,18 +80,15 @@ export interface MetaState {
 
 export interface IntentionsState {
   email: {
-    current: string,
-    success: boolean,
-    error: boolean,
-    // isFormVisible: boolean,
-    isLoading: boolean,
-  },
+    current: string;
+    success: boolean;
+    error: boolean;
+    isLoading: boolean;
+  };
   response: {
-    // value: string,
-    isFormVisible: boolean,
-    // isLoading: boolean,
-    error: boolean,
-  },
+    isFormVisible: boolean;
+    error: boolean;
+  };
   payment: {
     isButtonVisible: boolean;
     isFormVisible: boolean;
@@ -93,5 +98,5 @@ export interface IntentionsState {
   messaging: {
     isVisible: boolean;
   };
-  link: string
+  link: string;
 }

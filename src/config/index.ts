@@ -5,6 +5,15 @@ import { SPECIAL_MERCHANT, SPECIAL_SUPPORT_TICKET } from './env';
 export { Events, Roles } from './enums';
 export { config } from './socket';
 
+export const textOnly = [{
+  id: uuidV4(),
+  role: Roles.assistant,
+  time: new Date().getTime(),
+  content: [
+    { 'type': 'text', 'text': 'Do you want to lose weight?', 'sequence': 2 },
+  ]
+}];
+
 export const initialMessage = [
   {
     id: uuidV4(),
@@ -35,18 +44,10 @@ export const initialMessage = [
       { 'type': 'buttons', 'sequence': 1, 'buttons': [{ 'value': 'Yes', 'sequence': 1, 'text': 'Yes' }, { 'value': 'No', 'sequence': 2, 'text': 'No' }] }
     ]
   },
-  {
-    id: uuidV4(),
-    role: Roles.assistant,
-    time: new Date().getTime(),
-    content: [
-      { 'type': 'text', 'text': 'Do you want to lose weight?', 'sequence': 2 },
-    ]
-  },
 ];
-interface InitiationConfig { id: string, purpose?: string, close: { href?: string, visible?: boolean } }
+interface InitiationConfig { id: string, purpose?: string, close: { href?: string, visible?: boolean }, configuredMessage: Array<any> }
 
-export const chat = ({ id, purpose, close }: InitiationConfig) => ({
+export const chat = ({ id, purpose, close, configuredMessage }: InitiationConfig) => ({
   meta: {
     cid: localStorage.getItem('__cid') || id,
     systemType: 'test',
@@ -72,7 +73,7 @@ export const chat = ({ id, purpose, close }: InitiationConfig) => ({
       role: 'AI-powered nutritionist',
       imgSrc: 'https://storage.1forfit.com/lGbeX4lzNpWGyywHuJxMdegZ6My040jsvtVwZqBv.png',
       welcome: 'Welcome to our live support. We\'re here to understand your requirements and suggest the best Keto diet suited for you.',
-      initialMessage
+      initialMessage: configuredMessage || initialMessage
     },
     chatUrl: 'https://chat-ws.test',
     purpose: purpose || 'default',

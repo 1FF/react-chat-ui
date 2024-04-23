@@ -4,19 +4,19 @@ import Markdown from 'react-markdown';
 import { Definition } from '../../config/enums';
 import { useAppSelector } from '../../hooks';
 import { AssistantProps } from '../../interfaces/component';
-import { getChat, sortBySequence } from '../../store/slices/chat';
+import { getChat, getLastHistoryId, sortBySequence } from '../../store/slices/chat';
 import { getMeta } from '../../store/slices/meta';
 import { extractVideoCode, uuidV4 } from '../../utils';
+import { replaceNewRowSymbols } from '../../utils/formatting';
 import MarkdownLink from '../Markdown/link';
 import { Media } from '../Media';
 import OptionList from './options';
 import { flickerEffect } from './variants';
-import { replaceNewRowSymbols } from '../../utils/formatting';
 
 const Assistant = ({ message, itemId }: AssistantProps) => {
   const { isStreaming } = useAppSelector(getChat);
   const { pd } = useAppSelector(getMeta);
-  const isLast = useAppSelector((state) => state.chat.historyIds.length - 1 === state.chat.historyIds.indexOf(itemId));
+  const isLast = useAppSelector(getLastHistoryId) === itemId;
   const { base: baseFlicker } = flickerEffect({ isTyping: isStreaming && isLast });
   const sortedContent = [...message.content].sort(sortBySequence);
 
@@ -57,7 +57,7 @@ const Assistant = ({ message, itemId }: AssistantProps) => {
             <Media
               e2e="assistant-iframe"
               key={uuidV4()}
-              title={it[it.type]?.title||''}
+              title={it[it.type]?.title || ''}
               background={`url(https://img.youtube.com/vi/${extractVideoCode(it[it.type]?.url)}/hqdefault.jpg)`}
               url={extractVideoCode(it[it.type]?.url || 'https://www.youtube.com/embed/g4B8Dhl4pxY')}
               type={Definition.video}
@@ -71,7 +71,7 @@ const Assistant = ({ message, itemId }: AssistantProps) => {
               key={uuidV4()}
               e2e="assistant-img"
               image={it[it.type]?.url || ''}
-              background={'url("' + it[it.type]?.url + '")'}
+              background={`url("${it[it.type]?.url}")`}
               type={Definition.image}
               title={it[it.type]?.title}
             />

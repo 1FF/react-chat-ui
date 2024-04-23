@@ -18,7 +18,7 @@ import {
   setLink,
 } from '../store/slices/intentions';
 import { setMarketing, setPd } from '../store/slices/meta';
-import { uuidV4 } from '../utils';
+import { getQueryParam, uuidV4 } from '../utils';
 
 export const intentionsMiddleware: Middleware = (store) => (next) => {
 
@@ -55,6 +55,7 @@ export const intentionsMiddleware: Middleware = (store) => (next) => {
         id: uuidV4(),
         role: Roles.user,
         sequence: 1,
+        term: getQueryParam(),
         content: {
           sequence: 1,
           text: intentions.email.current,

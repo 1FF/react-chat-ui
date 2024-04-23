@@ -26,17 +26,17 @@ interface VideoProps {
 
 export interface VideoMessage {
   type: Definition.video;
-  video: VideoProps
+  video: VideoProps;
 }
 
 interface ImageProps {
   url: string;
-  title: string
-  alt: string | null
+  title: string;
+  alt: string | null;
 }
 export interface ImageMessage {
   type: Definition.image;
-  image: ImageProps
+  image: ImageProps;
 }
 
 export interface ButtonOptions {
@@ -49,35 +49,54 @@ export interface ButtonOptions {
 }
 
 export interface BaseOptions extends ButtonOptions {
-  id: string, link: string, noStream: boolean
+  id: string;
+  link: string;
+  noStream: boolean;
 }
 
 export interface OptionsListProps {
-  options: Array<BaseOptions> | undefined
+  options: Array<BaseOptions> | undefined;
 }
 
 export type AssistantMessageTypeUnion =
-  TextMessage | ButtonsMessage | EmailMessage | VideoMessage | ImageMessage | PaymentMessage;
+  | TextMessage
+  | ButtonsMessage
+  | EmailMessage
+  | VideoMessage
+  | ImageMessage
+  | PaymentMessage;
 
 export type SupportedMessageTypes =
-  Definition.text | Definition.buttons | Definition.payment | Definition.email | Definition.video | Definition.image;
+  | Definition.text
+  | Definition.buttons
+  | Definition.payment
+  | Definition.email
+  | Definition.video
+  | Definition.image;
 
 export interface AssistantRecord {
-  type: SupportedMessageTypes,
-  sequence: number,
+  type: SupportedMessageTypes;
+  sequence: number;
   text?: string;
   video?: VideoProps;
   image?: ImageProps;
   buttons?: Array<ButtonOptions>;
   email?: string;
   payment?: string;
+
+  groupId?: string;
+  sent?: boolean;
+  resend?: boolean;
 }
 
 export interface SocketHistoryRecord {
-  id: string,
-  role: string,
-  time: number,
-  content: string | Array<AssistantRecord>
+  id: string;
+  role: string;
+  time: number;
+  content: Array<AssistantRecord>;
+  groupId?: string;
+  sent?: boolean;
+  resend?: boolean;
 }
 
 export interface MessageProperties {
@@ -102,31 +121,37 @@ export interface MessageProperties {
 }
 
 export type PredefinedMessagePayload = {
-  content: string,
-  buttons?: Array<ButtonOptions>,
-}
+  content: string;
+  buttons?: Array<ButtonOptions>;
+};
 
 export type UserMessageContent = {
-  groupId: string, sent: boolean, resend: boolean, text: string, sequence: number
-}
+  groupId: string;
+  sent: boolean;
+  resend: boolean;
+  text: string;
+  sequence: number;
+};
 
 export interface UserHistoryData {
   id: string;
   role: Roles.user;
-  content: Array<UserMessageContent>
+  content: Array<UserMessageContent>;
 }
 
 export interface UserHistoryDataFiller {
   id: string;
   role: Roles.user;
-  sequence: number
-  content: UserMessageContent
+  sequence: number;
+  content: UserMessageContent;
+  term: string;
 }
 
 export interface AssistantHistoryDataFiller {
   id: string;
   content?: AssistantRecord;
   sequence?: number;
+  term: string;
 }
 
 export interface AssistantHistoryInitialMessage {
@@ -138,7 +163,7 @@ export interface AssistantHistoryInitialMessage {
 export interface ClientMessage {
   role: Roles.assistant | Roles.user;
   term: string;
-  user_id: string;
+  userId: string;
   message: string;
   messageId: string;
   region: string;

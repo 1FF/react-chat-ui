@@ -4,7 +4,7 @@ import { OptionsListProps } from '../../interfaces/index';
 import { track } from '../../services/tracking';
 import { fillUserHistoryData, setOutgoing, userMessageFindOne } from '../../store/slices/chat';
 import { getMeta } from '../../store/slices/meta';
-import { uuidV4 } from '../../utils';
+import { getQueryParam, uuidV4 } from '../../utils';
 import { Btn } from '../Button';
 import { Link } from '../Link';
 
@@ -16,8 +16,9 @@ export const OptionList = ({ options = [] }: OptionsListProps) => {
   const setOption = (val: string, sequence: number) => {
     dispatch(fillUserHistoryData({
       id: uuidV4(),
-      sequence: 1,
+      sequence,
       role: Roles.user,
+      term: getQueryParam(),
       content: {
         sequence: 1, text: val, resend: false, sent: true, groupId: ''
       }
@@ -37,6 +38,7 @@ export const OptionList = ({ options = [] }: OptionsListProps) => {
     dispatch(fillUserHistoryData({
       id: uuidV4(),
       sequence: 1,
+      term: getQueryParam(),
       role: Roles.user,
       content: {
         sequence: 1,

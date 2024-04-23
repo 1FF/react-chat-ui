@@ -11,7 +11,7 @@ export const meta: MetaState = {
   marketing: {
     screen: {},
     lastUtmParams: {},
-    utmParams: {}
+    utmParams: {},
   },
 };
 
@@ -39,7 +39,7 @@ export const config: ConfigState = {
     code: '',
     image: '',
     title: '',
-  }
+  },
 };
 
 export const chat: ChatState = {
@@ -49,8 +49,6 @@ export const chat: ChatState = {
     role: Roles.user,
     message: '',
   },
-  historyData: {},
-  historyIds: [],
   error: '',
   isLoading: false,
   typingTimeoutExpired: false,
@@ -58,6 +56,8 @@ export const chat: ChatState = {
   connected: false,
   closed: false,
   isStreaming: false,
+  record: {},
+  thread: {},
 };
 
 export const intentions: IntentionsState = {
@@ -80,7 +80,7 @@ export const intentions: IntentionsState = {
   messaging: {
     isVisible: false,
   },
-  link: ''
+  link: '',
 };
 
 export default { meta, config, intentions, chat };

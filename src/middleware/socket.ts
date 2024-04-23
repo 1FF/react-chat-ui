@@ -1,20 +1,20 @@
-import { Middleware } from '@reduxjs/toolkit';
+import { Action, Middleware } from '@reduxjs/toolkit';
 import { io, Socket } from 'socket.io-client';
 
 import { config as socketConfig, Events } from '../config';
-import { QueryParams, Roles } from '../config/enums';
+import { Roles } from '../config/enums';
 import { CHAT_FINISHED_TIMESTAMP, DEFAULT_CLOSE_HREF, SCROLL_STOP_CLASS, SUPPORT_PURPOSE } from '../config/env';
 import {
   AssistantHistoryInitialMessage,
   AssistantRecord,
   ClientMessage,
   SocketHistoryRecord,
-  UserMessageContent
-} from '../interfaces'
+  UserMessageContent,
+} from '../interfaces';
 import {
   fillAssistantHistoryData,
   fillInitialMessage,
-  hideResendIcon,
+  initiateThread,
   resendMessage,
   resetError,
   resetHistory,
@@ -23,13 +23,14 @@ import {
   setClosed,
   setConnected,
   setError,
-  setExistingHistory,
   setIsLoading,
   setIsStreaming,
   setLastGroupPointer,
   setOutgoing,
   setTypingTimeoutExpired,
   showResendIcon,
+  syncMessageStatus,
+  updateHistoryByTerm,
 } from '../store/slices/chat';
 import { setConfig } from '../store/slices/config';
 import { setRegion } from '../store/slices/meta';
@@ -37,8 +38,9 @@ import { getQueryParam, uuidV4 } from '../utils';
 
 let socket: Socket;
 
-const chatMiddleware: Middleware = (store) => (next) => (action) => {
+const chatMiddleware: Middleware = (store) => (next) => (action: Action & { $isSync: boolean | undefined }) => {
   const { meta, chat, config } = store.getState();
+  const thread = chat.thread[getQueryParam()];
 
   const onError = () => {
     const { config } = store.getState();
@@ -47,7 +49,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
   };
 
   const dispatchRetry = () => {
-    store.dispatch(showResendIcon({ itemId: chat.historyIds.pop() }));
+    store.dispatch(showResendIcon({ itemId: [...chat.record[thread].historyIds].pop() }));
     onError();
   };
 
@@ -57,7 +59,15 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
     }
 
     if (socket && socket.connected && data.message.trim() !== '') {
-      socket.emit(Events.chat, { time: new Date().getTime(), ...data }, withTimeout(dispatchRetry));
+      socket.emit(
+        Events.chat,
+        {
+          time: new Date().getTime(),
+          threadId: chat.thread[getQueryParam()],
+          ...data,
+        },
+        withTimeout(dispatchRetry),
+      );
       store.dispatch(resetError());
       return;
     }
@@ -66,7 +76,6 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
   };
 
   const handleMessageResending = ({ itemId }: { itemId: string }) => {
-    store.dispatch(hideResendIcon({ itemId }));
     store.dispatch(setIsLoading());
 
     const onResendError = () => {
@@ -76,19 +85,22 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
       store.dispatch(setError(config.translations.error));
     };
 
-    const message = chat.historyData[itemId].content.map((item: { text: string }) => item.text).join(['\n']);
+    const message = chat.record[thread].historyData[itemId].content
+      .map((item: { text: string }) => item.text)
+      .join(['\n']);
     if (socket?.connected && message.trim() !== '') {
       socket.volatile.emit(
         Events.chat,
         {
           role: Roles.user,
           message,
-          term: getQueryParam(QueryParams.chat),
-          user_id: meta.cid,
-          messageId: itemId,
+          term: getQueryParam(),
+          threadId: chat.thread[getQueryParam()],
           region: meta.region,
+          messageId: itemId,
+          userId: meta.cid,
         },
-        withTimeout(onResendError)
+        withTimeout(onResendError),
       );
       store.dispatch(resetError());
     } else {
@@ -96,14 +108,14 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
     }
   };
 
-  if (setOutgoing.match(action) && !('$isSync' in action)) {
+  if (setOutgoing.match(action) && !action.$isSync) {
     handleMessageSending({
       role: Roles.user,
       message: action.payload,
-      term: getQueryParam(QueryParams.chat),
-      user_id: meta.cid,
+      term: getQueryParam(),
       region: meta.region,
-      messageId: [...chat.historyIds].pop(),
+      userId: meta.cid,
+      messageId: [...chat.record[thread].historyIds].pop(),
     });
   }
 
@@ -125,23 +137,26 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
   }
 
   if (setTypingTimeoutExpired.match(action) && action.payload && !('$isSync' in action)) {
-    const messageId = [...chat.historyIds].pop();
-    const currentMessage = chat.historyData[messageId]
-    const lastMessage = chat.historyData[messageId].content.map(({ text }: { text: UserMessageContent }) => text).join('\n');
-    
+    const messageId = [...chat.record[thread].historyIds].pop();
+    const currentMessage = chat.record[thread].historyData[messageId];
+    const lastMessage = chat.record[thread].historyData[messageId].content
+      .map(({ text }: { text: UserMessageContent }) => text)
+      .join('\n');
+
     if (currentMessage.role === Roles.user && lastMessage.trim() !== '') {
       handleMessageSending({
         role: Roles.user,
         message: lastMessage,
-        term: getQueryParam(QueryParams.chat),
-        user_id: meta.cid,
+        term: getQueryParam(),
         region: meta.region,
-        messageId
+        messageId: messageId,
+        userId: meta.cid,
       });
     }
   }
 
   if (resendMessage.match(action) && !('$isSync' in action)) {
+    // @ts-expect-error must understand why the action is of type never??
     handleMessageResending(action.payload);
   }
 
@@ -157,86 +172,114 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
   socket.on(Events.connect, () => {
     const { meta } = store.getState();
     socket.sendBuffer = [];
-    socket.emit(Events.chatHistory, { user_id: meta.cid, region: meta.region, term: getQueryParam(QueryParams.chat) });
+    socket.emit(Events.chatHistory, { userId: meta.cid, region: meta.region, term: getQueryParam() });
     store.dispatch(setConnected(true));
     store.dispatch(setLastGroupPointer(uuidV4()));
   });
 
-  socket.on(Events.chatHistory, ({ history: servedHistory, errors, region }
-    : { history: Array<SocketHistoryRecord>, errors: string[], region: string }) => {
+  socket.on(
+    Events.chatHistory,
+    ({
+      history: servedHistory,
+      errors,
+      region,
+      term: servedTerm,
+      threadId,
+    }: {
+      history: Array<SocketHistoryRecord>;
+      errors: string[];
+      region: string;
+      term: string;
+      threadId: string;
+    }) => {
+      store.dispatch(resetIsLoading());
+      store.dispatch(setIsStreaming(false));
+      store.dispatch(setRegion(region));
+      store.dispatch(initiateThread({ threadId }));
 
-    store.dispatch(resetIsLoading());
-    store.dispatch(setIsStreaming(false));
-    store.dispatch(setRegion(region));
-    const { config, meta } = store.getState();
+      const { config, meta } = store.getState();
 
-    if (errors.length) {
-      store.dispatch(setError(errors[0]));
-      return;
-    }
+      if (errors.length) {
+        store.dispatch(setError(errors[0]));
+        return;
+      }
 
-    if (servedHistory.length) {
-      store.dispatch(setExistingHistory(servedHistory));
-      return
-    }
+      if (servedHistory.length) {
+        store.dispatch(syncMessageStatus({ history: servedHistory, term: servedTerm }));
+        store.dispatch(updateHistoryByTerm({ history: servedHistory, term: servedTerm }));
+        return;
+      }
 
-    store.dispatch(resetHistory());
-    store.dispatch(setIsLoading());
-    let interval = 0;
-    config.aiProfile.initialMessage
-      .forEach((element: AssistantHistoryInitialMessage, index: number, arr: Array<SocketHistoryRecord>) => {
-        interval += 1000;
+      !action.$isSync && store.dispatch(resetHistory({ term: getQueryParam(), thread }));
+      !action.$isSync && store.dispatch(setIsLoading());
+      let interval = 0;
+      config.aiProfile.initialMessage.forEach(
+        (element: AssistantHistoryInitialMessage, index: number, arr: Array<SocketHistoryRecord>) => {
+          interval += 1000;
 
-        setTimeout(() => {
+          setTimeout(() => {
+            !action.$isSync && store.dispatch(fillInitialMessage({ message: element, term: getQueryParam() }));
 
-          store.dispatch(fillInitialMessage(element));
+            if (arr.length === index + 1) {
+              !action.$isSync &&
+                config.aiProfile.initialMessage.forEach((message: SocketHistoryRecord) =>
+                  handleMessageSending({
+                    role: Roles.assistant,
+                    term: getQueryParam(),
+                    message: JSON.stringify(message.content),
+                    region: meta.region,
+                    userId: meta.cid,
+                    messageId: message.id,
+                  }),
+                );
+              store.dispatch(resetIsLoading());
+            }
+          }, interval);
+        },
+      );
+    },
+  );
 
-          if (arr.length === index + 1) {
-            config.aiProfile.initialMessage.forEach((message: SocketHistoryRecord) =>
-              handleMessageSending({
-                role: Roles.assistant,
-                term: getQueryParam(QueryParams.chat),
-                user_id: meta.cid,
-                message: JSON.stringify(message.content),
-                messageId: message.id,
-                region: meta.region,
-              }));
-            store.dispatch(resetIsLoading());
-
-          }
-        }, interval);
-
-      });
-  });
-
-  socket.on(Events.streamStart, ({ id }: { id: string }) => {
+  socket.on(Events.streamStart, ({ id, term }: { id: string; term: string }) => {
     store.dispatch(setIsStreaming(true));
     store.dispatch(resetIsLoading());
     store.dispatch(resetOutgoing());
     store.dispatch(resetError());
-    store.dispatch(fillAssistantHistoryData({ id }));
+    store.dispatch(
+      fillAssistantHistoryData({
+        id,
+        term,
+      }),
+    );
   });
 
-  socket.on(Events.streamData, (data: AssistantRecord
-    & {
-      id: string,
-      errors: Array<string>
-    }) => {
+  socket.on(
+    Events.streamData,
+    (
+      data: AssistantRecord & {
+        id: string;
+        term: string;
+        errors: Array<string>;
+      },
+    ) => {
+      store.dispatch(
+        fillAssistantHistoryData({
+          id: data.id,
+          sequence: data.sequence,
+          term: data.term,
+          content: {
+            type: data.type,
+            [data.type]: data[data.type],
+            sequence: data.sequence,
+          },
+        }),
+      );
 
-    store.dispatch(fillAssistantHistoryData({
-      id: data.id,
-      sequence: data.sequence,
-      content: {
-        type: data.type,
-        [data.type]: data[data.type],
-        sequence: data.sequence
+      if (data.errors?.length && !chat.error) {
+        store.dispatch(setError(data.errors[0]));
       }
-    }));
-
-    if (data.errors?.length && !chat.error) {
-      store.dispatch(setError(data.errors[0]));
-    }
-  });
+    },
+  );
 
   socket.on(Events.streamEnd, () => {
     store.dispatch(setIsStreaming(false));

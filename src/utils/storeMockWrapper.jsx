@@ -4,35 +4,33 @@ import { Provider } from 'react-redux';
 
 import intentionsMiddleware from '../middleware/intentions';
 import chatMiddleware from '../middleware/socket';
-import chatReducer from '../store/slices/chat';
+import initialState from '../store/initialState';
+import chatReducer, { setConnected, setLastGroupPointer } from '../store/slices/chat';
 import configReducer from '../store/slices/config';
 import intentionsReducer from '../store/slices/intentions';
 import metaReducer from '../store/slices/meta';
+import { uuidV4 } from '.';
 
-function renderWithProviders(
-  ui,
-  {
-    preloadedState = {},
-    // Automatically create a store instance if no store was passed in
-    store = configureStore({
-      reducer: {
-        meta: metaReducer,
-        intentions: intentionsReducer,
-        chat: chatReducer,
-        config: configReducer,
-      },
-      middleware:
-        (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false })
-          .concat(chatMiddleware, intentionsMiddleware),
-      preloadedState
-    }),
-    ...renderOptions
-  } = {}
-) {
-  // eslint-disable-next-line react/prop-types
+function renderWithProviders(ui, preloadedState = initialState) {
+  const store = configureStore({
+    reducer: {
+      meta: metaReducer,
+      intentions: intentionsReducer,
+      chat: chatReducer,
+      config: configReducer,
+    },
+    middleware:
+      (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false })
+        .concat(chatMiddleware, intentionsMiddleware),
+    preloadedState
+  });
   const Wrapper = ({ children }) => <Provider store={store}>{children}</Provider>;
+  let root
 
-  return { store, ...render(ui, { wrapper: Wrapper, ...renderOptions }) };
+  root = { store, ...render(ui, { wrapper: Wrapper }) }
+  root.store.dispatch(setConnected(true));
+  root.store.dispatch(setLastGroupPointer(uuidV4()));
+  return root;
 }
 
 export default renderWithProviders;
