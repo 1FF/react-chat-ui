@@ -16,6 +16,8 @@ import { ChatState } from '../../interfaces/store';
 import { formatDateByLocale, getQueryParam, uuidV4 } from '../../utils';
 import { chat as initialState } from '../initialState';
 
+export const getThreadId = (state: { chat: ChatState }) => state.chat.thread[getQueryParam()] || state.chat.thread['default'];
+
 const configSlice = createSlice({
   name: 'chat',
   initialState,
@@ -31,14 +33,14 @@ const configSlice = createSlice({
     resetOutgoing(state) {
       state.outgoing = initialState.outgoing;
     },
-    initiateThread(state, { payload: { threadId } }) {
+    initiateThread(state, { payload: { threadId, term } }) {
       return produce(state, (draft) => {
+        draft.thread[term] = threadId;
         if (!draft.record[threadId]) {
           draft.record[threadId] = {
             historyIds: [],
             historyData: {},
           };
-          draft.thread[getQueryParam()] = threadId;
         }
       });
     },
@@ -61,7 +63,9 @@ const configSlice = createSlice({
     },
     updateHistoryByThread(
       state,
-      { payload: { history, threadId } }: PayloadAction<{ history: Array<SocketHistoryRecord>; threadId: string }>,
+      {
+        payload: { history, threadId, servedTerm },
+      }: PayloadAction<{ history: Array<SocketHistoryRecord>; threadId: string; servedTerm: string }>,
     ) {
       return produce(state, (draft) => {
         const serverIds = history.map(({ id }) => id);
@@ -70,6 +74,7 @@ const configSlice = createSlice({
         // DEV NOTE: here i search for ids that are not recorded in the client
         for (let i = 0; i < serverIds.length; i++) {
           const currentId = serverIds[i];
+
           if (!clientIds.includes(currentId)) {
             clientIds.splice(i, 0, currentId);
             draft.record[threadId].historyData[currentId] = history[i];
@@ -82,7 +87,7 @@ const configSlice = createSlice({
     addPredefinedAssistantMessage(state, { payload }: PayloadAction<PredefinedMessagePayload>) {
       return produce(state, (draft: Draft<ChatState>): void => {
         const id = uuidV4();
-        const threadId = draft.thread[getQueryParam()];
+        const threadId = getThreadId({ chat: draft });
 
         draft.record[threadId].historyIds.push(id);
         draft.record[threadId].historyData[id] = {
@@ -100,12 +105,6 @@ const configSlice = createSlice({
       { payload: { id, content, sequence, threadId } }: PayloadAction<AssistantHistoryDataFiller>,
     ) {
       return produce(state, (draft: Draft<ChatState>) => {
-        
-        const threadIdAccordingToQueryParam = state.thread[getQueryParam()];
-        if (threadId !== threadIdAccordingToQueryParam) {
-          return;
-        }
-
         if (draft.record[threadId] && !draft.record[threadId].historyData[id]) {
           draft.record[threadId].historyData[id] = { id, role: Roles.assistant, content: [] };
           draft.record[threadId].historyIds.push(id);
@@ -138,10 +137,10 @@ const configSlice = createSlice({
         draft.record[threadId].historyData[id].content.push(data);
       });
     },
-    fillUserHistoryData(state, { payload: { id, content, term } }: PayloadAction<UserHistoryDataFiller>) {
+    fillUserHistoryData(state, { payload: { id, content } }: PayloadAction<UserHistoryDataFiller>) {
       return produce(state, (draft: Draft<ChatState>) => {
         let belongsTo;
-        const threadId = state.thread[term];
+        const threadId = getThreadId({ chat: draft });
 
         if (content.groupId && draft.record[threadId]?.historyData) {
           Object.entries(draft.record[threadId].historyData).forEach(([key, value]) => {
@@ -168,12 +167,7 @@ const configSlice = createSlice({
       state,
       { payload: { message, term } }: PayloadAction<{ message: AssistantHistoryInitialMessage; term: string }>,
     ) {
-      const currentTerm = getQueryParam();
-      if (term !== currentTerm) {
-        return;
-      }
-
-      const threadId = state.thread[term];
+      const threadId = getThreadId({ chat: state });
 
       state.record[threadId].historyIds.push(message.id);
       state.record[threadId].historyData[message.id] = {
@@ -200,7 +194,7 @@ const configSlice = createSlice({
     },
     showResendIcon(state, { payload }: PayloadAction<{ itemId: string }>) {
       return produce(state, (draft: Draft<ChatState>) => {
-        const threadId = state.thread[getQueryParam()];
+        const threadId = getThreadId({ chat: draft });
 
         draft.record[threadId].historyData[payload.itemId].content = draft.record[threadId].historyData[
           payload.itemId
@@ -215,9 +209,8 @@ const configSlice = createSlice({
       state.lastGroupId = payload;
     },
     resendMessage(state, { payload }: PayloadAction<{ itemId: string }>) {
-      const term = getQueryParam();
       return produce(state, (draft: Draft<ChatState>) => {
-        const threadId = state.thread[term];
+        const threadId = getThreadId({ chat: draft });
 
         draft.record[threadId].historyData[payload.itemId].content = draft.record[threadId].historyData[
           payload.itemId
@@ -237,19 +230,11 @@ const configSlice = createSlice({
     setIsStreaming(state, { payload }: PayloadAction<boolean>) {
       state.isStreaming = payload;
     },
-    resetHistory(state, { payload: { term, thread } }) {
-      const currentTerm = getQueryParam();
-
-      if (currentTerm !== term) {
-        return;
-      }
-
+    resetHistory(state, { payload: { thread } }) {
       state.record[thread] = { historyData: {}, historyIds: [] };
     },
   },
 });
-
-const getThreadId = (state: { chat: ChatState }) => state.chat.thread[getQueryParam()];
 
 export const getChat = (state: { chat: ChatState }) => state.chat;
 

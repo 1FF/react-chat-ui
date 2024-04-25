@@ -6,7 +6,7 @@ import { Roles } from '../../config/enums';
 import { TYPING_TIMEOUT } from '../../config/env';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { fillUserHistoryData, getChat, setLastGroupPointer, setTypingTimeoutExpired } from '../../store/slices/chat';
-import { getQueryParam, uuidV4 } from '../../utils';
+import { uuidV4 } from '../../utils';
 import { layoutFoot as variant } from '../Layout/variants';
 
 export const ResponseForm = () => {
@@ -37,7 +37,6 @@ export const ResponseForm = () => {
         role: Roles.user,
         id: uuidV4(),
         sequence: 1,
-        term: getQueryParam(),
         content: {
           sequence: 1, text: response, groupId, resend: false, sent: true
         }

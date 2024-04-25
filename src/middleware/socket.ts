@@ -14,6 +14,7 @@ import {
 import {
   fillAssistantHistoryData,
   fillInitialMessage,
+  getThreadId,
   initiateThread,
   resendMessage,
   resetError,
@@ -61,9 +62,12 @@ const chatMiddleware: Middleware = (store) => (next) => (action: Action & { $isS
       socket.emit(
         Events.chat,
         {
-          time: new Date().getTime(),
-          threadId: store.getState().chat.thread[getQueryParam()],
           ...data,
+          time: new Date().getTime(),
+          threadId: getThreadId(store.getState()),
+          term: getQueryParam(),
+          region: meta.region,
+          userId: meta.cid,
         },
         withTimeout(dispatchRetry),
       );
@@ -94,7 +98,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action: Action & { $isS
           role: Roles.user,
           message,
           term: getQueryParam(),
-          threadId: chat.thread[getQueryParam()],
+          threadId: getThreadId(chat),
           region: meta.region,
           messageId: itemId,
           userId: meta.cid,
@@ -111,9 +115,6 @@ const chatMiddleware: Middleware = (store) => (next) => (action: Action & { $isS
     handleMessageSending({
       role: Roles.user,
       message: action.payload,
-      term: getQueryParam(),
-      region: meta.region,
-      userId: meta.cid,
       messageId: [...chat.record[thread].historyIds].pop(),
     });
   }
@@ -146,10 +147,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action: Action & { $isS
       handleMessageSending({
         role: Roles.user,
         message: lastMessage,
-        term: getQueryParam(),
-        region: meta.region,
         messageId: messageId,
-        userId: meta.cid,
       });
     }
   }
@@ -194,9 +192,9 @@ const chatMiddleware: Middleware = (store) => (next) => (action: Action & { $isS
       store.dispatch(resetIsLoading());
       store.dispatch(setIsStreaming(false));
       store.dispatch(setRegion(region));
-      store.dispatch(initiateThread({ threadId }));
+      store.dispatch(initiateThread({ threadId, term: servedTerm }));
 
-      const { config, meta } = store.getState();
+      const { config } = store.getState();
 
       if (errors.length) {
         store.dispatch(setError(errors[0]));
@@ -205,11 +203,11 @@ const chatMiddleware: Middleware = (store) => (next) => (action: Action & { $isS
 
       if (servedHistory.length) {
         store.dispatch(syncMessageStatus({ history: servedHistory, term: servedTerm }));
-        store.dispatch(updateHistoryByThread({ history: servedHistory, threadId: threadId }));
+        store.dispatch(updateHistoryByThread({ history: servedHistory, threadId: threadId, servedTerm }));
         return;
       }
 
-      !action.$isSync && store.dispatch(resetHistory({ term: getQueryParam(), thread }));
+      !action.$isSync && store.dispatch(resetHistory({ term: getQueryParam(), thread: threadId }));
       !action.$isSync && store.dispatch(setIsLoading());
       let interval = 0;
       config.aiProfile.initialMessage.forEach(
@@ -224,10 +222,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action: Action & { $isS
                 config.aiProfile.initialMessage.forEach((message: SocketHistoryRecord) =>
                   handleMessageSending({
                     role: Roles.assistant,
-                    term: getQueryParam(),
                     message: JSON.stringify(message.content),
-                    region: meta.region,
-                    userId: meta.cid,
                     messageId: message.id,
                   }),
                 );

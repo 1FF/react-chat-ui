@@ -55,7 +55,6 @@ export const intentionsMiddleware: Middleware = (store) => (next) => {
         id: uuidV4(),
         role: Roles.user,
         sequence: 1,
-        term: getQueryParam(),
         content: {
           sequence: 1,
           text: intentions.email.current,

@@ -144,7 +144,6 @@ export interface UserHistoryDataFiller {
   role: Roles.user;
   sequence: number;
   content: UserMessageContent;
-  term: string;
 }
 
 export interface AssistantHistoryDataFiller {
@@ -163,11 +162,8 @@ export interface AssistantHistoryInitialMessage {
 
 export interface ClientMessage {
   role: Roles.assistant | Roles.user;
-  term: string;
-  userId: string;
   message: string;
   messageId: string;
-  region: string;
 }
 
 export interface PaymentDataSetterProps {
