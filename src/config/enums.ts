@@ -5,6 +5,7 @@ enum Definition {
   video = 'video',
   image = 'image',
   email = 'email',
+  special = 'special',
 }
 
 enum ScreenOrientation {
@@ -13,7 +14,7 @@ enum ScreenOrientation {
 }
 
 enum QueryParams {
-  chat = 'utm_chat'
+  chat = 'utm_chat',
 }
 
 enum AllEvents {
@@ -53,7 +54,7 @@ enum Intentions {
   payment = 'payment_intent',
   emailError = 'email_validation_error',
   emailSuccess = 'email_validation_success',
-  destroy = 'payment_intent_destroy'
+  destroy = 'payment_intent_destroy',
 }
 
 enum Roles {
@@ -78,4 +79,4 @@ enum Theme {
   dark = 'dark',
 }
 
-export { AllEvents, Definition, Events, Intentions, QueryParams,Roles, ScreenOrientation, Theme }
+export { AllEvents, Definition, Events, Intentions, QueryParams, Roles, ScreenOrientation, Theme };

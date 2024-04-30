@@ -31,7 +31,7 @@ const StreamBubble = ({ itemId }: { itemId: string }) => {
               resend: record.resend || false,
               sent: record.sent || true,
               groupId: record.groupId || '',
-              itemId: itemId
+              itemId
             }}
           />)
       }

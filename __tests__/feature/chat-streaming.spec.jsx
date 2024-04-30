@@ -5,12 +5,13 @@ import { act } from 'react-dom/test-utils';
 import { serverSocket } from '../../__mocks__/socket.io-client';
 import AppBase from '../../src/components/AppBase';
 import { chat as getInitialConfig, Events, initialMessage } from '../../src/config';
+import { Definition } from '../../src/config/enums';
 import { STORING_CHECKER_INTERVAL } from '../../src/config/env';
 import { intent } from '../../src/main';
 import initialState from '../../src/store/initialState';
 import { uuidV4 } from '../../src/utils';
 import renderWithProviders from '../../src/utils/storeMockWrapper';
-import { dispatchStreaming, localTearDown } from '../helpers';
+import { dispatchStreaming, generateStreamingData, localTearDown } from '../helpers';
 
 jest.useFakeTimers();
 
@@ -20,6 +21,7 @@ describe('AppBase, streaming events execute properly', () => {
   const href = `https://example.com/?utm_chat=${term}}`;
   const search = `?utm_chat=${term}`;
   const threadId = uuidV4();
+  const recordId = '4216d0a8-2621-499c-8a65-70191e31ee5a';
 
   beforeEach(async () => {
     const mockLocation = {
@@ -54,32 +56,15 @@ describe('AppBase, streaming events execute properly', () => {
         region: faker.location.country(),
         history: [],
         errors: [],
-        term: term,
-        threadId: threadId,
+        term,
+        threadId,
       });
       jest.advanceTimersByTime(initialMessage.length * 1000 * initialMessage.length - 1);
       preHistoryRecievalRecords = root.store.getState().chat.record[threadId].historyIds;
     });
 
     act(() => {
-      dispatchStreaming([
-        {
-          type: 'text',
-          text: '',
-          sequence: 1,
-          id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
-          term,
-          threadId: threadId,
-        },
-        {
-          type: 'text',
-          text: ' ticket',
-          sequence: 1,
-          id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
-          term,
-          threadId: threadId,
-        },
-      ]);
+      dispatchStreaming(generateStreamingData({ term, recordId, threadId, addons: [] }));
     });
 
     const userFormElement = root.container.querySelector('[data-e2e="user-form"]');
@@ -108,43 +93,33 @@ describe('AppBase, streaming events execute properly', () => {
         region: faker.location.country(),
         history: [],
         errors: [],
-        term: term,
-        threadId: threadId,
+        term,
+        threadId,
       });
       jest.advanceTimersByTime(initialMessage.length * 1000 * initialMessage.length - 1);
     });
 
     act(() => {
-      dispatchStreaming([
-        {
-          type: 'text',
-          text: '',
-          sequence: 1,
-          id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
+      dispatchStreaming(
+        generateStreamingData({
           term,
-          threadId: threadId,
-        },
-        {
-          type: 'text',
-          text: ' ticket',
-          sequence: 1,
-          id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
-          term,
-          threadId: threadId,
-        },
-        {
-          id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
-          type: 'buttons',
-          sequence: 1,
-          term,
-          threadId: threadId,
-
-          buttons: [
-            { value: 'Yes', sequence: 1, text: 'Yes' },
-            { value: 'No', sequence: 2, text: 'No' },
+          recordId,
+          threadId,
+          addons: [
+            {
+              id: recordId,
+              type: Definition.buttons,
+              sequence: 1,
+              term,
+              threadId,
+              [Definition.buttons]: [
+                { value: 'Yes', sequence: 1, text: 'Yes' },
+                { value: 'No', sequence: 2, text: 'No' },
+              ],
+            },
           ],
-        },
-      ]);
+        }),
+      );
     });
 
     const userFormElement = root.container.querySelector('[data-e2e="user-form"]');
@@ -174,39 +149,30 @@ describe('AppBase, streaming events execute properly', () => {
         region: faker.location.country(),
         history: [],
         errors: [],
-        term: term,
-        threadId: threadId,
+        term,
+        threadId,
       });
       jest.advanceTimersByTime(initialMessage.length * 1000 * initialMessage.length - 1);
     });
 
     act(() => {
-      dispatchStreaming([
-        {
-          type: 'text',
-          text: '',
-          sequence: 1,
-          id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
+      dispatchStreaming(
+        generateStreamingData({
           term,
-          threadId: threadId,
-        },
-        {
-          type: 'text',
-          text: ' ticket',
-          sequence: 1,
-          id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
-          term,
-          threadId: threadId,
-        },
-        {
-          id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
-          type: 'email',
-          sequence: 1,
-          email: 'provide email',
-          term,
-          threadId: threadId,
-        },
-      ]);
+          recordId,
+          threadId,
+          addons: [
+            {
+              id: recordId,
+              type: Definition.email,
+              sequence: 1,
+              [Definition.email]: 'provide email',
+              term,
+              threadId,
+            },
+          ],
+        }),
+      );
     });
 
     const emailFormElement = root.container.querySelector('[data-e2e="email-form"]');
@@ -246,39 +212,30 @@ describe('AppBase, streaming events execute properly', () => {
         region: faker.location.country(),
         history: [],
         errors: [],
-        term: term,
-        threadId: threadId,
+        term,
+        threadId,
       });
       jest.advanceTimersByTime(initialMessage.length * 1000 * initialMessage.length - 1);
     });
 
     act(() => {
-      dispatchStreaming([
-        {
-          type: 'text',
-          text: '',
-          sequence: 1,
-          id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
+      dispatchStreaming(
+        generateStreamingData({
           term,
-          threadId: threadId,
-        },
-        {
-          type: 'text',
-          text: ' ticket',
-          sequence: 1,
-          id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
-          term,
-          threadId: threadId,
-        },
-        {
-          id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
-          type: 'payment',
-          sequence: 1,
-          payment: 'provide payment',
-          term,
-          threadId: threadId,
-        },
-      ]);
+          recordId,
+          threadId,
+          addons: [
+            {
+              id: recordId,
+              type: Definition.payment,
+              sequence: 1,
+              [Definition.payment]: 'provide payment',
+              term,
+              threadId,
+            },
+          ],
+        }),
+      );
     });
 
     const paymentButtonElement = root.container.querySelector('[data-e2e="payment-form-trigger-btn"]');

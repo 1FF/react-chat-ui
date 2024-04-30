@@ -107,7 +107,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
           role: Roles.user,
           message,
           term: getQueryParam(),
-          threadId: threadId,
+          threadId,
           region: meta.region,
           messageId: itemId,
           userId: meta.cid,
@@ -202,7 +202,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
 
       if (servedHistory.length) {
         store.dispatch(syncMessageStatus({ history: servedHistory, term: servedTerm }));
-        store.dispatch(updateHistoryByThread({ history: servedHistory, threadId: threadId }));
+        store.dispatch(updateHistoryByThread({ history: servedHistory, threadId }));
         return;
       }
 
@@ -214,7 +214,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
           interval += 1000;
 
           setTimeout(() => {
-            store.dispatch(fillInitialMessage({ message: element, threadId: threadId }));
+            store.dispatch(fillInitialMessage({ message: element, threadId }));
 
             if (arr.length === index + 1) {
               config.aiProfile.initialMessage.forEach((message: SocketHistoryRecord) =>

@@ -5,11 +5,12 @@ import { act } from 'react-dom/test-utils';
 import { serverSocket } from '../../__mocks__/socket.io-client';
 import AppBase from '../../src/components/AppBase';
 import { chat as getInitialConfig, Events, initialMessage } from '../../src/config';
+import { Definition } from '../../src/config/enums';
 import { SPECIAL_MERCHANT, SPECIAL_SUPPORT_TICKET, SUPPORT_PURPOSE } from '../../src/config/env';
 import { setLink } from '../../src/store/slices/intentions';
 import { uuidV4 } from '../../src/utils';
 import renderWithProviders from '../../src/utils/storeMockWrapper';
-import { dispatchStreaming, localTearDown } from '../helpers';
+import { dispatchStreaming, generateStreamingData, localTearDown } from '../helpers';
 
 jest.useFakeTimers();
 
@@ -52,39 +53,30 @@ describe('Special messages are hidden and elements depending on them are visuali
         region: faker.location.country(),
         history: [],
         errors: [],
-        term: term,
-        threadId: threadId,
+        term,
+        threadId,
       });
       jest.advanceTimersByTime(initialMessage.length * 1000 * initialMessage.length - 1);
     });
 
     act(() =>
-      dispatchStreaming([
-        {
-          type: 'text',
-          text: faker.lorem.text(),
-          sequence: 1,
-          id: recordId,
+      dispatchStreaming(
+        generateStreamingData({
           term,
-          threadId: threadId,
-        },
-        {
-          type: 'special',
-          special: SPECIAL_MERCHANT,
-          sequence: 1,
-          id: recordId,
-          term,
-          threadId: threadId,
-        },
-        {
-          type: 'text',
-          text: faker.lorem.text(),
-          sequence: 1,
-          id: recordId,
-          term,
-          threadId: threadId,
-        },
-      ]),
+          recordId,
+          threadId,
+          addons: [
+            {
+              type: Definition.special,
+              [Definition.special]: SPECIAL_MERCHANT,
+              sequence: 1,
+              id: recordId,
+              term,
+              threadId,
+            },
+          ],
+        }),
+      ),
     );
 
     const linkQuiz = root.container.querySelector('[data-e2e="quiz-trigger-btn"]');
@@ -114,39 +106,30 @@ describe('Special messages are hidden and elements depending on them are visuali
         region: faker.location.country(),
         history: [],
         errors: [],
-        term: term,
-        threadId: threadId,
+        term,
+        threadId,
       });
       jest.advanceTimersByTime(initialMessage.length * 1000 * initialMessage.length - 1);
     });
 
     act(() =>
-      dispatchStreaming([
-        {
-          type: 'text',
-          text: faker.lorem.text(),
-          sequence: 1,
-          id: recordId,
+      dispatchStreaming(
+        generateStreamingData({
           term,
-          threadId: threadId,
-        },
-        {
-          type: 'special',
-          special: SPECIAL_SUPPORT_TICKET,
-          sequence: 1,
-          id: recordId,
-          term,
-          threadId: threadId,
-        },
-        {
-          type: 'text',
-          text: faker.lorem.text(),
-          sequence: 1,
-          id: recordId,
-          term,
-          threadId: threadId,
-        },
-      ]),
+          recordId,
+          threadId,
+          addons: [
+            {
+              type: Definition.special,
+              [Definition.special]: SPECIAL_SUPPORT_TICKET,
+              sequence: 1,
+              id: recordId,
+              term,
+              threadId,
+            },
+          ],
+        }),
+      ),
     );
 
     const linkQuiz = root.container.querySelector('[data-e2e="quiz-trigger-btn"]');
@@ -176,8 +159,8 @@ describe('Special messages are hidden and elements depending on them are visuali
         region: faker.location.country(),
         history: [],
         errors: [],
-        term: term,
-        threadId: threadId,
+        term,
+        threadId,
       });
       jest.advanceTimersByTime(initialMessage.length * 1000 * initialMessage.length - 1);
     });
@@ -187,24 +170,14 @@ describe('Special messages are hidden and elements depending on them are visuali
     });
 
     act(() => {
-      dispatchStreaming([
-        {
-          type: 'text',
-          text: faker.lorem.text(),
-          sequence: 1,
-          id: recordId,
+      dispatchStreaming(
+        generateStreamingData({
           term,
-          threadId: threadId,
-        },
-        {
-          type: 'text',
-          text: faker.lorem.text(),
-          sequence: 1,
-          id: recordId,
-          term,
-          threadId: threadId,
-        },
-      ]);
+          recordId,
+          threadId,
+          addons: [],
+        }),
+      );
     });
 
     const linkQuiz = root.container.querySelector('[data-e2e="quiz-trigger-btn"]');
@@ -234,8 +207,8 @@ describe('Special messages are hidden and elements depending on them are visuali
         region: faker.location.country(),
         history: [],
         errors: [],
-        term: term,
-        threadId: threadId,
+        term,
+        threadId,
       });
       jest.advanceTimersByTime(initialMessage.length * 1000 * initialMessage.length - 1);
     });
@@ -245,24 +218,14 @@ describe('Special messages are hidden and elements depending on them are visuali
     });
 
     act(() => {
-      dispatchStreaming([
-        {
-          type: 'text',
-          text: faker.lorem.text(),
-          sequence: 1,
-          id: recordId,
+      dispatchStreaming(
+        generateStreamingData({
           term,
-          threadId: threadId,
-        },
-        {
-          type: 'text',
-          text: faker.lorem.text(),
-          sequence: 1,
-          id: recordId,
-          term,
-          threadId: threadId,
-        },
-      ]);
+          recordId,
+          threadId,
+          addons: [],
+        }),
+      );
     });
 
     const linkQuiz = root.container.querySelector('[data-e2e="quiz-trigger-btn"]');
