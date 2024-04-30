@@ -130,7 +130,6 @@ export type UserMessageContent = {
   sent: boolean;
   resend: boolean;
   text: string;
-  sequence: number;
 };
 
 export interface UserHistoryData {
@@ -141,9 +140,8 @@ export interface UserHistoryData {
 
 export interface UserHistoryDataFiller {
   id: string;
-  role: Roles.user;
-  sequence: number;
   content: UserMessageContent;
+  threadId: string;
 }
 
 export interface AssistantHistoryDataFiller {

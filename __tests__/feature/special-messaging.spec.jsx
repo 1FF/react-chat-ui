@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /* eslint-env jest */
 import { act } from 'react-dom/test-utils';
 
@@ -14,7 +15,7 @@ jest.useFakeTimers();
 
 let root;
 describe('Special messages are hidden and elements depending on them are visualized accordingly', () => {
-  const term = 'default'
+  const term = 'default';
   const href = `https://example.com/?utm_chat=${term}}`;
   const search = `?utm_chat=${term}`;
   const threadId = uuidV4();
@@ -41,41 +42,50 @@ describe('Special messages are hidden and elements depending on them are visuali
       root = renderWithProviders(
         <div id="chatbot-container">
           <AppBase config={getInitialConfig({ id: uuidV4(), purpose: SUPPORT_PURPOSE, close: { visible: true } })} />
-        </div>
+        </div>,
       );
     });
 
     // Act
     act(() => {
       serverSocket.emit(Events.chatHistory, {
-        'region': faker.location.country(),
-        'history': [],
-        'errors': [],
-        'term': term,
-        'threadId': threadId,
-      })
-      jest.advanceTimersByTime((initialMessage.length * 1000) * initialMessage.length - 1);
+        region: faker.location.country(),
+        history: [],
+        errors: [],
+        term: term,
+        threadId: threadId,
+      });
+      jest.advanceTimersByTime(initialMessage.length * 1000 * initialMessage.length - 1);
     });
 
-    act(() => dispatchStreaming([{
-      'type': 'text',
-      'text': faker.lorem.text(),
-      'sequence': 1,
-      'id': recordId,
-      term
-    }, {
-      'type': 'special',
-      'special': SPECIAL_MERCHANT,
-      'sequence': 1,
-      'id': recordId,
-      term
-    }, {
-      'type': 'text',
-      'text': faker.lorem.text(),
-      'sequence': 1,
-      'id': recordId,
-      term
-    }]));
+    act(() =>
+      dispatchStreaming([
+        {
+          type: 'text',
+          text: faker.lorem.text(),
+          sequence: 1,
+          id: recordId,
+          term,
+          threadId: threadId,
+        },
+        {
+          type: 'special',
+          special: SPECIAL_MERCHANT,
+          sequence: 1,
+          id: recordId,
+          term,
+          threadId: threadId,
+        },
+        {
+          type: 'text',
+          text: faker.lorem.text(),
+          sequence: 1,
+          id: recordId,
+          term,
+          threadId: threadId,
+        },
+      ]),
+    );
 
     const linkQuiz = root.container.querySelector('[data-e2e="quiz-trigger-btn"]');
     const userFormElement = root.container.querySelector('[data-e2e="user-form"]');
@@ -94,40 +104,50 @@ describe('Special messages are hidden and elements depending on them are visuali
       root = renderWithProviders(
         <div id="chatbot-container">
           <AppBase config={getInitialConfig({ id: uuidV4(), purpose: SUPPORT_PURPOSE, close: { visible: true } })} />
-        </div>);
+        </div>,
+      );
     });
 
     // Act
     act(() => {
       serverSocket.emit(Events.chatHistory, {
-        'region': faker.location.country(),
-        'history': [],
-        'errors': [],
-        'term': term,
-        'threadId': threadId,
-      })
-      jest.advanceTimersByTime((initialMessage.length * 1000) * initialMessage.length - 1);
+        region: faker.location.country(),
+        history: [],
+        errors: [],
+        term: term,
+        threadId: threadId,
+      });
+      jest.advanceTimersByTime(initialMessage.length * 1000 * initialMessage.length - 1);
     });
 
-    act(() => dispatchStreaming([{
-      'type': 'text',
-      'text': faker.lorem.text(),
-      'sequence': 1,
-      'id': recordId,
-      term
-    }, {
-      'type': 'special',
-      'special': SPECIAL_SUPPORT_TICKET,
-      'sequence': 1,
-      'id': recordId,
-      term
-    }, {
-      'type': 'text',
-      'text': faker.lorem.text(),
-      'sequence': 1,
-      'id': recordId,
-      term
-    }]));
+    act(() =>
+      dispatchStreaming([
+        {
+          type: 'text',
+          text: faker.lorem.text(),
+          sequence: 1,
+          id: recordId,
+          term,
+          threadId: threadId,
+        },
+        {
+          type: 'special',
+          special: SPECIAL_SUPPORT_TICKET,
+          sequence: 1,
+          id: recordId,
+          term,
+          threadId: threadId,
+        },
+        {
+          type: 'text',
+          text: faker.lorem.text(),
+          sequence: 1,
+          id: recordId,
+          term,
+          threadId: threadId,
+        },
+      ]),
+    );
 
     const linkQuiz = root.container.querySelector('[data-e2e="quiz-trigger-btn"]');
     const userFormElement = root.container.querySelector('[data-e2e="user-form"]');
@@ -146,20 +166,20 @@ describe('Special messages are hidden and elements depending on them are visuali
       root = renderWithProviders(
         <div id="chatbot-container">
           <AppBase config={getInitialConfig({ id: uuidV4(), purpose: SUPPORT_PURPOSE, close: { visible: true } })} />
-        </div>
+        </div>,
       );
     });
 
     // Act
     act(() => {
       serverSocket.emit(Events.chatHistory, {
-        'region': faker.location.country(),
-        'history': [],
-        'errors': [],
-        'term': term,
-        'threadId': threadId,
-      })
-      jest.advanceTimersByTime((initialMessage.length * 1000) * initialMessage.length - 1);
+        region: faker.location.country(),
+        history: [],
+        errors: [],
+        term: term,
+        threadId: threadId,
+      });
+      jest.advanceTimersByTime(initialMessage.length * 1000 * initialMessage.length - 1);
     });
 
     act(() => {
@@ -167,19 +187,24 @@ describe('Special messages are hidden and elements depending on them are visuali
     });
 
     act(() => {
-      dispatchStreaming([{
-        'type': 'text',
-        'text': faker.lorem.text(),
-        'sequence': 1,
-        'id': recordId,
-        term
-      }, {
-        'type': 'text',
-        'text': faker.lorem.text(),
-        'sequence': 1,
-        'id': recordId,
-        term
-      }]);
+      dispatchStreaming([
+        {
+          type: 'text',
+          text: faker.lorem.text(),
+          sequence: 1,
+          id: recordId,
+          term,
+          threadId: threadId,
+        },
+        {
+          type: 'text',
+          text: faker.lorem.text(),
+          sequence: 1,
+          id: recordId,
+          term,
+          threadId: threadId,
+        },
+      ]);
     });
 
     const linkQuiz = root.container.querySelector('[data-e2e="quiz-trigger-btn"]');
@@ -199,20 +224,20 @@ describe('Special messages are hidden and elements depending on them are visuali
       root = renderWithProviders(
         <div id="chatbot-container">
           <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true } })} />
-        </div>
+        </div>,
       );
     });
 
     // Act
     act(() => {
       serverSocket.emit(Events.chatHistory, {
-        'region': faker.location.country(),
-        'history': [],
-        'errors': [],
-        'term': term,
-        'threadId': threadId,
-      })
-      jest.advanceTimersByTime((initialMessage.length * 1000) * initialMessage.length - 1);
+        region: faker.location.country(),
+        history: [],
+        errors: [],
+        term: term,
+        threadId: threadId,
+      });
+      jest.advanceTimersByTime(initialMessage.length * 1000 * initialMessage.length - 1);
     });
 
     act(() => {
@@ -220,20 +245,26 @@ describe('Special messages are hidden and elements depending on them are visuali
     });
 
     act(() => {
-      dispatchStreaming([{
-        'type': 'text',
-        'text': faker.lorem.text(),
-        'sequence': 1,
-        'id': recordId,
-        term
-      }, {
-        'type': 'text',
-        'text': faker.lorem.text(),
-        'sequence': 1,
-        'id': recordId,
-        term
-      }]);
+      dispatchStreaming([
+        {
+          type: 'text',
+          text: faker.lorem.text(),
+          sequence: 1,
+          id: recordId,
+          term,
+          threadId: threadId,
+        },
+        {
+          type: 'text',
+          text: faker.lorem.text(),
+          sequence: 1,
+          id: recordId,
+          term,
+          threadId: threadId,
+        },
+      ]);
     });
+
     const linkQuiz = root.container.querySelector('[data-e2e="quiz-trigger-btn"]');
     const userFormElement = root.container.querySelector('[data-e2e="user-form"]');
     const emailFormElement = root.container.querySelector('[data-e2e="email-form"]');

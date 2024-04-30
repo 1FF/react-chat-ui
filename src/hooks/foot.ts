@@ -1,24 +1,24 @@
 import { Roles } from '../config';
 import { SUPPORT_PURPOSE } from '../config/env';
-import { getChat } from '../store/slices/chat';
+import { getChat, getThreadId } from '../store/slices/chat';
 import { getConfig } from '../store/slices/config';
 import { getEmailIntentions, getPaymentIntentions } from '../store/slices/intentions';
 import { getMeta } from '../store/slices/meta';
-import { getQueryParam } from '../utils';
 import { useAppSelector } from '.';
 
 export const useFootProps = () => {
-  const term = getQueryParam();
   const { cid, systemType, marketing, pd } = useAppSelector(getMeta);
   const { translations, purpose, specialUrls } = useAppSelector(getConfig);
-  const { isLoading, isStreaming, record, thread } = useAppSelector(getChat);
-  const { error: streamError } = useAppSelector((store) => store.chat);
+  const { isLoading, isStreaming, record, error: streamError, thread } = useAppSelector(getChat);
+
+  // @ts-expect-error passing only the needed prop
+  const currentThread = getThreadId({ chat: { thread } });
   const storedLink = useAppSelector((store) => store.intentions.link);
   const { error: emailError, current: currentEmail } = useAppSelector(getEmailIntentions);
   const {
     isFormVisible: isPaymentFormVisible,
     error: paymentIntentError,
-    isSuccessful: paymentSuccess
+    isSuccessful: paymentSuccess,
   } = useAppSelector(getPaymentIntentions);
   const error = streamError || emailError || paymentIntentError;
   const staticProps = {
@@ -39,7 +39,6 @@ export const useFootProps = () => {
     ctaHref: '',
   };
 
-  const currentThread = thread[term];
   if (!currentThread) {
     return staticProps;
   }
@@ -80,7 +79,9 @@ export const useFootProps = () => {
   if (isLastAssistantMsg && message && message?.special && specialUrls[message.special]) {
     return {
       ...staticProps,
-      ctaText: specialUrls[message.special].includes('merchant') ? translations.merchantButton : translations.supportButton,
+      ctaText: specialUrls[message.special].includes('merchant')
+        ? translations.merchantButton
+        : translations.supportButton,
       ctaHref: specialUrls[message.special],
     };
   }

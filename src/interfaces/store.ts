@@ -1,6 +1,6 @@
 import { Roles, Theme } from '../config/enums';
 import { SpecialUrls } from '../interfaces/component';
-import { AssistantMessageTypeUnion, MessageProperties } from '.';
+import { AssistantMessageTypeUnion, MessageProperties, SocketHistoryRecord } from '.';
 
 interface Outgoing {
   term: string;
@@ -99,4 +99,12 @@ export interface IntentionsState {
     isVisible: boolean;
   };
   link: string;
+}
+
+export interface ServerData {
+  history: Array<SocketHistoryRecord>;
+  errors: string[];
+  region: string;
+  term: string;
+  threadId: string;
 }

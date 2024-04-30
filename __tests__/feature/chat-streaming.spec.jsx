@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /* eslint-env jest */
 import { act } from 'react-dom/test-utils';
 
@@ -68,6 +69,7 @@ describe('AppBase, streaming events execute properly', () => {
           sequence: 1,
           id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
           term,
+          threadId: threadId,
         },
         {
           type: 'text',
@@ -75,6 +77,7 @@ describe('AppBase, streaming events execute properly', () => {
           sequence: 1,
           id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
           term,
+          threadId: threadId,
         },
       ]);
     });
@@ -119,6 +122,7 @@ describe('AppBase, streaming events execute properly', () => {
           sequence: 1,
           id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
           term,
+          threadId: threadId,
         },
         {
           type: 'text',
@@ -126,12 +130,15 @@ describe('AppBase, streaming events execute properly', () => {
           sequence: 1,
           id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
           term,
+          threadId: threadId,
         },
         {
           id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
           type: 'buttons',
           sequence: 1,
           term,
+          threadId: threadId,
+
           buttons: [
             { value: 'Yes', sequence: 1, text: 'Yes' },
             { value: 'No', sequence: 2, text: 'No' },
@@ -181,6 +188,7 @@ describe('AppBase, streaming events execute properly', () => {
           sequence: 1,
           id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
           term,
+          threadId: threadId,
         },
         {
           type: 'text',
@@ -188,6 +196,7 @@ describe('AppBase, streaming events execute properly', () => {
           sequence: 1,
           id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
           term,
+          threadId: threadId,
         },
         {
           id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
@@ -195,6 +204,7 @@ describe('AppBase, streaming events execute properly', () => {
           sequence: 1,
           email: 'provide email',
           term,
+          threadId: threadId,
         },
       ]);
     });
@@ -250,6 +260,7 @@ describe('AppBase, streaming events execute properly', () => {
           sequence: 1,
           id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
           term,
+          threadId: threadId,
         },
         {
           type: 'text',
@@ -257,6 +268,7 @@ describe('AppBase, streaming events execute properly', () => {
           sequence: 1,
           id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
           term,
+          threadId: threadId,
         },
         {
           id: '4216d0a8-2621-499c-8a65-70191e31ee5a',
@@ -264,6 +276,7 @@ describe('AppBase, streaming events execute properly', () => {
           sequence: 1,
           payment: 'provide payment',
           term,
+          threadId: threadId,
         },
       ]);
     });

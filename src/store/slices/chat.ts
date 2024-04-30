@@ -16,7 +16,8 @@ import { ChatState } from '../../interfaces/store';
 import { formatDateByLocale, getQueryParam, uuidV4 } from '../../utils';
 import { chat as initialState } from '../initialState';
 
-export const getThreadId = (state: { chat: ChatState }) => state.chat.thread[getQueryParam()] || state.chat.thread['default'];
+export const getThreadId = (state: { chat: ChatState }) =>
+  state.chat.thread[getQueryParam()] || state.chat.thread['default'];
 
 const configSlice = createSlice({
   name: 'chat',
@@ -36,6 +37,7 @@ const configSlice = createSlice({
     initiateThread(state, { payload: { threadId, term } }) {
       return produce(state, (draft) => {
         draft.thread[term] = threadId;
+
         if (!draft.record[threadId]) {
           draft.record[threadId] = {
             historyIds: [],
@@ -63,12 +65,10 @@ const configSlice = createSlice({
     },
     updateHistoryByThread(
       state,
-      {
-        payload: { history, threadId, servedTerm },
-      }: PayloadAction<{ history: Array<SocketHistoryRecord>; threadId: string; servedTerm: string }>,
+      { payload: { history, threadId } }: PayloadAction<{ history: Array<SocketHistoryRecord>; threadId: string }>,
     ) {
       return produce(state, (draft) => {
-        const serverIds = history.map(({ id }) => id);
+        const serverIds = history.sort((a, b) => a.time - b.time).map(({ id }) => id);
         const clientIds = draft.record[threadId].historyIds;
 
         // DEV NOTE: here i search for ids that are not recorded in the client
@@ -77,6 +77,7 @@ const configSlice = createSlice({
 
           if (!clientIds.includes(currentId)) {
             clientIds.splice(i, 0, currentId);
+
             draft.record[threadId].historyData[currentId] = history[i];
           }
         }
@@ -115,32 +116,36 @@ const configSlice = createSlice({
           return;
         }
 
-        const data = {
-          sequence: sequence || 1,
-          type: content.type,
-          [content.type]: content[content.type],
-        };
+
+        if (!draft.record[threadId]) {
+          return;
+        }
 
         // check for duplicates and unite them
         if (
           draft.record[threadId].historyData[id].content.some(
-            (record) => record.sequence === data.sequence && record.type === data.type,
+            (record) => record.sequence === content.sequence && record.type === content.type,
           )
         ) {
           draft.record[threadId].historyData[id].content = getUnifiedSequence(
             draft.record[threadId].historyData[id].content as Array<AssistantRecord>,
-            data,
+            content
           );
           return;
         }
 
-        draft.record[threadId].historyData[id].content.push(data);
+        draft.record[threadId].historyData[id].content.push(content);
       });
     },
-    fillUserHistoryData(state, { payload: { id, content } }: PayloadAction<UserHistoryDataFiller>) {
+    fillUserHistoryData(state, { payload: { id, content, threadId } }: PayloadAction<UserHistoryDataFiller>) {
+      const currentThreadId = getThreadId({ chat: state });
+
+      if (threadId !== currentThreadId) {
+        return;
+      }
+
       return produce(state, (draft: Draft<ChatState>) => {
         let belongsTo;
-        const threadId = getThreadId({ chat: draft });
 
         if (content.groupId && draft.record[threadId]?.historyData) {
           Object.entries(draft.record[threadId].historyData).forEach(([key, value]) => {
@@ -165,7 +170,7 @@ const configSlice = createSlice({
     },
     fillInitialMessage(
       state,
-      { payload: { message, term } }: PayloadAction<{ message: AssistantHistoryInitialMessage; term: string }>,
+      { payload: { message } }: PayloadAction<{ message: AssistantHistoryInitialMessage; threadId: string }>,
     ) {
       const threadId = getThreadId({ chat: state });
 

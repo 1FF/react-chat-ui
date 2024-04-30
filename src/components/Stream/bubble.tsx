@@ -28,7 +28,6 @@ const StreamBubble = ({ itemId }: { itemId: string }) => {
             key={uuidV4()}
             record={{
               text: record.text || '',
-              sequence: record.sequence || 0,
               resend: record.resend || false,
               sent: record.sent || true,
               groupId: record.groupId || '',

@@ -1,8 +1,8 @@
-import { AllEvents, Roles } from '../../config/enums';
+import { AllEvents } from '../../config/enums';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { OptionsListProps } from '../../interfaces/index';
 import { track } from '../../services/tracking';
-import { fillUserHistoryData, setOutgoing, userMessageFindOne } from '../../store/slices/chat';
+import { fillUserHistoryData, getChat, getThreadId, setOutgoing, userMessageFindOne } from '../../store/slices/chat';
 import { getMeta } from '../../store/slices/meta';
 import { uuidV4 } from '../../utils';
 import { Btn } from '../Button';
@@ -11,17 +11,21 @@ import { Link } from '../Link';
 export const OptionList = ({ options = [] }: OptionsListProps) => {
   const dispatch = useAppDispatch();
   const meta = useAppSelector(getMeta);
+  const chat = useAppSelector(getChat)
   const isFirstUserMessage = !useAppSelector(userMessageFindOne);
 
-  const setOption = (val: string, sequence: number) => {
+  const setOption = (val: string, sequence:number) => {
     dispatch(fillUserHistoryData({
       id: uuidV4(),
-      sequence,
-      role: Roles.user,
+      threadId: getThreadId({ chat }),
       content: {
-        sequence: 1, text: val, resend: false, sent: true, groupId: ''
+        text: val,
+        resend: false,
+        sent: true,
+        groupId: ''
       }
     }));
+
     dispatch(setOutgoing(val));
     if (isFirstUserMessage) {
       track({
@@ -36,10 +40,8 @@ export const OptionList = ({ options = [] }: OptionsListProps) => {
   const setMessage = (val: string) => {
     dispatch(fillUserHistoryData({
       id: uuidV4(),
-      sequence: 1,
-      role: Roles.user,
+      threadId: getThreadId({ chat }),
       content: {
-        sequence: 1,
         text: val,
         resend: false,
         sent: true,
