@@ -1,3 +1,4 @@
+import { QueryParams } from '../config/enums';
 
 /**
  * Retrieves certain query parameter from a URL.
@@ -5,7 +6,7 @@
  * @example getQueryParam('utm_chat')
  * @param {string} param
  */
-export const getQueryParam = (param) => {
+export const getQueryParam = (param = QueryParams.chat) => {
   const urlParams = new URLSearchParams(window.location.search);
 
   return urlParams.get(param) || '';

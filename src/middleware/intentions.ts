@@ -1,6 +1,6 @@
 import { Middleware } from '@reduxjs/toolkit';
 
-import { AllEvents, Roles } from '../config/enums';
+import { AllEvents } from '../config/enums';
 import { STORING_CHECKER_INTERVAL } from '../config/env';
 import { PaymentDataSetterProps } from '../interfaces';
 import intent from '../services/intentions';
@@ -9,6 +9,7 @@ import { RootState } from '../store';
 import {
   addPredefinedAssistantMessage,
   fillUserHistoryData,
+  getThreadId,
   setOutgoing
 } from '../store/slices/chat';
 import {
@@ -53,16 +54,14 @@ export const intentionsMiddleware: Middleware = (store) => (next) => {
     store.dispatch(
       fillUserHistoryData({
         id: uuidV4(),
-        role: Roles.user,
-        sequence: 1,
+        threadId: getThreadId({ chat:store.getState().chat }),
         content: {
-          sequence: 1,
           text: intentions.email.current,
           resend: false,
           sent: true,
           groupId: '',
         },
-      })
+      }),
     );
     store.dispatch(setOutgoing(intentions.email.current));
 

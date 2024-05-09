@@ -1,20 +1,39 @@
+/* eslint-disable no-undef */
 /* eslint-env jest */
 import { act } from 'react-dom/test-utils';
 
-import { dispatchStreaming, localTearDown } from '../helpers';
-import { SPECIAL_MERCHANT, SPECIAL_SUPPORT_TICKET, SUPPORT_PURPOSE } from '../../src/config/env';
-import { setLink } from '../../src/store/slices/intentions';
-import { setConnected } from '../../src/store/slices/chat';
-import renderWithProviders from '../../src/utils/storeMockWrapper';
-import { Events, chat as getInitialConfig, initialMessage } from '../../src/config';
 import { serverSocket } from '../../__mocks__/socket.io-client';
 import AppBase from '../../src/components/AppBase';
+import { chat as getInitialConfig, Events, initialMessage } from '../../src/config';
+import { Definition } from '../../src/config/enums';
+import { SPECIAL_MERCHANT, SPECIAL_SUPPORT_TICKET, SUPPORT_PURPOSE } from '../../src/config/env';
+import { setLink } from '../../src/store/slices/intentions';
 import { uuidV4 } from '../../src/utils';
+import renderWithProviders from '../../src/utils/storeMockWrapper';
+import { dispatchStreaming, generateStreamingData, localTearDown } from '../helpers';
 
 jest.useFakeTimers();
 
 let root;
 describe('Special messages are hidden and elements depending on them are visualized accordingly', () => {
+  const term = 'default';
+  const href = `https://example.com/?utm_chat=${term}}`;
+  const search = `?utm_chat=${term}`;
+  const threadId = uuidV4();
+
+  beforeEach(async () => {
+    const mockLocation = {
+      href,
+      search,
+    };
+
+    Object.defineProperty(window, 'location', {
+      value: mockLocation,
+      writable: true,
+      enumerable: true,
+    });
+  });
+
   afterEach(localTearDown);
 
   test(`should arrange items accordingly when special key is ${SPECIAL_MERCHANT}`, async () => {
@@ -24,37 +43,41 @@ describe('Special messages are hidden and elements depending on them are visuali
       root = renderWithProviders(
         <div id="chatbot-container">
           <AppBase config={getInitialConfig({ id: uuidV4(), purpose: SUPPORT_PURPOSE, close: { visible: true } })} />
-        </div>
+        </div>,
       );
-      root.store.dispatch(setConnected(true));
     });
 
     // Act
     act(() => {
       serverSocket.emit(Events.chatHistory, {
-        "region": faker.location.country(),
-        "history": [],
-        "errors": []
-      })
-      jest.advanceTimersByTime((initialMessage.length * 1000) * initialMessage.length - 1);
+        region: faker.location.country(),
+        history: [],
+        errors: [],
+        term,
+        threadId,
+      });
+      jest.advanceTimersByTime(initialMessage.length * 1000 * initialMessage.length - 1);
     });
 
-    act(() => dispatchStreaming([{
-      "type": "text",
-      "text": faker.lorem.text(),
-      "sequence": 1,
-      "id": recordId
-    }, {
-      "type": "special",
-      "special": SPECIAL_MERCHANT,
-      "sequence": 1,
-      "id": recordId
-    }, {
-      "type": "text",
-      "text": faker.lorem.text(),
-      "sequence": 1,
-      "id": recordId
-    }]));
+    act(() =>
+      dispatchStreaming(
+        generateStreamingData({
+          term,
+          recordId,
+          threadId,
+          addons: [
+            {
+              type: Definition.special,
+              [Definition.special]: SPECIAL_MERCHANT,
+              sequence: 1,
+              id: recordId,
+              term,
+              threadId,
+            },
+          ],
+        }),
+      ),
+    );
 
     const linkQuiz = root.container.querySelector('[data-e2e="quiz-trigger-btn"]');
     const userFormElement = root.container.querySelector('[data-e2e="user-form"]');
@@ -73,36 +96,41 @@ describe('Special messages are hidden and elements depending on them are visuali
       root = renderWithProviders(
         <div id="chatbot-container">
           <AppBase config={getInitialConfig({ id: uuidV4(), purpose: SUPPORT_PURPOSE, close: { visible: true } })} />
-        </div>);
-      root.store.dispatch(setConnected(true));
+        </div>,
+      );
     });
 
     // Act
     act(() => {
       serverSocket.emit(Events.chatHistory, {
-        "region": faker.location.country(),
-        "history": [],
-        "errors": []
-      })
-      jest.advanceTimersByTime((initialMessage.length * 1000) * initialMessage.length - 1);
+        region: faker.location.country(),
+        history: [],
+        errors: [],
+        term,
+        threadId,
+      });
+      jest.advanceTimersByTime(initialMessage.length * 1000 * initialMessage.length - 1);
     });
 
-    act(() => dispatchStreaming([{
-      "type": "text",
-      "text": faker.lorem.text(),
-      "sequence": 1,
-      "id": recordId
-    }, {
-      "type": "special",
-      "special": SPECIAL_SUPPORT_TICKET,
-      "sequence": 1,
-      "id": recordId
-    }, {
-      "type": "text",
-      "text": faker.lorem.text(),
-      "sequence": 1,
-      "id": recordId
-    }]));
+    act(() =>
+      dispatchStreaming(
+        generateStreamingData({
+          term,
+          recordId,
+          threadId,
+          addons: [
+            {
+              type: Definition.special,
+              [Definition.special]: SPECIAL_SUPPORT_TICKET,
+              sequence: 1,
+              id: recordId,
+              term,
+              threadId,
+            },
+          ],
+        }),
+      ),
+    );
 
     const linkQuiz = root.container.querySelector('[data-e2e="quiz-trigger-btn"]');
     const userFormElement = root.container.querySelector('[data-e2e="user-form"]');
@@ -121,19 +149,20 @@ describe('Special messages are hidden and elements depending on them are visuali
       root = renderWithProviders(
         <div id="chatbot-container">
           <AppBase config={getInitialConfig({ id: uuidV4(), purpose: SUPPORT_PURPOSE, close: { visible: true } })} />
-        </div>
+        </div>,
       );
-      root.store.dispatch(setConnected(true));
     });
 
     // Act
     act(() => {
       serverSocket.emit(Events.chatHistory, {
-        "region": faker.location.country(),
-        "history": [],
-        "errors": []
-      })
-      jest.advanceTimersByTime((initialMessage.length * 1000) * initialMessage.length - 1);
+        region: faker.location.country(),
+        history: [],
+        errors: [],
+        term,
+        threadId,
+      });
+      jest.advanceTimersByTime(initialMessage.length * 1000 * initialMessage.length - 1);
     });
 
     act(() => {
@@ -141,17 +170,14 @@ describe('Special messages are hidden and elements depending on them are visuali
     });
 
     act(() => {
-      dispatchStreaming([{
-        "type": "text",
-        "text": faker.lorem.text(),
-        "sequence": 1,
-        "id": recordId
-      }, {
-        "type": "text",
-        "text": faker.lorem.text(),
-        "sequence": 1,
-        "id": recordId
-      }]);
+      dispatchStreaming(
+        generateStreamingData({
+          term,
+          recordId,
+          threadId,
+          addons: [],
+        }),
+      );
     });
 
     const linkQuiz = root.container.querySelector('[data-e2e="quiz-trigger-btn"]');
@@ -171,19 +197,20 @@ describe('Special messages are hidden and elements depending on them are visuali
       root = renderWithProviders(
         <div id="chatbot-container">
           <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true } })} />
-        </div>
+        </div>,
       );
-      root.store.dispatch(setConnected(true));
     });
 
     // Act
     act(() => {
       serverSocket.emit(Events.chatHistory, {
-        "region": faker.location.country(),
-        "history": [],
-        "errors": []
-      })
-      jest.advanceTimersByTime((initialMessage.length * 1000) * initialMessage.length - 1);
+        region: faker.location.country(),
+        history: [],
+        errors: [],
+        term,
+        threadId,
+      });
+      jest.advanceTimersByTime(initialMessage.length * 1000 * initialMessage.length - 1);
     });
 
     act(() => {
@@ -191,18 +218,16 @@ describe('Special messages are hidden and elements depending on them are visuali
     });
 
     act(() => {
-      dispatchStreaming([{
-        "type": "text",
-        "text": faker.lorem.text(),
-        "sequence": 1,
-        "id": recordId
-      }, {
-        "type": "text",
-        "text": faker.lorem.text(),
-        "sequence": 1,
-        "id": recordId
-      }]);
+      dispatchStreaming(
+        generateStreamingData({
+          term,
+          recordId,
+          threadId,
+          addons: [],
+        }),
+      );
     });
+
     const linkQuiz = root.container.querySelector('[data-e2e="quiz-trigger-btn"]');
     const userFormElement = root.container.querySelector('[data-e2e="user-form"]');
     const emailFormElement = root.container.querySelector('[data-e2e="email-form"]');

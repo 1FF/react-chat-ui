@@ -1,6 +1,6 @@
 import { Roles } from '../config';
 import { SUPPORT_PURPOSE } from '../config/env';
-import { getChat } from '../store/slices/chat';
+import { getChat, getThreadId } from '../store/slices/chat';
 import { getConfig } from '../store/slices/config';
 import { getEmailIntentions, getPaymentIntentions } from '../store/slices/intentions';
 import { getMeta } from '../store/slices/meta';
@@ -9,14 +9,16 @@ import { useAppSelector } from '.';
 export const useFootProps = () => {
   const { cid, systemType, marketing, pd } = useAppSelector(getMeta);
   const { translations, purpose, specialUrls } = useAppSelector(getConfig);
-  const { isLoading, isStreaming, historyData, historyIds } = useAppSelector(getChat);
-  const { error: streamError } = useAppSelector((store) => store.chat);
+  const { isLoading, record, error: streamError, thread } = useAppSelector(getChat);
+
+  // @ts-expect-error passing only the needed prop
+  const currentThread = getThreadId({ chat: { thread } });
   const storedLink = useAppSelector((store) => store.intentions.link);
   const { error: emailError, current: currentEmail } = useAppSelector(getEmailIntentions);
   const {
     isFormVisible: isPaymentFormVisible,
     error: paymentIntentError,
-    isSuccessful: paymentSuccess
+    isSuccessful: paymentSuccess,
   } = useAppSelector(getPaymentIntentions);
   const error = streamError || emailError || paymentIntentError;
   const staticProps = {
@@ -28,7 +30,7 @@ export const useFootProps = () => {
     currentEmail,
     translations,
     pd,
-    isStreaming,
+    isStreaming: false,
     isPaymentButtonVisible: false,
     isPaymentFormVisible: false,
     isEmailFormVisible: false,
@@ -36,13 +38,22 @@ export const useFootProps = () => {
     ctaText: '',
     ctaHref: '',
   };
-  const lastMsgId = [...historyIds].pop();
-  const lastMsg = lastMsgId && historyData[lastMsgId];
+
+  if (!currentThread) {
+    return staticProps;
+  }
+
+  const lastMsgId = [...record[currentThread].historyIds].pop();
+  const lastMsg = lastMsgId && record[currentThread].historyData[lastMsgId];
   const isLastAssistantMsg = lastMsg && lastMsg.role === Roles.assistant;
   const link = isLastAssistantMsg && storedLink;
   const noButtonChoices = !(lastMsg && lastMsg?.content.find((m) => m.buttons));
   const hasPaymentIntent = lastMsg && lastMsg?.content.find((m) => m.payment);
   const hasEmailIntent = lastMsg && lastMsg?.content.find((m) => m.email);
+
+  if (lastMsg && 'isStreaming' in lastMsg) {
+    staticProps.isStreaming = !!lastMsg.isStreaming;
+  }
 
   if (isLastAssistantMsg && hasPaymentIntent) {
     return {
@@ -69,10 +80,12 @@ export const useFootProps = () => {
   }
 
   const message = lastMsg && lastMsg?.content?.find((m) => m.special);
-  if (isLastAssistantMsg && message && message?.special) {
+  if (isLastAssistantMsg && message && message?.special && specialUrls[message.special]) {
     return {
       ...staticProps,
-      ctaText: specialUrls[message.special].includes('merchant') ? translations.merchantButton : translations.supportButton,
+      ctaText: specialUrls[message.special].includes('merchant')
+        ? translations.merchantButton
+        : translations.supportButton,
       ctaHref: specialUrls[message.special],
     };
   }

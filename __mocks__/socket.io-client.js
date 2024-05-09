@@ -15,7 +15,9 @@ function emit(event, ...args) {
     return;
   }
 
-  EVENTS[event].forEach(func => func(...args));
+  if (EVENTS[event]?.length) {
+    EVENTS[event].forEach((func) => func(...args));
+  }
 }
 
 export const socket = {

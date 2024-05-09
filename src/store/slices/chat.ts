@@ -2,18 +2,22 @@ import { createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
 import produce from 'immer';
 
 import { getUnifiedSequence } from '../../config';
-import { Definition, QueryParams, Roles } from '../../config/enums';
+import { Definition, Roles } from '../../config/enums';
 import {
   AssistantHistoryDataFiller,
   AssistantHistoryInitialMessage,
   AssistantRecord,
+  MessageProperties,
   PredefinedMessagePayload,
   SocketHistoryRecord,
   UserHistoryDataFiller,
 } from '../../interfaces';
 import { ChatState } from '../../interfaces/store';
-import { getQueryParam, uuidV4 } from '../../utils';
+import { formatDateByLocale, getQueryParam, uuidV4 } from '../../utils';
 import { chat as initialState } from '../initialState';
+
+export const getThreadId = (state: { chat: ChatState }) =>
+  state.chat.thread[getQueryParam()] || state.chat.thread['default'];
 
 const configSlice = createSlice({
   name: 'chat',
@@ -21,7 +25,7 @@ const configSlice = createSlice({
   reducers: {
     setOutgoing(state, { payload }: PayloadAction<string>) {
       state.outgoing = {
-        term: getQueryParam(QueryParams.chat),
+        term: getQueryParam(),
         user_id: localStorage.getItem('__cid') || '',
         role: Roles.user,
         message: payload,
@@ -30,40 +34,69 @@ const configSlice = createSlice({
     resetOutgoing(state) {
       state.outgoing = initialState.outgoing;
     },
-    setExistingHistory(state, { payload }: PayloadAction<Array<SocketHistoryRecord>>) {
+    initiateThread(state, { payload: { threadId, term } }) {
       return produce(state, (draft) => {
-        // server has LESS or EQUAL data than frontend -> update the status to unsent
-        if (state.historyIds.length >= payload.length) {
-          const unsentMessages = state.historyIds.filter((id) => !payload.find((record) => record.id === id));
-          unsentMessages.forEach(
-            (id) =>
-            (draft.historyData[id].content = draft.historyData[id].content.map((record) => ({
-              ...record,
-              sent: false,
-              resend: true,
-            }))),
-          );
-          return;
-        }
+        draft.thread[term] = threadId;
 
-        draft.historyIds = payload.map(({ id }) => id);
-        draft.historyData = payload.reduce(
-          (prev, current) => ({
-            ...prev,
-            [current.id]: current
-          }),
-          {},
+        if (!draft.record[threadId]) {
+          draft.record[threadId] = {
+            historyIds: [],
+            historyData: {},
+          };
+        }
+      });
+    },
+    syncMessageStatus(state, { payload: { threadId, history } }) {
+      return produce(state, (draft) => {
+        const unsentMessages = draft.record[threadId]?.historyIds.filter(
+          (id) => !history.find((record: SocketHistoryRecord) => record.id === id),
+        );
+        unsentMessages?.forEach(
+          (id) =>
+            (draft.record[threadId].historyData[id].content = draft.record[threadId].historyData[id].content.map(
+              (record) => ({
+                ...record,
+                sent: false,
+                resend: true,
+              }),
+            )),
         );
       });
     },
-    addPredefinedAssistantMessage(
+    updateHistoryByThread(
       state,
-      { payload }: PayloadAction<PredefinedMessagePayload>
+      { payload: { history, threadId } }: PayloadAction<{ history: Array<SocketHistoryRecord>; threadId: string }>,
     ) {
-      const id = uuidV4();
+      return produce(state, (draft) => {
+        const serverIds = history.sort((a, b) => a.time - b.time).map(({ id }) => id);
+        const clientIds = draft.record[threadId].historyIds;
+
+        // DEV NOTE: here i search for ids that are not recorded in the client
+        for (let i = 0; i < serverIds.length; i++) {
+          const currentId = serverIds[i];
+
+          if (clientIds.includes(currentId)) {
+            draft.record[threadId].historyData[currentId] = {
+              ...draft.record[threadId].historyData[currentId],
+              isStreaming: false,
+            };
+          } else {
+            clientIds.splice(i, 0, currentId);
+
+            draft.record[threadId].historyData[currentId] = history[i];
+          }
+        }
+
+        draft.record[threadId].historyIds = clientIds;
+      });
+    },
+    addPredefinedAssistantMessage(state, { payload }: PayloadAction<PredefinedMessagePayload>) {
       return produce(state, (draft: Draft<ChatState>): void => {
-        draft.historyIds.push(id);
-        draft.historyData[id] = {
+        const id = uuidV4();
+        const threadId = getThreadId({ chat: draft });
+
+        draft.record[threadId].historyIds.push(id);
+        draft.record[threadId].historyData[id] = {
           id,
           role: Roles.assistant,
           content: [
@@ -73,52 +106,58 @@ const configSlice = createSlice({
         };
       });
     },
-    fillAssistantHistoryData(state, { payload }: PayloadAction<AssistantHistoryDataFiller>) {
+    fillAssistantHistoryData(
+      state,
+      { payload: { id, content, sequence, threadId, isStreaming } }: PayloadAction<AssistantHistoryDataFiller>,
+    ) {
       return produce(state, (draft: Draft<ChatState>) => {
-        const id = payload.id;
-
-        if (!draft.historyData[id]) {
-          draft.historyData[id] = { id, role: Roles.assistant, content: [] };
-          draft.historyIds.push(id);
+        if (draft.record[threadId] && !draft.record[threadId].historyData[id]) {
+          draft.record[threadId].historyData[id] = { id, role: Roles.assistant, isStreaming, content: [] };
+          draft.record[threadId].historyIds.push(id);
           return;
         }
 
-        if (!payload.content) {
+        if (draft.record[threadId]?.historyData[id]) {
+          draft.record[threadId].historyData[id].isStreaming = isStreaming;
+        }
+
+        if (!content) {
           return;
         }
 
-        const dataType = payload.content.type;
-        const data = {
-          sequence: payload.sequence || 1,
-          type: dataType,
-          [dataType]: payload.content[payload.content.type],
-        };
+        if (!draft.record[threadId]) {
+          return;
+        }
 
-        const hasDuplicatedSequenceAndType = draft.historyData[id].content.some(
-          (record) => record.sequence === data.sequence && record.type === data.type,
-        );
-
-        if (hasDuplicatedSequenceAndType) {
-          draft.historyData[id].content = getUnifiedSequence(
-            draft.historyData[id].content as Array<AssistantRecord>,
-            data,
+        // check for duplicates and unite them
+        if (
+          draft.record[threadId].historyData[id].content.some(
+            (record) => record.sequence === content.sequence && record.type === content.type,
+          )
+        ) {
+          draft.record[threadId].historyData[id].content = getUnifiedSequence(
+            draft.record[threadId].historyData[id].content as Array<AssistantRecord>,
+            content,
           );
           return;
         }
 
-        draft.historyData[id].content.push(data);
+        draft.record[threadId].historyData[id].content.push(content);
       });
     },
-    fillUserHistoryData(
-      state,
-      { payload: { id, content } }: PayloadAction<UserHistoryDataFiller>
-    ) {
+    fillUserHistoryData(state, { payload: { id, content, threadId } }: PayloadAction<UserHistoryDataFiller>) {
+      const currentThreadId = getThreadId({ chat: state });
+
+      if (threadId !== currentThreadId) {
+        return;
+      }
+
       return produce(state, (draft: Draft<ChatState>) => {
         let belongsTo;
 
-        if (content.groupId) {
-          Object.entries(draft.historyData).forEach(([key, value]) => {
-            if (value.content.find((el) => el.groupId === content.groupId)) {
+        if (content.groupId && draft.record[threadId]?.historyData) {
+          Object.entries(draft.record[threadId].historyData).forEach(([key, value]) => {
+            if ([...value.content].find((el) => el.groupId === content.groupId)) {
               belongsTo = key;
             }
           });
@@ -126,27 +165,29 @@ const configSlice = createSlice({
 
         if (belongsTo) {
           // this is due to keyboard interaction we send messages after timeout
-          const userMessageRecord = draft.historyData[belongsTo];
+          const userMessageRecord = draft.record[threadId].historyData[belongsTo];
           userMessageRecord.content.push(content);
           return;
         }
 
-        if (!draft.historyData[id]) {
-          draft.historyData[id] = { id, role: Roles.user, content: [content] };
-          draft.historyIds.push(id);
+        if (!draft.record[threadId].historyData[id]) {
+          draft.record[threadId].historyData[id] = { id, role: Roles.user, content: [content] };
+          draft.record[threadId].historyIds.push(id);
         }
       });
     },
     fillInitialMessage(
       state,
-      { payload }: PayloadAction<AssistantHistoryInitialMessage>
+      { payload: { message } }: PayloadAction<{ message: AssistantHistoryInitialMessage; threadId: string }>,
     ) {
-      state.historyIds.push(payload.id);
-      state.historyData[payload.id] = {
-        id: payload.id,
+      const threadId = getThreadId({ chat: state });
+
+      state.record[threadId].historyIds.push(message.id);
+      state.record[threadId].historyData[message.id] = {
+        id: message.id,
         role: Roles.assistant,
         time: new Date().getTime(),
-        content: payload.content,
+        content: message.content,
       };
     },
     setIsLoading(state) {
@@ -164,18 +205,13 @@ const configSlice = createSlice({
     setClosed(state) {
       state.closed = true;
     },
-    hideResendIcon(state, { payload }: PayloadAction<{ itemId: string }>) {
-      return produce(state, (draft: Draft<ChatState>) => {
-        draft.historyData[payload.itemId].content = draft.historyData[payload.itemId].content.map((record) => ({
-          ...record,
-          sent: true,
-          resend: false,
-        }));
-      });
-    },
     showResendIcon(state, { payload }: PayloadAction<{ itemId: string }>) {
       return produce(state, (draft: Draft<ChatState>) => {
-        draft.historyData[payload.itemId].content = draft.historyData[payload.itemId].content.map((record) => ({
+        const threadId = getThreadId({ chat: draft });
+
+        draft.record[threadId].historyData[payload.itemId].content = draft.record[threadId].historyData[
+          payload.itemId
+        ].content.map((record) => ({
           ...record,
           sent: false,
           resend: true,
@@ -185,8 +221,18 @@ const configSlice = createSlice({
     setLastGroupPointer(state, { payload }: PayloadAction<string>) {
       state.lastGroupId = payload;
     },
-    resendMessage(state, { payload }) {
-      // empty - used only to listen in the middleware for changes
+    resendMessage(state, { payload }: PayloadAction<{ itemId: string }>) {
+      return produce(state, (draft: Draft<ChatState>) => {
+        const threadId = getThreadId({ chat: draft });
+
+        draft.record[threadId].historyData[payload.itemId].content = draft.record[threadId].historyData[
+          payload.itemId
+        ].content.map((record) => ({
+          ...record,
+          sent: true,
+          resend: false,
+        }));
+      });
     },
     setError(state, { payload }: PayloadAction<string>) {
       state.error = payload;
@@ -194,25 +240,51 @@ const configSlice = createSlice({
     resetError(state) {
       state.error = initialState.error;
     },
-    setIsStreaming(state, { payload }: PayloadAction<boolean>) {
-      state.isStreaming = payload;
-    },
-    resetHistory(state) {
-      state.historyIds = initialState.historyIds;
-      state.historyData = initialState.historyData;
+    resetHistory(state, { payload: { thread } }) {
+      state.record[thread] = { historyData: {}, historyIds: [] };
     },
   },
 });
 
 export const getChat = (state: { chat: ChatState }) => state.chat;
-export const userMessageFindOne = (state: { chat: ChatState }) =>
-  state.chat.historyIds.find((historyId) => state.chat.historyData[historyId].role === Roles.user);
-export const sortBySequence = (a: AssistantRecord, b: AssistantRecord) => a.sequence - b.sequence;
+
+export const getHistoryIds = (state: { chat: ChatState }) => {
+  return state.chat.record[getThreadId(state)]?.historyIds;
+};
+
+export const userMessageFindOne = (state: { chat: ChatState }) => {
+  const threadId = getThreadId(state);
+  const historyIds = getHistoryIds(state) || [];
+  return historyIds.find((historyId) => state.chat.record[threadId].historyData[historyId].role === Roles.user);
+};
+
+export const getFirstMessageTime = (state: { chat: ChatState }) => {
+  const threadId = getThreadId(state);
+  const historyIds = getHistoryIds(state) || [];
+  return formatDateByLocale(state.chat.record[threadId]?.historyData[historyIds[0]]?.time || new Date().getTime());
+};
+
+export const getLastHistoryId = (state: { chat: ChatState }) =>
+  [...state.chat.record[getThreadId(state)].historyIds].pop();
+
+export const getRecordById = (itemId: string) => {
+  return (state: { chat: ChatState }) => {
+    return state.chat.record[getThreadId(state)].historyData[itemId];
+  };
+};
+
+export const sortBySequence = (a: MessageProperties, b: MessageProperties) => {
+  if (a.sequence && b.sequence) {
+    return a.sequence - b.sequence;
+  }
+
+  return 0;
+};
 
 export const {
   setOutgoing,
   resetOutgoing,
-  setExistingHistory,
+  updateHistoryByThread,
   addPredefinedAssistantMessage,
   setIsLoading,
   resetIsLoading,
@@ -222,14 +294,14 @@ export const {
   resetError,
   setConnected,
   setClosed,
-  hideResendIcon,
   showResendIcon,
   resendMessage,
-  setIsStreaming,
   fillAssistantHistoryData,
   fillUserHistoryData,
   resetHistory,
   fillInitialMessage,
+  initiateThread,
+  syncMessageStatus,
 } = configSlice.actions;
 
 export default configSlice.reducer;

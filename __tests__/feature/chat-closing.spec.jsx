@@ -3,19 +3,20 @@ import { fireEvent } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import { io } from 'socket.io-client';
 
-import { localTearDown } from '../helpers';
-import { SCROLL_STOP_CLASS } from '../../src/config/env';
-import renderWithProviders from '../../src/utils/storeMockWrapper';
-import AppBase from '../../src/components/AppBase';
-import { setConnected } from '../../src/store/slices/chat';
 import { serverSocket } from '../../__mocks__/socket.io-client';
-import { Events, chat as getInitialConfig, initialMessage } from '../../src/config';
+import AppBase from '../../src/components/AppBase';
+import { chat as getInitialConfig, Events, initialMessage } from '../../src/config';
+import { SCROLL_STOP_CLASS } from '../../src/config/env';
+import { setConnected } from '../../src/store/slices/chat';
 import { uuidV4 } from '../../src/utils';
+import renderWithProviders from '../../src/utils/storeMockWrapper';
+import { localTearDown } from '../helpers';
 
 let root;
 describe('Close button closes chat', () => {
-  const href = 'https://example.com/?utm_chat=default';
-  const search = '?utm_chat=default';
+  const term = 'default'
+  const href = `https://example.com/?utm_chat=${term}}`;
+  const search = `?utm_chat=${term}`;
 
   beforeEach(async () => {
     const mockLocation = {
@@ -45,9 +46,9 @@ describe('Close button closes chat', () => {
     });
 
     const serverData = {
-      "region": faker.location.country(),
-      "history": [],
-      "errors": []
+      'region': faker.location.country(),
+      'history': [],
+      'errors': []
     }
     act(() => {
       serverSocket.emit(Events.chatHistory, serverData);
@@ -90,9 +91,9 @@ describe('Close button closes chat', () => {
     });
 
     const serverData = {
-      "region": faker.location.country(),
-      "history": [],
-      "errors": []
+      'region': faker.location.country(),
+      'history': [],
+      'errors': []
     }
     act(() => {
       serverSocket.emit(Events.chatHistory, serverData);

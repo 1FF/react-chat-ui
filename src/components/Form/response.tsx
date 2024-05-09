@@ -2,16 +2,15 @@ import { useEffect, useRef, useState } from 'react';
 
 import { IconBtn } from '../../components/Button';
 import { Input } from '../../components/Input';
-import { Roles } from '../../config/enums';
+import { TYPING_TIMEOUT } from '../../config/env';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { fillUserHistoryData, getChat, setLastGroupPointer, setTypingTimeoutExpired } from '../../store/slices/chat';
+import { fillUserHistoryData, getChat, getThreadId, setLastGroupPointer, setTypingTimeoutExpired } from '../../store/slices/chat';
 import { uuidV4 } from '../../utils';
 import { layoutFoot as variant } from '../Layout/variants';
-import { TYPING_TIMEOUT } from '../../config/env';
 
 export const ResponseForm = () => {
   const dispatch = useAppDispatch();
-  const { connected, isLoading } = useAppSelector(getChat);
+  const chat = useAppSelector(getChat);
   const { base, input, button } = variant();
   const [response, setCurrentResponse] = useState<string | ''>('');
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
@@ -34,11 +33,13 @@ export const ResponseForm = () => {
 
     if (response.trim()) {
       dispatch(fillUserHistoryData({
-        role: Roles.user,
         id: uuidV4(),
-        sequence: 1,
+        threadId: getThreadId({ chat }),
         content: {
-          sequence: 1, text: response, groupId, resend: false, sent: true
+          text: response,
+          groupId,
+          resend: false,
+          sent: true
         }
       }));
     }
@@ -65,8 +66,8 @@ export const ResponseForm = () => {
     >
       <div className={input()}>
         <Input
-          disabled={!connected}
-          isLoading={isLoading}
+          disabled={!chat.connected}
+          isLoading={chat.isLoading}
           e2e="message-input"
           name="response"
           onChange={handleInputChange}
@@ -77,7 +78,7 @@ export const ResponseForm = () => {
         />
       </div>
       <div className={button()}>
-        <IconBtn onClick={handleFormSubmit} disabled={!connected}>
+        <IconBtn onClick={handleFormSubmit} disabled={!chat.connected}>
           <svg
             fill="currentColor" viewBox="0 0 24 24"
             width="20px" height="20px"

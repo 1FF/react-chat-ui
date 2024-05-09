@@ -1,31 +1,46 @@
 /* eslint-env jest */
 import { act } from 'react-dom/test-utils';
 
-import { uuidV4 } from '../../src/utils';
-import { localTearDown } from '../helpers';
-import AppBase from '../../src/components/AppBase';
-import renderWithProviders from '../../src/utils/storeMockWrapper';
-import { setConnected } from '../../src/store/slices/chat';
 import { serverSocket } from '../../__mocks__/socket.io-client';
-import { Events, Roles, chat as getInitialConfig, initialMessage } from '../../src/config';
+import AppBase from '../../src/components/AppBase';
+import { chat as getInitialConfig, Events, initialMessage,Roles } from '../../src/config';
+import { setConnected } from '../../src/store/slices/chat';
+import { uuidV4 } from '../../src/utils';
 import { replaceNewRowSymbols } from '../../src/utils/formatting';
+import renderWithProviders from '../../src/utils/storeMockWrapper';
+import { localTearDown } from '../helpers';
 
 const textProbeWithTwoRows = (separator = '\n') => ({ 'type': 'text', 'text': `${faker.lorem.word()}${separator}${faker.lorem.word()}`, 'sequence': 2 });
 
 const serverData = {
-  "region": faker.location.country(),
-  "history": [],
-  "errors": [],
+  'region': faker.location.country(),
+  'history': [],
+  'errors': [],
 }
 
 jest.useFakeTimers();
 
 let root;
 describe('Having special symbols \n \r or <br> makes separates items into new rows', () => {
-  beforeEach(() => {
+  const term = 'default'
+  const href = `https://example.com/?utm_chat=${term}}`;
+  const search = `?utm_chat=${term}`;
+
+  beforeEach(async () => {
+    const mockLocation = {
+      href,
+      search,
+    };
+
+    Object.defineProperty(window, 'location', {
+      value: mockLocation,
+      writable: true,
+      enumerable: true,
+    });
     serverData.history = [];
     serverData.errors = [];
     serverData.region = faker.location.country();
+    serverData.term = term;
   });
 
   afterEach(localTearDown);
@@ -37,7 +52,6 @@ describe('Having special symbols \n \r or <br> makes separates items into new ro
           <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true } })} />
         </div>
       );
-      root.store.dispatch(setConnected(true));
     });
 
     serverData.history = [{
@@ -66,7 +80,6 @@ describe('Having special symbols \n \r or <br> makes separates items into new ro
           <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true } })} />
         </div>
       );
-      root.store.dispatch(setConnected(true));
     });
 
     serverData.history = [{
@@ -125,7 +138,6 @@ describe('Having special symbols \n \r or <br> makes separates items into new ro
           <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true } })} />
         </div>
       );
-      root.store.dispatch(setConnected(true));
     });
 
     serverData.history = [{
@@ -154,7 +166,6 @@ describe('Having special symbols \n \r or <br> makes separates items into new ro
           <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true } })} />
         </div>
       );
-      root.store.dispatch(setConnected(true));
     });
 
     serverData.history = [{
@@ -183,7 +194,6 @@ describe('Having special symbols \n \r or <br> makes separates items into new ro
           <AppBase config={getInitialConfig({ id: uuidV4(), purpose: '', close: { visible: true } })} />
         </div>
       );
-      root.store.dispatch(setConnected(true));
     });
 
     serverData.history = [{
@@ -191,6 +201,7 @@ describe('Having special symbols \n \r or <br> makes separates items into new ro
       role: Roles.assistant,
       time: new Date().getTime(),
       content: [textProbeWithTwoRows(separator)],
+      term
     }];
 
     // Act
@@ -211,7 +222,7 @@ describe('replaceNewRowSymbols', () => {
     // Arrange
     // Act
     const result = replaceNewRowSymbols('text <br> text');
-    
+
     // Assert
     expect(result).toContain('\n')
   });
