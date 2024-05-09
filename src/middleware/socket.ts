@@ -26,7 +26,6 @@ import {
   setConnected,
   setError,
   setIsLoading,
-  setIsStreaming,
   setLastGroupPointer,
   setOutgoing,
   setTypingTimeoutExpired,
@@ -59,7 +58,9 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
   };
 
   const handleMessageSending = (data: ClientMessage): void => {
-    if (action.$isSync) { return; }
+    if (action.$isSync) {
+      return;
+    }
 
     if (data.role === Roles.user) {
       store.dispatch(setIsLoading());
@@ -189,7 +190,6 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
     Events.chatHistory,
     ({ history: servedHistory, errors, region, term: servedTerm, threadId }: ServerData) => {
       store.dispatch(resetIsLoading());
-      store.dispatch(setIsStreaming(false));
       store.dispatch(setRegion(region));
       store.dispatch(initiateThread({ threadId, term: servedTerm }));
 
@@ -233,7 +233,6 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
   );
 
   socket.on(Events.streamStart, ({ id, term, threadId }: { id: string; term: string; threadId: string }) => {
-    store.dispatch(setIsStreaming(true));
     store.dispatch(resetIsLoading());
     store.dispatch(resetOutgoing());
     store.dispatch(resetError());
@@ -242,6 +241,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
         id,
         term,
         threadId,
+        isStreaming: true,
       }),
     );
   });
@@ -262,6 +262,7 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
           sequence: data.sequence,
           term: data.term,
           threadId: data.threadId,
+          isStreaming: true,
           content: {
             type: data.type,
             [data.type]: data[data.type],
@@ -277,7 +278,14 @@ const chatMiddleware: Middleware = (store) => (next) => (action) => {
   );
 
   socket.on(Events.streamEnd, ({ id, term, threadId }: { id: string; term: string; threadId: string }) => {
-    store.dispatch(setIsStreaming(false));
+    store.dispatch(
+      fillAssistantHistoryData({
+        id,
+        term,
+        threadId,
+        isStreaming: false,
+      }),
+    );
   });
 
   socket.on(Events.streamError, onError);

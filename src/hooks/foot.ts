@@ -9,7 +9,7 @@ import { useAppSelector } from '.';
 export const useFootProps = () => {
   const { cid, systemType, marketing, pd } = useAppSelector(getMeta);
   const { translations, purpose, specialUrls } = useAppSelector(getConfig);
-  const { isLoading, isStreaming, record, error: streamError, thread } = useAppSelector(getChat);
+  const { isLoading, record, error: streamError, thread } = useAppSelector(getChat);
 
   // @ts-expect-error passing only the needed prop
   const currentThread = getThreadId({ chat: { thread } });
@@ -30,7 +30,7 @@ export const useFootProps = () => {
     currentEmail,
     translations,
     pd,
-    isStreaming,
+    isStreaming: false,
     isPaymentButtonVisible: false,
     isPaymentFormVisible: false,
     isEmailFormVisible: false,
@@ -50,6 +50,10 @@ export const useFootProps = () => {
   const noButtonChoices = !(lastMsg && lastMsg?.content.find((m) => m.buttons));
   const hasPaymentIntent = lastMsg && lastMsg?.content.find((m) => m.payment);
   const hasEmailIntent = lastMsg && lastMsg?.content.find((m) => m.email);
+
+  if (lastMsg && 'isStreaming' in lastMsg) {
+    staticProps.isStreaming = !!lastMsg.isStreaming;
+  }
 
   if (isLastAssistantMsg && hasPaymentIntent) {
     return {

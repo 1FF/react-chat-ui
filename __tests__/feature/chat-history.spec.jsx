@@ -187,7 +187,6 @@ describe('Chat-history event works and visualizes items accordingly', () => {
 
     const { chat } = root.store.getState();
     expect(chat.isLoading).toBe(false);
-    expect(chat.isStreaming).toBe(false);
   });
 
   test('email form submitted does not submit the email when the field is empty', async () => {
@@ -293,7 +292,6 @@ describe('Chat-history event works and visualizes items accordingly', () => {
 
     const { chat } = root.store.getState();
     expect(chat.isLoading).toBe(false);
-    expect(chat.isStreaming).toBe(false);
   });
 
   test('on chat-history event with errors in the callback visualizes the error', async () => {

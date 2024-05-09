@@ -55,7 +55,6 @@ export const chat: ChatState = {
   lastGroupId: uuidV4(),
   connected: false,
   closed: false,
-  isStreaming: false,
   record: {},
   thread: {},
 };

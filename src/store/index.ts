@@ -32,7 +32,6 @@ export const store = configureStore({
       intentionsMiddleware,
       createStateSyncMiddleware({
         whitelist: [
-          'chat/setIsStreaming',
           'chat/resetIsLoading',
           'chat/resetOutgoing',
           'chat/resetError',

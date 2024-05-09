@@ -4,7 +4,7 @@ import Markdown from 'react-markdown';
 import { Definition } from '../../config/enums';
 import { useAppSelector } from '../../hooks';
 import { AssistantProps } from '../../interfaces/component';
-import { getChat, getLastHistoryId, sortBySequence } from '../../store/slices/chat';
+import { getLastHistoryId, sortBySequence } from '../../store/slices/chat';
 import { getMeta } from '../../store/slices/meta';
 import { extractVideoCode, uuidV4 } from '../../utils';
 import { replaceNewRowSymbols } from '../../utils/formatting';
@@ -14,10 +14,9 @@ import OptionList from './options';
 import { flickerEffect } from './variants';
 
 const Assistant = ({ message, itemId }: AssistantProps) => {
-  const { isStreaming } = useAppSelector(getChat);
   const { pd } = useAppSelector(getMeta);
   const isLast = useAppSelector(getLastHistoryId) === itemId;
-  const { base: baseFlicker } = flickerEffect({ isTyping: isStreaming && isLast });
+  const { base: baseFlicker } = flickerEffect({ isTyping: !!message.isStreaming });
   const sortedContent = [...message.content].sort(sortBySequence);
 
   return (
@@ -25,16 +24,14 @@ const Assistant = ({ message, itemId }: AssistantProps) => {
       {sortedContent.map((it) => {
         if (it.type === Definition.text) {
           return (
-            <div
-              key={uuidV4()}
-              className="tw--flex tw--flex-col tw--space-y-[10px]"
-              data-e2e="assistant-text"
-            >
+            <div key={uuidV4()} className="tw--flex tw--flex-col tw--space-y-[10px]" data-e2e="assistant-text">
               <span className={baseFlicker()}>
                 <Markdown
                   key={uuidV4()}
                   components={{
-                    a(props) { return <MarkdownLink properties={props} />; },
+                    a(props) {
+                      return <MarkdownLink properties={props} />;
+                    },
                   }}
                 >
                   {replaceNewRowSymbols(it[it.type] || '')}
@@ -85,7 +82,6 @@ const Assistant = ({ message, itemId }: AssistantProps) => {
         if (it.type === Definition.email) {
           return it[it.type];
         }
-
       })}
     </>
   );

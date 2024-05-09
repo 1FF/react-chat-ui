@@ -13,6 +13,7 @@ export interface ChatRecord {
   id: string;
   role: string;
   time?: number;
+  isStreaming?: boolean;
   content: Array<MessageProperties>;
 }
 
@@ -24,7 +25,6 @@ export interface ChatState {
   lastGroupId: string;
   connected: boolean;
   closed: boolean;
-  isStreaming: boolean;
   record: {
     [key: string]: {
       historyData: Record<string, ChatRecord>;

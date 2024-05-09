@@ -146,10 +146,11 @@ export interface UserHistoryDataFiller {
 
 export interface AssistantHistoryDataFiller {
   id: string;
-  content?: AssistantRecord;
-  sequence?: number;
+  isStreaming: boolean;
   term: string;
   threadId: string;
+  sequence?: number;
+  content?: AssistantRecord;
 }
 
 export interface AssistantHistoryInitialMessage {

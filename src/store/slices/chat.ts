@@ -75,7 +75,12 @@ const configSlice = createSlice({
         for (let i = 0; i < serverIds.length; i++) {
           const currentId = serverIds[i];
 
-          if (!clientIds.includes(currentId)) {
+          if (clientIds.includes(currentId)) {
+            draft.record[threadId].historyData[currentId] = {
+              ...draft.record[threadId].historyData[currentId],
+              isStreaming: false,
+            };
+          } else {
             clientIds.splice(i, 0, currentId);
 
             draft.record[threadId].historyData[currentId] = history[i];
@@ -103,19 +108,22 @@ const configSlice = createSlice({
     },
     fillAssistantHistoryData(
       state,
-      { payload: { id, content, sequence, threadId } }: PayloadAction<AssistantHistoryDataFiller>,
+      { payload: { id, content, sequence, threadId, isStreaming } }: PayloadAction<AssistantHistoryDataFiller>,
     ) {
       return produce(state, (draft: Draft<ChatState>) => {
         if (draft.record[threadId] && !draft.record[threadId].historyData[id]) {
-          draft.record[threadId].historyData[id] = { id, role: Roles.assistant, content: [] };
+          draft.record[threadId].historyData[id] = { id, role: Roles.assistant, isStreaming, content: [] };
           draft.record[threadId].historyIds.push(id);
           return;
+        }
+
+        if (draft.record[threadId]?.historyData[id]) {
+          draft.record[threadId].historyData[id].isStreaming = isStreaming;
         }
 
         if (!content) {
           return;
         }
-
 
         if (!draft.record[threadId]) {
           return;
@@ -129,7 +137,7 @@ const configSlice = createSlice({
         ) {
           draft.record[threadId].historyData[id].content = getUnifiedSequence(
             draft.record[threadId].historyData[id].content as Array<AssistantRecord>,
-            content
+            content,
           );
           return;
         }
@@ -232,9 +240,6 @@ const configSlice = createSlice({
     resetError(state) {
       state.error = initialState.error;
     },
-    setIsStreaming(state, { payload }: PayloadAction<boolean>) {
-      state.isStreaming = payload;
-    },
     resetHistory(state, { payload: { thread } }) {
       state.record[thread] = { historyData: {}, historyIds: [] };
     },
@@ -291,7 +296,6 @@ export const {
   setClosed,
   showResendIcon,
   resendMessage,
-  setIsStreaming,
   fillAssistantHistoryData,
   fillUserHistoryData,
   resetHistory,
