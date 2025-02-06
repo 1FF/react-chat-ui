@@ -3648,7 +3648,7 @@ const Js = (
       style: { height: `${u}px` },
       className: i({ minimized: o }) + " " + n,
       children: [
-        s.isVisible && /* @__PURE__ */ l.jsx(Qs, { props: s }),
+        (s == null ? void 0 : s.isVisible) && /* @__PURE__ */ l.jsx(Qs, { props: s }),
         /* @__PURE__ */ l.jsxs("div", { className: c(), children: [
           e,
           t,

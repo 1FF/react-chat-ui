@@ -15,7 +15,7 @@ export const LayoutBase = ({ head, stream, foot }: LayoutBaseProps) => {
       style={{ height: `${height}px` }}
       className={base({ minimized: isPluginMode }) + ' ' + theme}
     >
-      {mediaModal.isVisible && <MediaModal props={mediaModal} />}
+      {mediaModal?.isVisible && <MediaModal props={mediaModal} />}
       <div className={wrapper()}>
         {head}
         {stream}
